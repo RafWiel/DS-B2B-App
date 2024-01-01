@@ -11,7 +11,7 @@ import MailIcon from '@mui/icons-material/Mail';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 //import Toolbar from '@mui/material/Toolbar';
 import { memo } from 'react';
-import { IconButton, Theme, styled } from '@mui/material';
+import { Box, IconButton, Theme, styled } from '@mui/material';
 import MuiDrawer from '@mui/material/Drawer';
 import { CSSObject, useTheme } from '@emotion/react';
 import { useAppStore } from '../store';
@@ -58,11 +58,12 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 
 const SideBar = memo(() => {
     const theme = useTheme();
+    
+    const isOpenMobile = useAppStore((state) => state.isOpenMobile);  
+    const closeMobile = useAppStore((state) => state.closeMobile);
+    const isOpenDesktop = useAppStore((state) => state.isOpenDesktop);  
+    const closeDesktop = useAppStore((state) => state.closeDesktop);
 
-    const isOpen = useAppStore((state) => state.isOpen);  
-    const open = useAppStore((state) => state.close);
-    const close = useAppStore((state) => state.close);
-            
     const DrawerHeader = styled('div')(({ theme }) => ({
         display: 'flex',
         alignItems: 'center',
@@ -72,75 +73,39 @@ const SideBar = memo(() => {
         ...theme.mixins.toolbar,
       }));
 
-    // const drawer = (
-    //     <Box>
-    //         <DrawerHeader>
-    //             <IconButton onClick={handleDrawerClose}>
-    //                 <ChevronLeftIcon />
-    //             </IconButton>
-    //         </DrawerHeader>
-    //         <Divider />
-    //         <List>
-    //             {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-    //                 <ListItem key={text} disablePadding>
-    //                     <ListItemButton>
-    //                         <ListItemIcon>
-    //                             {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-    //                         </ListItemIcon>
-    //                         <ListItemText primary={text} />
-    //                     </ListItemButton>
-    //                 </ListItem>
-    //             ))}
-    //         </List>
-    //         <Divider />
-    //         <List>
-    //             {['All mail', 'Trash', 'Spam'].map((text, index) => (
-    //                 <ListItem key={text} disablePadding>
-    //                     <ListItemButton>
-    //                         <ListItemIcon>
-    //                             {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-    //                         </ListItemIcon>
-    //                         <ListItemText primary={text} />
-    //                     </ListItemButton>
-    //                 </ListItem>
-    //             ))}
-    //         </List>
-    //     </Box>
-    // );
-  
-    return (
-        <Drawer variant="permanent" open={isOpen}>
+    const drawer = (
+        <Box>
             <DrawerHeader>
-                <IconButton onClick={close}>
+                <IconButton onClick={closeDesktop}>
                     <ChevronLeftIcon />
                 </IconButton>
             </DrawerHeader>
             <Divider />
             <List>
-            {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
+                {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
                 <ListItem key={text} disablePadding sx={{ display: 'block' }}>
                     <ListItemButton
                         sx={{
                         minHeight: 48,
-                        justifyContent: isOpen ? 'initial' : 'center',
+                        justifyContent: isOpenDesktop ? 'initial' : 'center',
                         px: 2.5,
                         }}
                     >
                         <ListItemIcon
-                        sx={{
-                            minWidth: 0,
-                            mr: isOpen ? 3 : 'auto',
-                            justifyContent: 'center',
-                        }}
+                            sx={{
+                                minWidth: 0,
+                                mr: isOpenDesktop ? 3 : 'auto',
+                                justifyContent: 'center',
+                            }}
                         >
                         {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
                         </ListItemIcon>
-                        <ListItemText primary={text} sx={{ opacity: isOpen ? 1 : 0 }} />
+                        <ListItemText primary={text} sx={{ opacity: isOpenDesktop ? 1 : 0 }} />
                     </ListItemButton>
                 </ListItem>
             ))}
             </List>
-            <Divider />
+            {/* <Divider />
             <List>
             {['All mail', 'Trash', 'Spam'].map((text, index) => (
                 <ListItem key={text} disablePadding sx={{ display: 'block' }}>
@@ -152,11 +117,11 @@ const SideBar = memo(() => {
                         }}
                     >
                         <ListItemIcon
-                        sx={{
-                            minWidth: 0,
-                            mr: isOpen ? 3 : 'auto',
-                            justifyContent: 'center',
-                        }}
+                            sx={{
+                                minWidth: 0,
+                                mr: isOpen ? 3 : 'auto',
+                                justifyContent: 'center',
+                            }}
                         >
                         {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
                         </ListItemIcon>
@@ -164,8 +129,35 @@ const SideBar = memo(() => {
                     </ListItemButton>
                 </ListItem>
             ))}
-            </List>
-        </Drawer>
+            </List> */}
+        </Box>
+    );
+  
+    return (
+        <Box>
+            <Drawer                
+                variant="temporary"
+                open={isOpenMobile}
+                onClose={closeMobile}
+                ModalProps={{
+                    keepMounted: true, // Better open performance on mobile.
+                }}
+                sx={{
+                    display: { xs: 'block', sm: 'none' },                    
+                }}
+            >
+                {drawer}
+            </Drawer>
+            <Drawer
+                variant="permanent"
+                sx={{
+                    display: { xs: 'none', sm: 'block' },                    
+                }}
+                open={isOpenDesktop}
+            >
+                {drawer}
+            </Drawer>
+        </Box>        
     );
 })
 
