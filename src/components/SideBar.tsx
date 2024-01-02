@@ -54,15 +54,16 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
         '& .MuiDrawer-paper': closedMixin(theme),
       }),
     }),
-  );
+);
 
 const SideBar = memo(() => {
     const theme = useTheme();
     
-    const isOpenMobile = useAppStore((state) => state.isOpenMobile);  
-    const closeMobile = useAppStore((state) => state.closeMobile);
-    const isOpenDesktop = useAppStore((state) => state.isOpenDesktop);  
-    const closeDesktop = useAppStore((state) => state.closeDesktop);
+    const isOpenMobile = useAppStore((state) => state.isOpenMobile);      
+    const isOpenDesktop = useAppStore((state) => state.isOpenDesktop);      
+    const close = useAppStore((state) => state.close);
+
+    console.log('isOpenMobile', isOpenMobile);
 
     const DrawerHeader = styled('div')(({ theme }) => ({
         display: 'flex',
@@ -76,7 +77,7 @@ const SideBar = memo(() => {
     const drawer = (
         <Box>
             <DrawerHeader>
-                <IconButton onClick={closeDesktop}>
+                <IconButton onClick={close}>
                     <ChevronLeftIcon />
                 </IconButton>
             </DrawerHeader>
@@ -87,20 +88,20 @@ const SideBar = memo(() => {
                     <ListItemButton
                         sx={{
                         minHeight: 48,
-                        justifyContent: isOpenDesktop ? 'initial' : 'center',
+                        justifyContent: (isOpenDesktop || isOpenMobile) ? 'initial' : 'center',
                         px: 2.5,
                         }}
                     >
                         <ListItemIcon
                             sx={{
                                 minWidth: 0,
-                                mr: isOpenDesktop ? 3 : 'auto',
+                                mr: (isOpenDesktop || isOpenMobile) ? 3 : 'auto',
                                 justifyContent: 'center',
                             }}
                         >
                         {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
                         </ListItemIcon>
-                        <ListItemText primary={text} sx={{ opacity: isOpenDesktop ? 1 : 0 }} />
+                        <ListItemText primary={text} sx={{ opacity: (isOpenDesktop || isOpenMobile) ? 1 : 0 }} />
                     </ListItemButton>
                 </ListItem>
             ))}
@@ -135,19 +136,20 @@ const SideBar = memo(() => {
   
     return (
         <Box>
-            <Drawer                
+            <MuiDrawer                
                 variant="temporary"
                 open={isOpenMobile}
-                onClose={closeMobile}
+                onClose={close}
                 ModalProps={{
                     keepMounted: true, // Better open performance on mobile.
                 }}
                 sx={{
-                    display: { xs: 'block', sm: 'none' },                    
+                    display: { xs: 'block', sm: 'none' },   
+                    '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },                 
                 }}
             >
                 {drawer}
-            </Drawer>
+            </MuiDrawer>
             <Drawer
                 variant="permanent"
                 sx={{

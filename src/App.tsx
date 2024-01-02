@@ -11,51 +11,44 @@ import SideBar, { drawerWidth } from './components/SideBar';
 import { useAppStore } from './store';
 
 interface AppBarProps extends MuiAppBarProps {
-  open?: boolean;
+    open?: boolean;
 }
 
 const AppBar = styled(MuiAppBar, {
-  shouldForwardProp: (prop) => prop !== 'open',
+    shouldForwardProp: (prop) => prop !== 'open',
 })<AppBarProps>(({ theme, open }) => ({
-  zIndex: theme.zIndex.drawer + 1,
-  transition: theme.transitions.create(['width', 'margin'], {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen,
-  }),
-  ...(open && {    
     [theme.breakpoints.up('sm')]: {
-        marginLeft: drawerWidth,
-        width: `calc(100% - ${drawerWidth}px)`
+        zIndex: theme.zIndex.drawer + 1
     },    
     transition: theme.transitions.create(['width', 'margin'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
     }),
-  }),
+    ...(open && {
+        [theme.breakpoints.up('sm')]: {
+            marginLeft: drawerWidth,
+            width: `calc(100% - ${drawerWidth}px)`
+        },
+        transition: theme.transitions.create(['width', 'margin'], {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.enteringScreen,
+        }),
+    }),
 }));
-
-const DrawerHeader = styled('div')(({ theme }) => ({
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    padding: theme.spacing(0, 1),
-    // necessary for content to be below app bar
-    ...theme.mixins.toolbar,
-  }));
 
 export default function App() {
     const theme = useTheme();
-    const isDesktopSideBarOpen = useAppStore((state) => state.isOpenDesktop);  
+    const isDesktopSideBarOpen = useAppStore((state) => state.isOpenDesktop);
     const openDesktopSideBar = useAppStore((state) => state.openDesktop);
     const openMobileSideBar = useAppStore((state) => state.openMobile);
     //const closeDesktopSideBar = useAppStore((state) => state.closeDesktop);
-  
-    
+
+
 
     return (
         <Box sx={{ display: 'flex' }}>
             <CssBaseline />
-            <AppBar position="fixed" open={isDesktopSideBarOpen} theme={theme}>        
+            <AppBar position="fixed" open={isDesktopSideBarOpen} theme={theme}>
                 <Toolbar>
                     <IconButton
                         color="inherit"
@@ -63,8 +56,7 @@ export default function App() {
                         onClick={openMobileSideBar}
                         edge="start"
                         sx={{
-                            marginRight: 5,
-                            
+                            marginRight: 2,
                             display: { xs: 'block', sm: 'none' },
                         }}
                     >
@@ -77,20 +69,20 @@ export default function App() {
                         edge="start"
                         sx={{
                             marginRight: 5,
-                            ...(isDesktopSideBarOpen && { display: 'none' }),
                             display: { xs: 'none', sm: 'block' },
+                            ...(isDesktopSideBarOpen && { display: 'none' }),                            
                         }}
                     >
                         <MenuIcon />
                     </IconButton>
                     <Typography variant="h6" noWrap component="div">
-                        Mini variant drawer
+                        TODO: Local storage
                     </Typography>
-            </Toolbar>
+                </Toolbar>
             </AppBar>
             <SideBar />
             <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-                <DrawerHeader />
+                <Toolbar />
                 <Typography paragraph>
                     Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
                     tempor incididunt ut labore et dolore magna aliqua. Rhoncus dolor purus non
@@ -120,5 +112,5 @@ export default function App() {
                 </Typography>
             </Box>
         </Box>
-  );
+    );
 }

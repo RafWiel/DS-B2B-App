@@ -2,30 +2,28 @@ import { StateCreator } from "zustand";
 
 export type SideBarSlice = {
     isOpenMobile: boolean;
-    openMobile: () => void;  
-    closeMobile: () => void;      
     isOpenDesktop: boolean;
+    openMobile: () => void;      
     openDesktop: () => void;  
-    closeDesktop: () => void;          
+    close: () => void;          
 }
 
 export const createSideBarSlice: StateCreator<SideBarSlice, [], [], SideBarSlice> = (set) => ({
     isOpenMobile: false,
+    isOpenDesktop: false,
     openMobile: () => {
         console.log('open mobile called');
         set({ isOpenMobile: true });
     },
-    closeMobile: () => {
-        console.log('close mobile called');
-        set({ isOpenMobile: false });
-    },
-    isOpenDesktop: false,
     openDesktop: () => {
         console.log('open desktop called');
         set({ isOpenDesktop: true });
     },
-    closeDesktop: () => {
-        console.log('close desktop called');
-        set({ isOpenDesktop: false });
-    }
+    close: () => {
+        console.log('close called');
+        set({ 
+            isOpenMobile: false,
+            isOpenDesktop: false, 
+        });
+    },        
 });
