@@ -16,7 +16,7 @@ import MuiDrawer from '@mui/material/Drawer';
 import { CSSObject, useTheme } from '@emotion/react';
 import { useAppStore } from '../store';
 
-export const drawerWidth = 240;
+export const drawerWidth = 270;
 
 const openedMixin = (theme: Theme): CSSObject => ({
     width: drawerWidth,
@@ -61,9 +61,7 @@ const SideBar = memo(() => {
     
     const isOpenMobile = useAppStore((state) => state.isOpenMobile);      
     const isOpenDesktop = useAppStore((state) => state.isOpenDesktop);      
-    const close = useAppStore((state) => state.close);
-
-    console.log('isOpenMobile', isOpenMobile);
+    const close = useAppStore((state) => state.close);    
 
     const DrawerHeader = styled('div')(({ theme }) => ({
         display: 'flex',
@@ -83,7 +81,7 @@ const SideBar = memo(() => {
             </DrawerHeader>
             <Divider />
             <List>
-                {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
+                {['Zlecenia serwisowe', 'Konsultacje telefoniczne', 'Zgłoszenia rejestracji', 'Klienci', 'Firmy', 'Pracownicy'].map((text, index) => (
                 <ListItem key={text} disablePadding sx={{ display: 'block' }}>
                     <ListItemButton
                         sx={{
