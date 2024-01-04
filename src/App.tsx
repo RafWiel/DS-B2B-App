@@ -1,5 +1,4 @@
-import './assets/app.css'
-import { styled, useTheme } from '@mui/material/styles';
+import { createTheme, styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
@@ -17,6 +16,9 @@ import Customers from './pages/Customers';
 import Companies from './pages/Companies';
 import Employees from './pages/Employees';
 import NotFound from './pages/NotFound';
+import { ThemeProvider } from '@emotion/react';
+import './assets/app.css';
+import { useEffect, useState } from 'react';
 
 interface AppBarProps extends MuiAppBarProps {
     open?: boolean;
@@ -44,81 +46,137 @@ const AppBar = styled(MuiAppBar, {
     }),
 }));
 
-export default function App() {
-    const theme = useTheme();
+export default function App() {    
     const isDesktopSideBarOpen = useAppStore((state) => state.isOpenDesktop);
     const openDesktopSideBar = useAppStore((state) => state.openDesktop);
-    const openMobileSideBar = useAppStore((state) => state.openMobile);
-    //const closeDesktopSideBar = useAppStore((state) => state.closeDesktop);
+    const openMobileSideBar = useAppStore((state) => state.openMobile);    
 
+    const theme = createTheme({
+        typography: {
+          fontFamily: [
+            '-apple-system',
+            'Montserrat',
+            '"Segoe UI"',
+            'Roboto',
+            '"Helvetica Neue"',
+            'Arial',
+            'sans-serif',
+            '"Apple Color Emoji"',
+            '"Segoe UI Emoji"',
+            '"Segoe UI Symbol"',
+          ].join(','),
+        },
+        // components: {
+        //     MuiToolbar: {
+        //         styleOverrides: {
+        //           regular: {                                                            
+        //             minHeight: "64px", 
+        //             "@media (max-width: 600px)": {
+        //                 minHeight: "56px",
+        //             },                                       
+        //           },
+        //         },
+        //       },
+        //   }
+    });
 
+    const [appBarHeight, setAppBarHeight] = useState(0);
+    //const isMobileView = useMediaQuery(theme.breakpoints.down("sm"));
+    
+    
+
+    useEffect(() => {  
+        handleResize();              
+        window.addEventListener('resize', handleResize);
+        
+        return () => {               
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
+
+    const handleResize = () => {        
+        setAppBarHeight(document.getElementById("appBar")?.clientHeight ?? 0);
+    }
 
     return (
-        <Box sx={{ display: 'flex' }}>
-            <CssBaseline />
-            <AppBar position="fixed" open={isDesktopSideBarOpen} theme={theme}>
-                <Toolbar>
-                    <IconButton
-                        color="inherit"
-                        aria-label="open drawer"
-                        onClick={openMobileSideBar}
-                        edge="start"
-                        sx={{
-                            marginRight: 2,
-                            display: { xs: 'block', sm: 'none' },
-                        }}
-                    >
-                        <MenuIcon />
-                    </IconButton>
-                    <IconButton
-                        color="inherit"
-                        aria-label="open drawer"
-                        onClick={openDesktopSideBar}
-                        edge="start"
-                        sx={{
-                            marginRight: 5,
-                            display: { xs: 'none', sm: 'block' },
-                            ...(isDesktopSideBarOpen && { display: 'none' }),                            
-                        }}
-                    >
-                        <MenuIcon />
-                    </IconButton>
-                    <Typography variant="h6" noWrap component="div">
-                        TODO: Local storage
-                    </Typography>
-                </Toolbar>
-            </AppBar>
-            <SideBar />
-            <Box component="main" sx={{ flexGrow: 1, p: 0 }}>
-                <Toolbar />
-                <Switch>
-                    {/* <Route path="/"><Home /></Route> */}
-                    <Route path="/">
-                        <Redirect to="/service-requests" />
-                    </Route>
-                    <Route path="/service-requests">
-                        <ServiceRequests />
-                    </Route>
-                    <Route path="/phone-consultations">
-                        <PhoneConsultations />
-                    </Route>          
-                    <Route path="/registration-requests">
-                        <RegistrationRequests />
-                    </Route>
-                    <Route path="/customers">
-                        <Customers />
-                    </Route>
-                    <Route path="/companies">
-                        <Companies />
-                    </Route>
-                    <Route path="/employees">
-                        <Employees />
-                    </Route>                    
-                    <Route>
-                        <NotFound />
-                    </Route>
-                </Switch>
+        <ThemeProvider theme={theme}>
+            <Box 
+                sx={{ 
+                    display: 'flex',
+                    minHeight: `calc(100vh - ${appBarHeight}px)`,                    
+                }}
+            >
+                <CssBaseline />
+                <AppBar id="appBar" position="fixed" open={isDesktopSideBarOpen} theme={theme}>
+                    <Toolbar>
+                        <IconButton
+                            color="inherit"
+                            aria-label="open drawer"
+                            onClick={openMobileSideBar}
+                            edge="start"
+                            sx={{
+                                marginRight: 2,
+                                display: { xs: 'block', sm: 'none' },
+                            }}
+                        >
+                            <MenuIcon />
+                        </IconButton>
+                        <IconButton
+                            color="inherit"
+                            aria-label="open drawer"
+                            onClick={openDesktopSideBar}
+                            edge="start"
+                            sx={{
+                                marginRight: 5,
+                                display: { xs: 'none', sm: 'block' },
+                                ...(isDesktopSideBarOpen && { display: 'none' }),                            
+                            }}
+                        >
+                            <MenuIcon />
+                        </IconButton>
+                        <Typography variant="h6" noWrap component="div">
+                            TODO: Local storage
+                        </Typography>
+                    </Toolbar>
+                </AppBar>
+                <SideBar />
+                <Box 
+                    component="main" 
+                    sx={{ 
+                        flexGrow: 1, 
+                        p: 0,                        
+                    }}
+                >
+                    <Toolbar />
+                    <Switch>
+                        {/* <Route path="/"><Home /></Route> */}
+                        <Route path="/">
+                            <Redirect to="/service-requests" />
+                        </Route>
+                        <Route path="/service-requests">
+                            <ServiceRequests />
+                        </Route>
+                        <Route path="/phone-consultations">
+                            <PhoneConsultations />
+                        </Route>          
+                        <Route path="/registration-requests">
+                            <RegistrationRequests />
+                        </Route>
+                        <Route path="/customers">
+                            <Customers />
+                        </Route>
+                        <Route path="/companies">
+                            <Companies />
+                        </Route>
+                        <Route path="/employees">
+                            <Employees />
+                        </Route>                    
+                        <Route>
+                            <NotFound />
+                        </Route>
+                    </Switch>
+                </Box>
             </Box>
-        </Box>
+        </ThemeProvider>
     );
 }

@@ -1,3 +1,5 @@
+@import 'fonts.css';
+
 #root {
     font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
     font-weight: 400;    
@@ -13,10 +15,8 @@
 }
 
 body {
-    margin: 0 auto;  
-    display: flex;
-    min-width: 320px;
-    min-height: 100vh;
+    margin: 0 auto;          
+    min-height: 50vh;
     
     color: #2c3e50;
     background: #e8e8e8;

@@ -16,7 +16,7 @@ import MuiDrawer from '@mui/material/Drawer';
 import { CSSObject, useTheme } from '@emotion/react';
 import { useAppStore } from '../store';
 
-export const drawerWidth = 270;
+export const drawerWidth = 285;
 
 const openedMixin = (theme: Theme): CSSObject => ({
     width: drawerWidth,
@@ -85,9 +85,9 @@ const SideBar = memo(() => {
                 <ListItem key={text} disablePadding sx={{ display: 'block' }}>
                     <ListItemButton
                         sx={{
-                        minHeight: 48,
-                        justifyContent: (isOpenDesktop || isOpenMobile) ? 'initial' : 'center',
-                        px: 2.5,
+                            minHeight: 48,
+                            justifyContent: (isOpenDesktop || isOpenMobile) ? 'initial' : 'center',
+                            px: 2.5,
                         }}
                     >
                         <ListItemIcon
