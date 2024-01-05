@@ -19,6 +19,7 @@ import NotFound from './pages/NotFound';
 import { ThemeProvider } from '@emotion/react';
 import './assets/app.css';
 import { useEffect, useState } from 'react';
+import routes from './routes';
 
 interface AppBarProps extends MuiAppBarProps {
     open?: boolean;
@@ -135,7 +136,7 @@ export default function App() {
                             <MenuIcon />
                         </IconButton>
                         <Typography variant="h6" noWrap component="div">
-                            TODO: Local storage
+                            TODO: Przycisk 3 pozycyjny, Local storage menu sidebar
                         </Typography>
                     </Toolbar>
                 </AppBar>
@@ -150,25 +151,25 @@ export default function App() {
                     <Toolbar />
                     <Switch>
                         {/* <Route path="/"><Home /></Route> */}
-                        <Route path="/">
-                            <Redirect to="/service-requests" />
+                        <Route path={routes.home}>
+                            <Redirect to={routes.serviceRequests} />
                         </Route>
-                        <Route path="/service-requests">
+                        <Route path={routes.serviceRequests}>
                             <ServiceRequests />
                         </Route>
-                        <Route path="/phone-consultations">
+                        <Route path={routes.phoneConsultations}>
                             <PhoneConsultations />
                         </Route>          
-                        <Route path="/registration-requests">
+                        <Route path={routes.registrationRequests}>
                             <RegistrationRequests />
                         </Route>
-                        <Route path="/customers">
+                        <Route path={routes.customers}>
                             <Customers />
                         </Route>
-                        <Route path="/companies">
+                        <Route path={routes.companies}>
                             <Companies />
                         </Route>
-                        <Route path="/employees">
+                        <Route path={routes.employees}>
                             <Employees />
                         </Route>                    
                         <Route>

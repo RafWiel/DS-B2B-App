@@ -1,20 +1,17 @@
-//import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
-//import Drawer from '@mui/material/Drawer';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import MailIcon from '@mui/icons-material/Mail';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-//import Toolbar from '@mui/material/Toolbar';
 import { memo } from 'react';
 import { Box, IconButton, Theme, styled } from '@mui/material';
 import MuiDrawer from '@mui/material/Drawer';
 import { CSSObject, useTheme } from '@emotion/react';
 import { useAppStore } from '../store';
+import { Link } from 'wouter';
+import routes from '../routes';
 
 export const drawerWidth = 285;
 
@@ -61,7 +58,7 @@ const SideBar = memo(() => {
     
     const isOpenMobile = useAppStore((state) => state.isOpenMobile);      
     const isOpenDesktop = useAppStore((state) => state.isOpenDesktop);      
-    const close = useAppStore((state) => state.close);    
+    const close = useAppStore((state) => state.close);        
 
     const DrawerHeader = styled('div')(({ theme }) => ({
         display: 'flex',
@@ -70,7 +67,9 @@ const SideBar = memo(() => {
         padding: theme.spacing(0, 1),
         // necessary for content to be below app bar
         ...theme.mixins.toolbar,
-      }));
+    }));
+
+
 
     const drawer = (
         <Box>
@@ -81,8 +80,8 @@ const SideBar = memo(() => {
             </DrawerHeader>
             <Divider />
             <List>
-                {['Zlecenia serwisowe', 'Konsultacje telefoniczne', 'Zgłoszenia rejestracji', 'Klienci', 'Firmy', 'Pracownicy'].map((text, index) => (
-                <ListItem key={text} disablePadding sx={{ display: 'block' }}>
+                {routes.items.filter(u => u.isSidebarItem).map((route, index) => (
+                <ListItem key={route.id} disablePadding sx={{ display: 'block' }}>
                     <ListItemButton
                         sx={{
                             minHeight: 48,
@@ -97,38 +96,16 @@ const SideBar = memo(() => {
                                 justifyContent: 'center',
                             }}
                         >
-                        {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                        {route.renderIcon?.()}                        
                         </ListItemIcon>
-                        <ListItemText primary={text} sx={{ opacity: (isOpenDesktop || isOpenMobile) ? 1 : 0 }} />
+                        <Link href={route.id}>
+                            <ListItemText primary={route.text} sx={{ opacity: (isOpenDesktop || isOpenMobile) ? 1 : 0 }} />
+                        </Link>
+                        
                     </ListItemButton>
                 </ListItem>
             ))}
-            </List>
-            {/* <Divider />
-            <List>
-            {['All mail', 'Trash', 'Spam'].map((text, index) => (
-                <ListItem key={text} disablePadding sx={{ display: 'block' }}>
-                    <ListItemButton
-                        sx={{
-                        minHeight: 48,
-                        justifyContent: isOpen ? 'initial' : 'center',
-                        px: 2.5,
-                        }}
-                    >
-                        <ListItemIcon
-                            sx={{
-                                minWidth: 0,
-                                mr: isOpen ? 3 : 'auto',
-                                justifyContent: 'center',
-                            }}
-                        >
-                        {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                        </ListItemIcon>
-                        <ListItemText primary={text} sx={{ opacity: isOpen ? 1 : 0 }} />
-                    </ListItemButton>
-                </ListItem>
-            ))}
-            </List> */}
+            </List>            
         </Box>
     );
   
