@@ -136,7 +136,7 @@ export default function App() {
                             <MenuIcon />
                         </IconButton>
                         <Typography variant="h6" noWrap component="div">
-                            TODO: Przycisk 3 pozycyjny, Local storage menu sidebar
+                            TODO: Local storage menu sidebar
                         </Typography>
                     </Toolbar>
                 </AppBar>

@@ -6,11 +6,11 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import { memo } from 'react';
-import { Box, IconButton, Theme, styled } from '@mui/material';
+import { Box, IconButton, Theme, makeStyles, styled } from '@mui/material';
 import MuiDrawer from '@mui/material/Drawer';
-import { CSSObject, useTheme } from '@emotion/react';
+import { CSSObject } from '@emotion/react';
 import { useAppStore } from '../store';
-import { Link } from 'wouter';
+import { Link, useLocation } from 'wouter';
 import routes from '../routes';
 
 export const drawerWidth = 285;
@@ -54,11 +54,11 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 );
 
 const SideBar = memo(() => {
-    const theme = useTheme();
-    
+    //const theme = useTheme();    
+    const location = useLocation();
     const isOpenMobile = useAppStore((state) => state.isOpenMobile);      
     const isOpenDesktop = useAppStore((state) => state.isOpenDesktop);      
-    const close = useAppStore((state) => state.close);        
+    const close = useAppStore((state) => state.close);            
 
     const DrawerHeader = styled('div')(({ theme }) => ({
         display: 'flex',
@@ -69,8 +69,10 @@ const SideBar = memo(() => {
         ...theme.mixins.toolbar,
     }));
 
-
-
+    const isSelected = (id: string) => {
+        return location.indexOf(id) == 0;
+    }   
+        
     const drawer = (
         <Box>
             <DrawerHeader>
@@ -80,29 +82,43 @@ const SideBar = memo(() => {
             </DrawerHeader>
             <Divider />
             <List>
-                {routes.items.filter(u => u.isSidebarItem).map((route, index) => (
+                {routes.items.filter(u => u.isSidebarItem).map((route) => (
                 <ListItem key={route.id} disablePadding sx={{ display: 'block' }}>
-                    <ListItemButton
-                        sx={{
-                            minHeight: 48,
-                            justifyContent: (isOpenDesktop || isOpenMobile) ? 'initial' : 'center',
-                            px: 2.5,
-                        }}
-                    >
-                        <ListItemIcon
+                    <Link href={route.id}>                        
+                        <ListItemButton
+                            
+                            selected={isSelected(route.id)}                            
                             sx={{
-                                minWidth: 0,
-                                mr: (isOpenDesktop || isOpenMobile) ? 3 : 'auto',
-                                justifyContent: 'center',
+                                minHeight: 48,
+                                justifyContent: (isOpenDesktop || isOpenMobile) ? 'initial' : 'center',
+                                px: 2.5,
+                                "&.Mui-selected": {
+                                    backgroundColor: 'var(--color-selected-backround)',
+                                    "&:hover": {
+                                      backgroundColor: 'var(--color-selected-hover-backround)',
+                                    },
+                                },                                 
                             }}
                         >
-                        {route.renderIcon?.()}                        
-                        </ListItemIcon>
-                        <Link href={route.id}>
-                            <ListItemText primary={route.text} sx={{ opacity: (isOpenDesktop || isOpenMobile) ? 1 : 0 }} />
-                        </Link>
-                        
-                    </ListItemButton>
+                            <ListItemIcon
+                                sx={{
+                                    minWidth: 0,
+                                    mr: (isOpenDesktop || isOpenMobile) ? 3 : 'auto',
+                                    justifyContent: 'center',
+                                    color: isSelected(route.id) ? 'var(--color-primary)' : 'var(--color-grey)'
+                                }}
+                            >
+                                {route.renderIcon?.()}                        
+                            </ListItemIcon>                       
+                            <ListItemText 
+                                primary={route.text} 
+                                sx={{ 
+                                    opacity: (isOpenDesktop || isOpenMobile) ? 1 : 0,
+                                    color: isSelected(route.id) ? 'var(--color-primary)' : 'var(--color-dark-grey)'
+                                }} 
+                            />                                        
+                        </ListItemButton>
+                    </Link>                         
                 </ListItem>
             ))}
             </List>            

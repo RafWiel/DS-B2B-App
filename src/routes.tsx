@@ -2,10 +2,7 @@ import ArticleIcon from '@mui/icons-material/Article';
 import PhoneIcon from '@mui/icons-material/Phone';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import PeopleAltIcon from '@mui/icons-material/People';
-import BusinessIcon from '@mui/icons-material/Business';
-import BusinessCenterIcon from '@mui/icons-material/BusinessCenter';
 import FactoryIcon from '@mui/icons-material/Factory';
-import GroupsIcon from '@mui/icons-material/Groups';
 import BadgeIcon from '@mui/icons-material/Badge';
 
 const home = '/';
