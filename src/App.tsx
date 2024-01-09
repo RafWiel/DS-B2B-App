@@ -50,7 +50,7 @@ const AppBar = styled(MuiAppBar, {
 export default function App() {    
     const isDesktopSideBarOpen = useAppStore((state) => state.isOpenDesktop);
     const openDesktopSideBar = useAppStore((state) => state.openDesktop);
-    const openMobileSideBar = useAppStore((state) => state.openMobile);    
+    const openMobileSideBar = useAppStore((state) => state.openMobile);         
 
     const theme = createTheme({
         typography: {
@@ -82,9 +82,7 @@ export default function App() {
     });
 
     const [appBarHeight, setAppBarHeight] = useState(0);
-    //const isMobileView = useMediaQuery(theme.breakpoints.down("sm"));
-    
-    
+    //const isMobileView = useMediaQuery(theme.breakpoints.down("sm"));        
 
     useEffect(() => {  
         handleResize();              
@@ -136,7 +134,7 @@ export default function App() {
                             <MenuIcon />
                         </IconButton>
                         <Typography variant="h6" noWrap component="div">
-                            TODO: Local storage menu sidebar
+                            TODO: Lista pracownikow
                         </Typography>
                     </Toolbar>
                 </AppBar>

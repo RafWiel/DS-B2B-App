@@ -5,25 +5,24 @@ export type SideBarSlice = {
     isOpenDesktop: boolean;
     openMobile: () => void;      
     openDesktop: () => void;  
-    close: () => void;          
+    close: () => void;           
 }
 
 export const createSideBarSlice: StateCreator<SideBarSlice, [], [], SideBarSlice> = (set) => ({
     isOpenMobile: false,
-    isOpenDesktop: false,
-    openMobile: () => {
-        console.log('open mobile called');
+    isOpenDesktop: JSON.parse(localStorage.getItem('isSideBarOpenDesktop') ?? 'true'),
+    openMobile: () => {        
         set({ isOpenMobile: true });
     },
-    openDesktop: () => {
-        console.log('open desktop called');
+    openDesktop: () => {        
         set({ isOpenDesktop: true });
+        localStorage.setItem('isSideBarOpenDesktop', JSON.stringify(true));
     },
-    close: () => {
-        console.log('close called');
+    close: () => {        
         set({ 
             isOpenMobile: false,
             isOpenDesktop: false, 
         });
-    },        
+        localStorage.setItem('isSideBarOpenDesktop', JSON.stringify(false));
+    }     
 });

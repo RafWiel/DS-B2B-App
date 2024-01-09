@@ -5,8 +5,8 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import { memo } from 'react';
-import { Box, IconButton, Theme, makeStyles, styled } from '@mui/material';
+import { memo, useEffect } from 'react';
+import { Box, IconButton, Theme, styled } from '@mui/material';
 import MuiDrawer from '@mui/material/Drawer';
 import { CSSObject } from '@emotion/react';
 import { useAppStore } from '../store';
@@ -58,8 +58,8 @@ const SideBar = memo(() => {
     const location = useLocation();
     const isOpenMobile = useAppStore((state) => state.isOpenMobile);      
     const isOpenDesktop = useAppStore((state) => state.isOpenDesktop);      
-    const close = useAppStore((state) => state.close);            
-
+    const close = useAppStore((state) => state.close);  
+    
     const DrawerHeader = styled('div')(({ theme }) => ({
         display: 'flex',
         alignItems: 'center',
