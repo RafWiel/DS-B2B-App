@@ -8,7 +8,7 @@ import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import SideBar, { drawerWidth } from './components/SideBar';
 import { useAppStore } from './store';
-import { Redirect, Route, Switch } from 'wouter';
+import { Redirect, Route, Switch, useLocation } from 'wouter';
 import ServiceRequests from './pages/ServiceRequests';
 import PhoneConsultations from './pages/PhoneConsultations';
 import RegistrationRequests from './pages/RegistrationRequests';
@@ -47,12 +47,20 @@ const AppBar = styled(MuiAppBar, {
     }),
 }));
 
-export default function App() {    
+export default function App() {  
+    const location = useLocation();  
     const isDesktopSideBarOpen = useAppStore((state) => state.isOpenDesktop);
     const openDesktopSideBar = useAppStore((state) => state.openDesktop);
     const openMobileSideBar = useAppStore((state) => state.openMobile);         
+    const appBarTitle = useAppStore((state) => state.appBarTitle);         
+    const setAppBarTitle = useAppStore((state) => state.setAppBarTitle);         
 
     const theme = createTheme({
+        palette: {
+            background: {
+              default: '#e8e8e8'
+            }
+        },
         typography: {
           fontFamily: [
             '-apple-system',
@@ -85,6 +93,8 @@ export default function App() {
     //const isMobileView = useMediaQuery(theme.breakpoints.down("sm"));        
 
     useEffect(() => {  
+        setAppBarTitle(routes.getText(location[0]));
+
         handleResize();              
         window.addEventListener('resize', handleResize);
         
@@ -92,6 +102,10 @@ export default function App() {
             window.removeEventListener('resize', handleResize);
         };
     }, []);
+
+    useEffect(() => {  
+        setAppBarTitle(routes.getText(location[0]));
+    }, [location]);
 
     const handleResize = () => {        
         setAppBarHeight(document.getElementById("appBar")?.clientHeight ?? 0);
@@ -106,8 +120,13 @@ export default function App() {
                 }}
             >
                 <CssBaseline />
-                <AppBar id="appBar" position="fixed" open={isDesktopSideBarOpen} theme={theme}>
-                    <Toolbar>
+                <AppBar 
+                    id="appBar" 
+                    position="fixed" 
+                    open={isDesktopSideBarOpen} 
+                    theme={theme} 
+                    elevation={0}>
+                    <Toolbar >
                         <IconButton
                             color="inherit"
                             aria-label="open drawer"
@@ -134,13 +153,13 @@ export default function App() {
                             <MenuIcon />
                         </IconButton>
                         <Typography variant="h6" noWrap component="div">
-                            TODO: Lista pracownikow
+                            {appBarTitle}
                         </Typography>
                     </Toolbar>
                 </AppBar>
                 <SideBar />
                 <Box 
-                    component="main" 
+                    component="main"                    
                     sx={{ 
                         flexGrow: 1, 
                         p: 0,                        

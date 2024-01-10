@@ -11,6 +11,7 @@
 }
 
 :root {
+    --color-main-background: #e8e8e8;
     --color-dark-blue: #004e92 ;
     --color-primary: #4376c9;
     --color-grey: #8090a0;
@@ -19,12 +20,12 @@
     --color-selected-hover-backround: #d6e8fc;
 }
 
-body {
+.app {
     margin: 0 auto;          
     min-height: 50vh;
     
     color: #2c3e50;
-    background: #e8e8e8;
+    background: var(--color-main-background);
 
     @media (max-width: 576px) {
         background: white;

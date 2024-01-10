@@ -5,7 +5,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import { memo, useEffect } from 'react';
+import { memo } from 'react';
 import { Box, IconButton, Theme, styled } from '@mui/material';
 import MuiDrawer from '@mui/material/Drawer';
 import { CSSObject } from '@emotion/react';
@@ -13,7 +13,7 @@ import { useAppStore } from '../store';
 import { Link, useLocation } from 'wouter';
 import routes from '../routes';
 
-export const drawerWidth = 285;
+export const drawerWidth = 270;
 
 const openedMixin = (theme: Theme): CSSObject => ({
     width: drawerWidth,
@@ -39,7 +39,7 @@ const openedMixin = (theme: Theme): CSSObject => ({
 const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(
     ({ theme, open }) => ({
       width: drawerWidth,
-      flexShrink: 0,
+      flexShrink: 0,      
       whiteSpace: 'nowrap',
       boxSizing: 'border-box',
       ...(open && {
@@ -85,10 +85,9 @@ const SideBar = memo(() => {
                 {routes.items.filter(u => u.isSidebarItem).map((route) => (
                 <ListItem key={route.id} disablePadding sx={{ display: 'block' }}>
                     <Link href={route.id}>                        
-                        <ListItemButton
-                            
+                        <ListItemButton                            
                             selected={isSelected(route.id)}                            
-                            sx={{
+                            sx={{                                
                                 minHeight: 48,
                                 justifyContent: (isOpenDesktop || isOpenMobile) ? 'initial' : 'center',
                                 px: 2.5,
@@ -111,8 +110,10 @@ const SideBar = memo(() => {
                                 {route.renderIcon?.()}                        
                             </ListItemIcon>                       
                             <ListItemText 
+                                primaryTypographyProps={{fontSize: '14px'}} 
                                 primary={route.text} 
                                 sx={{ 
+                                    fontSize: '8px',
                                     opacity: (isOpenDesktop || isOpenMobile) ? 1 : 0,
                                     color: isSelected(route.id) ? 'var(--color-primary)' : 'var(--color-dark-grey)'
                                 }} 
