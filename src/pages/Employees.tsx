@@ -1,28 +1,52 @@
-import { Box, Card, CardContent, Typography } from "@mui/material";
+import { Box, Card, CardContent, Grid, InputAdornment, TextField } from "@mui/material";
 import { memo } from "react";
+import SearchIcon from '@mui/icons-material/Search';
+import { useTheme } from '@mui/material/styles';
 
 const Employees = memo(() => {
+    const theme = useTheme();    
+
     return (
         <Box 
             sx={{
-                padding: 1
+                padding: {
+                    xs: 0, 
+                    sm:1.5
+                }
             }}
         >
             <Card 
-                variant="soft"
-                sx={{ minWidth: 275 }}>
+                variant="outlined"
+                sx={{ 
+                    minWidth: 275,
+                    [theme.breakpoints.down('sm')]: {
+                        border: 'none' 
+                    },                    
+                }}>
                 <CardContent>
-                    <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                        Word of the Day
-                    </Typography>                    
-                    <Typography sx={{ mb: 1.5 }} color="text.secondary">
-                        adjective
-                    </Typography>
-                    <Typography variant="body2">
-                        well meaning and kindly.
-                        <br />
-                        {'"a benevolent smile"'}
-                    </Typography>
+                    <Grid container spacing={2}>
+                        <Grid item xs={8} sm={10}>                        
+                            <TextField 
+                                id="search"                                 
+                                label="Szukaj" 
+                                fullWidth                                 
+                                variant="standard" 
+                                InputProps={{
+                                    startAdornment: (
+                                    <InputAdornment position="start">
+                                        <SearchIcon />
+                                    </InputAdornment>
+                                    ),
+                                }}
+                            />                        
+                        </Grid>
+                        <Grid item xs={4} sm={2}>
+                            <TextField 
+                                label="Typ" 
+                                fullWidth 
+                                variant="standard" />
+                        </Grid>  
+                    </Grid>                                                            
                 </CardContent>      
             </Card>
         </Box>

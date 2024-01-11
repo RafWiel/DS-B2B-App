@@ -54,12 +54,12 @@ export default function App() {
     const openMobileSideBar = useAppStore((state) => state.openMobile);         
     const appBarTitle = useAppStore((state) => state.appBarTitle);         
     const setAppBarTitle = useAppStore((state) => state.setAppBarTitle);         
-
+    
     const theme = createTheme({
-        palette: {
+        palette: {    
             background: {
-              default: '#e8e8e8'
-            }
+                default: '#e8e8e8'                           
+            }                    
         },
         typography: {
           fontFamily: [
@@ -116,7 +116,14 @@ export default function App() {
             <Box 
                 sx={{ 
                     display: 'flex',
-                    minHeight: `calc(100vh - ${appBarHeight}px)`,                    
+                    //minHeight: `calc(100vh - ${appBarHeight}px)`, 
+                    minHeight: '100vh', 
+                    [theme.breakpoints.up('sm')]: {
+                        backgroundColor: '#e8e8e8'                   
+                    },
+                    [theme.breakpoints.down('sm')]: {
+                        backgroundColor: 'white'                   
+                    },
                 }}
             >
                 <CssBaseline />
