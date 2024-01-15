@@ -20,14 +20,14 @@
     --color-selected-hover-backround: #d6e8fc;
 }
 
-.app {
+/* .app {
     margin: 0 auto;          
     min-height: 50vh;
     
     color: #2c3e50;
-    background: var(--color-main-background);
+    background: var(--color-main-background);    
 
     @media (max-width: 576px) {
         background: white;
     }
-}
+} */

@@ -74,6 +74,7 @@ export default function App() {
             '"Segoe UI Emoji"',
             '"Segoe UI Symbol"',
           ].join(','),
+          fontSize: 12,
         },
         // components: {
         //     MuiToolbar: {
@@ -118,6 +119,7 @@ export default function App() {
                     display: 'flex',
                     //minHeight: `calc(100vh - ${appBarHeight}px)`, 
                     minHeight: '100vh', 
+                    //height: '100%',
                     [theme.breakpoints.up('sm')]: {
                         backgroundColor: '#e8e8e8'                   
                     },
@@ -167,13 +169,32 @@ export default function App() {
                 <SideBar />
                 <Box 
                     component="main"                    
-                    sx={{ 
+                    sx={{
+                        backgroundColor: 'red', 
+                        //height: '100%',                       
                         flexGrow: 1, 
                         p: 0,                        
                     }}
                 >
                     <Toolbar />
-                    <Switch>
+                    
+                    <Box 
+                    component="main"                    
+                    sx={{
+                        backgroundColor: 'green',
+                        //height:'100%'
+                        
+                                               
+                    }}
+                >
+
+                
+                    <Switch >   
+
+
+                        
+
+
                         {/* <Route path="/"><Home /></Route> */}
                         <Route path={routes.home}>
                             <Redirect to={routes.serviceRequests} />
@@ -199,7 +220,10 @@ export default function App() {
                         <Route>
                             <NotFound />
                         </Route>
+                    
+                        
                     </Switch>
+                    </Box>
                 </Box>
             </Box>
         </ThemeProvider>

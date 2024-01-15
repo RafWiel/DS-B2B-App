@@ -110,7 +110,7 @@ const SideBar = memo(() => {
                                 {route.renderIcon?.()}                        
                             </ListItemIcon>                       
                             <ListItemText 
-                                primaryTypographyProps={{fontSize: '14px'}} 
+                                // primaryTypographyProps={{fontSize: '14px'}} 
                                 primary={route.text} 
                                 sx={{ 
                                     fontSize: '8px',
