@@ -20,6 +20,7 @@ import { ThemeProvider } from '@emotion/react';
 import './assets/app.css';
 import { useEffect, useState } from 'react';
 import routes from './routes';
+import { Card, CardContent, Grid, TextField } from '@mui/material';
 
 interface AppBarProps extends MuiAppBarProps {
     open?: boolean;
@@ -170,32 +171,15 @@ export default function App() {
                 <Box 
                     component="main"                    
                     sx={{
-                        backgroundColor: 'red', 
-                        //height: '100%',                       
+                        display: 'flex',
+                        flexDirection: 'column',
+                        height: '100vh',
                         flexGrow: 1, 
                         p: 0,                        
                     }}
                 >
-                    <Toolbar />
-                    
-                    <Box 
-                    component="main"                    
-                    sx={{
-                        backgroundColor: 'green',
-                        //height:'100%'
-                        
-                                               
-                    }}
-                >
-
-                
+                    <Toolbar />                                                     
                     <Switch >   
-
-
-                        
-
-
-                        {/* <Route path="/"><Home /></Route> */}
                         <Route path={routes.home}>
                             <Redirect to={routes.serviceRequests} />
                         </Route>
@@ -219,11 +203,8 @@ export default function App() {
                         </Route>                    
                         <Route>
                             <NotFound />
-                        </Route>
-                    
-                        
-                    </Switch>
-                    </Box>
+                        </Route>                                        
+                    </Switch>                     
                 </Box>
             </Box>
         </ThemeProvider>
