@@ -170,10 +170,10 @@ export default function App() {
                 <SideBar />
                 <Box 
                     component="main"                    
-                    sx={{
+                    sx={{                        
                         display: 'flex',
                         flexDirection: 'column',
-                        height: '100vh',
+                        minHeight: '100vh',
                         flexGrow: 1, 
                         p: 0,                        
                     }}

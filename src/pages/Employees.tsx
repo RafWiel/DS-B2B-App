@@ -1,11 +1,10 @@
 import { memo } from "react";
-
 import { useTheme } from '@mui/material/styles';
 import EmployeesFilter from "../components/EmployeesFilter";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import EnhancedTable from "../components/DataGrid";
+import DataGrid from "../components/DataGrid";
 
 
 
@@ -63,15 +62,17 @@ const Employees = memo(() => {
                 variant="outlined"
                 sx={{    
                     marginTop: 1.5, 
-                    height: '100%',                         
+                    height: '100%',                        
                     [theme.breakpoints.down('sm')]: {
                         border: 'none' 
                     },                    
                 }}
             >
                 <CardContent>
-                    <EnhancedTable />
+                    <DataGrid />
 
+                    
+                    
 
 
                 </CardContent>
