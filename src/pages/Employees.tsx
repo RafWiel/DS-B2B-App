@@ -69,7 +69,9 @@ const Employees = memo(() => {
                 }}
             >
                 <CardContent>
-                    <DataGrid />
+                    <DataGrid 
+                        isCheckbox={false}
+                    />
 
                     
                     

@@ -11,7 +11,6 @@ import TableRow from '@mui/material/TableRow';
 import TableSortLabel from '@mui/material/TableSortLabel';
 //import Toolbar from '@mui/material/Toolbar';
 //import Typography from '@mui/material/Typography';
-import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
 //import IconButton from '@mui/material/IconButton';
 //import Tooltip from '@mui/material/Tooltip';
@@ -36,13 +35,18 @@ interface IHeadCell {
     numeric: boolean;
 }
 
-interface IDataGridProps {
+interface IDataGridProps {    
+    isCheckbox: boolean;
+}
+
+interface IHeadProps {
     numSelected: number;
     onRequestSort: (event: React.MouseEvent<unknown>, property: keyof IData) => void;
     onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
     order: Order;
     orderBy: string;
     rowCount: number;
+    isCheckbox: boolean;
 }
 
 // interface IEnhancedTableToolbarProps {
@@ -158,8 +162,8 @@ function stableSort<T>(array: readonly T[], comparator: (a: T, b: T) => number) 
     return stabilizedThis.map((el) => el[0]);
 }
 
-function EnhancedTableHead(props: IDataGridProps) {
-    const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } = props;
+function EnhancedTableHead(props: IHeadProps) {
+    const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort, isCheckbox } = props;
   
     const createSortHandler = (property: keyof IData) => (event: React.MouseEvent<unknown>) => {
         onRequestSort(event, property);
@@ -168,30 +172,40 @@ function EnhancedTableHead(props: IDataGridProps) {
     return (
         <TableHead>
             <TableRow>
-                <TableCell padding="checkbox">
-                    <Checkbox
-                        color="primary"
-                        indeterminate={numSelected > 0 && numSelected < rowCount}
-                        checked={rowCount > 0 && numSelected === rowCount}
-                        onChange={onSelectAllClick}
-                        inputProps={{
-                            'aria-label': 'select all desserts',
-                        }}
-                    />
-                </TableCell>
+                {
+                    isCheckbox &&
+                    <TableCell padding="checkbox">
+                        <Checkbox
+                            color="primary"
+                            indeterminate={numSelected > 0 && numSelected < rowCount}
+                            checked={rowCount > 0 && numSelected === rowCount}
+                            onChange={onSelectAllClick}
+                            inputProps={{
+                                'aria-label': 'select all desserts',
+                            }}
+                        />
+                    </TableCell>
+                }
                 {
                     headCells.map((headCell) => (
                         <TableCell
                             key={headCell.id}
                             align={headCell.numeric ? 'right' : 'left'}
-                            padding={headCell.disablePadding ? 'none' : 'normal'}
+                            padding={headCell.disablePadding ? 'none' : 'normal'}                            
                             sortDirection={orderBy === headCell.id ? order : false}
+                            sx = {{
+                                paddingLeft: headCell.disablePadding ? (isCheckbox ? 0 : 1) : 0
+                            }} 
                         >
                             <TableSortLabel
                                 active={orderBy === headCell.id}
                                 direction={orderBy === headCell.id ? order : 'asc'}
                                 onClick={createSortHandler(headCell.id)}
                                 IconComponent={KeyboardArrowDownIcon}
+                                sx={{
+                                    color: 'var(--color-grey)',
+                                    fontWeight: 550
+                                }}
                             >
                                 {headCell.label}
                                 {
@@ -262,8 +276,10 @@ function EnhancedTableHead(props: IDataGridProps) {
 //     );
 // }
 
-export default function DataGrid() {
-    const [order, setOrder] = React.useState<Order>('asc');
+export default function DataGrid(props: IDataGridProps) {
+    const { isCheckbox } = props;
+
+    const [order, setOrder] = React.useState<Order>('asc');    
     const [orderBy, setOrderBy] = React.useState<keyof IData>('calories');
     const [selected, setSelected] = React.useState<readonly number[]>([]);
     //const [page, setPage] = React.useState(0);  
@@ -353,12 +369,13 @@ export default function DataGrid() {
                     size='medium'
                 >
                     <EnhancedTableHead
-                        numSelected={selected.length}
+                        numSelected={selected.length}                        
                         order={order}
                         orderBy={orderBy}
                         onSelectAllClick={handleSelectAllClick}
                         onRequestSort={handleRequestSort}
                         rowCount={rows.length}
+                        isCheckbox={isCheckbox}
                     />
                     <TableBody>
                     {
@@ -377,22 +394,27 @@ export default function DataGrid() {
                                     selected={isItemSelected}
                                     sx={{ cursor: 'pointer' }}
                                 >
-                                    <TableCell padding="checkbox">
-                                    <Checkbox
-                                        color="primary"
-                                        checked={isItemSelected}
-                                        inputProps={{
-                                        'aria-labelledby': labelId,
-                                        }}
-                                    />
-                                    </TableCell>
+                                    {
+                                        isCheckbox &&
+                                        <TableCell padding="checkbox">                                                                        
+                                            <Checkbox
+                                                color="primary"
+                                                checked={isItemSelected}
+                                                inputProps={{
+                                                    'aria-labelledby': labelId,
+                                                }}
+                                            />                                    
+                                        </TableCell>
+                                    }
                                     <TableCell
-                                    component="th"
-                                    id={labelId}
-                                    scope="row"
-                                    padding="none"
+                                        component="th"
+                                        id={labelId}
+                                        scope="row"                                        
+                                        sx = {{
+                                            paddingLeft: isCheckbox ? 0 : 1
+                                        }}                                        
                                     >
-                                    {row.name}
+                                        {row.name}
                                     </TableCell>
                                     <TableCell align="right">{row.calories}</TableCell>
                                     <TableCell align="right">{row.fat}</TableCell>
