@@ -19,29 +19,28 @@ import Checkbox from '@mui/material/Checkbox';
 import { visuallyHidden } from '@mui/utils';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 
-interface IData {
-    id: number;
-    calories: number;
-    carbs: number;
-    fat: number;
-    name: string;
-    protein: number;
+export interface IBaseRow {
+    id: number;    
 }
 
-interface IHeadCell {
-    disablePadding: boolean;
-    id: keyof IData;
+export interface IColumn {    
+    id: string;
     label: string;
     numeric: boolean;
+    disablePadding: boolean;
+    visible: boolean;
 }
 
-interface IDataGridProps {    
+interface IDataGridProps {  
+    columns: IColumn[],  
+    rows: any[],
     isCheckbox: boolean;
 }
 
 interface IHeadProps {
+    columns: IColumn[],
     numSelected: number;
-    onRequestSort: (event: React.MouseEvent<unknown>, property: keyof IData) => void;
+    onRequestSort: (event: React.MouseEvent<unknown>, property: string) => void;
     onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
     order: Order;
     orderBy: string;
@@ -55,72 +54,15 @@ interface IHeadProps {
   
 type Order = 'asc' | 'desc';
 
-const headCells: readonly IHeadCell[] = [
-    {
-        id: 'name',
-        numeric: false,
-        disablePadding: true,
-        label: 'Dessert (100g serving)',
-    },
-    {
-        id: 'calories',
-        numeric: true,
-        disablePadding: false,
-        label: 'Calories',
-    },
-    {
-        id: 'fat',
-        numeric: true,
-        disablePadding: false,
-        label: 'Fat (g)',
-    },
-    {
-        id: 'carbs',
-        numeric: true,
-        disablePadding: false,
-        label: 'Carbs (g)',
-    },
-    {
-        id: 'protein',
-        numeric: true,
-        disablePadding: false,
-        label: 'Protein (g)',
-    },
-];
 
-const rows = [
-    createData(1, 'Cupcake', 305, 3.7, 67, 4.3),
-    createData(2, 'Donut', 452, 25.0, 51, 4.9),
-    createData(3, 'Eclair', 262, 16.0, 24, 6.0),
-    createData(4, 'Frozen yoghurt', 159, 6.0, 24, 4.0),
-    createData(5, 'Gingerbread', 356, 16.0, 49, 3.9),
-    createData(6, 'Honeycomb', 408, 3.2, 87, 6.5),
-    createData(7, 'Ice cream sandwich', 237, 9.0, 37, 4.3),
-    createData(8, 'Jelly Bean', 375, 0.0, 94, 0.0),
-    createData(9, 'KitKat', 518, 26.0, 65, 7.0),
-    createData(10, 'Lollipop', 392, 0.2, 98, 0.0),
-    createData(11, 'Marshmallow', 318, 0, 81, 2.0),
-    createData(12, 'Nougat', 360, 19.0, 9, 37.0),
-    createData(13, 'Oreo', 437, 18.0, 63, 4.0),
-];
 
-function createData(
-    id: number,
-    name: string,
-    calories: number,
-    fat: number,
-    carbs: number,
-    protein: number,
-): IData {
-    return {
-        id,
-        name,
-        calories,
-        fat,
-        carbs,
-        protein,
-    };
-}
+
+
+
+
+
+
+
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
     if (b[orderBy] < a[orderBy]) {
@@ -146,7 +88,7 @@ function getComparator<Key extends keyof any>(
         : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
-function stableSort<T>(array: readonly T[], comparator: (a: T, b: T) => number) {
+function stableSort<T>(array: T[], comparator: (a: T, b: T) => number) {
     const stabilizedThis = array.map((el, index) => [el, index] as [T, number]);
   
     stabilizedThis.sort((a, b) => {
@@ -163,9 +105,9 @@ function stableSort<T>(array: readonly T[], comparator: (a: T, b: T) => number) 
 }
 
 function EnhancedTableHead(props: IHeadProps) {
-    const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort, isCheckbox } = props;
+    const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort, isCheckbox, columns } = props;
   
-    const createSortHandler = (property: keyof IData) => (event: React.MouseEvent<unknown>) => {
+    const createSortHandler = (property: string) => (event: React.MouseEvent<unknown>) => {
         onRequestSort(event, property);
     };
 
@@ -187,29 +129,30 @@ function EnhancedTableHead(props: IHeadProps) {
                     </TableCell>
                 }
                 {
-                    headCells.map((headCell) => (
+                    columns && columns.map((column) => (
+                        column.visible && 
                         <TableCell
-                            key={headCell.id}
-                            align={headCell.numeric ? 'right' : 'left'}
-                            padding={headCell.disablePadding ? 'none' : 'normal'}                            
-                            sortDirection={orderBy === headCell.id ? order : false}
+                            key={column.id}
+                            align={column.numeric ? 'right' : 'left'}
+                            padding={column.disablePadding ? 'none' : 'normal'}                            
+                            sortDirection={orderBy === column.id ? order : false}
                             sx = {{
-                                paddingLeft: headCell.disablePadding ? (isCheckbox ? 0 : 1) : 0
+                                paddingLeft: column.disablePadding ? (isCheckbox ? 0 : 1) : 0
                             }} 
                         >
                             <TableSortLabel
-                                active={orderBy === headCell.id}
-                                direction={orderBy === headCell.id ? order : 'asc'}
-                                onClick={createSortHandler(headCell.id)}
+                                active={orderBy === column.id}
+                                direction={orderBy === column.id ? order : 'asc'}
+                                onClick={createSortHandler(column.id)}
                                 IconComponent={KeyboardArrowDownIcon}
                                 sx={{
                                     color: 'var(--color-grey)',
                                     fontWeight: 550
                                 }}
                             >
-                                {headCell.label}
+                                {column.label}
                                 {
-                                    orderBy === headCell.id ? (
+                                    orderBy === column.id ? (
                                         <Box component="span" sx={visuallyHidden}>
                                             {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
                                         </Box>
@@ -277,17 +220,17 @@ function EnhancedTableHead(props: IHeadProps) {
 // }
 
 export default function DataGrid(props: IDataGridProps) {
-    const { isCheckbox } = props;
+    const { columns, rows, isCheckbox } = props;
 
     const [order, setOrder] = React.useState<Order>('asc');    
-    const [orderBy, setOrderBy] = React.useState<keyof IData>('calories');
+    const [orderBy, setOrderBy] = React.useState<string>('calories');
     const [selected, setSelected] = React.useState<readonly number[]>([]);
     //const [page, setPage] = React.useState(0);  
     //const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
     const handleRequestSort = (
-        event: React.MouseEvent<unknown>,
-        property: keyof IData,
+        _: React.MouseEvent<unknown>,
+        property: string,
     ) => {
         const isAsc = orderBy === property && order === 'asc';
         
@@ -297,7 +240,7 @@ export default function DataGrid(props: IDataGridProps) {
 
     const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.checked) {
-            const newSelected = rows.map((n) => n.id);
+            const newSelected = rows.map((n: IBaseRow) => n.id);
             setSelected(newSelected);
             return;
         }
@@ -305,7 +248,7 @@ export default function DataGrid(props: IDataGridProps) {
         setSelected([]);
     };
 
-  const handleClick = (event: React.MouseEvent<unknown>, id: number) => {
+  const handleClick = (_: React.MouseEvent<unknown>, id: number) => {
         const selectedIndex = selected.indexOf(id);
         let newSelected: readonly number[] = [];
 
@@ -369,6 +312,7 @@ export default function DataGrid(props: IDataGridProps) {
                     size='medium'
                 >
                     <EnhancedTableHead
+                        columns={columns}
                         numSelected={selected.length}                        
                         order={order}
                         orderBy={orderBy}
@@ -380,13 +324,13 @@ export default function DataGrid(props: IDataGridProps) {
                     <TableBody>
                     {
                         visibleRows.map((row, index) => {
-                            const isItemSelected = isSelected(row.id);
+                            const isItemSelected = isSelected(Number(row.id));
                             const labelId = `enhanced-table-checkbox-${index}`;
 
                             return (
                                 <TableRow
                                     hover
-                                    onClick={(event) => handleClick(event, row.id)}
+                                    onClick={(event) => handleClick(event, Number(row.id))}
                                     role="checkbox"
                                     aria-checked={isItemSelected}
                                     tabIndex={-1}
@@ -405,21 +349,25 @@ export default function DataGrid(props: IDataGridProps) {
                                                 }}
                                             />                                    
                                         </TableCell>
-                                    }
-                                    <TableCell
-                                        component="th"
-                                        id={labelId}
-                                        scope="row"                                        
-                                        sx = {{
-                                            paddingLeft: isCheckbox ? 0 : 1
-                                        }}                                        
-                                    >
-                                        {row.name}
-                                    </TableCell>
-                                    <TableCell align="right">{row.calories}</TableCell>
-                                    <TableCell align="right">{row.fat}</TableCell>
-                                    <TableCell align="right">{row.carbs}</TableCell>
-                                    <TableCell align="right">{row.protein}</TableCell>
+                                    }                                    
+                                    {
+                                        columns && columns.map((column, index) => (
+                                            column.visible && 
+                                            <TableCell
+                                                component="th"
+                                                id={index <= 1 ? labelId : undefined}
+                                                scope="row" 
+                                                key={column.id}
+                                                align={column.numeric ? 'right' : 'left'} 
+                                                padding={column.disablePadding ? 'none' : 'normal'}                                                        
+                                                sx = {{
+                                                    paddingLeft: column.disablePadding ? (isCheckbox ? 0 : 1) : 0
+                                                }}                                               
+                                            >
+                                                {Object.values(row)[index]}                                                
+                                            </TableCell>
+                                        ))
+                                    }                                    
                                 </TableRow>
                             );
                         })

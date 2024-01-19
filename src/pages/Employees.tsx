@@ -4,30 +4,65 @@ import EmployeesFilter from "../components/EmployeesFilter";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import DataGrid from "../components/DataGrid";
+import DataGrid, { IBaseRow, IColumn } from "../components/DataGrid";
 
+interface IRow extends IBaseRow {
+    login: string;
+    name: string;
+    type: string;    
+}
 
+const columns: IColumn[] = [
+    {
+        id: 'id',
+        label: 'Id',
+        numeric: true,
+        disablePadding: false,        
+        visible: false,
+    },
+    {
+        id: 'login',
+        label: 'Login',
+        numeric: false,
+        disablePadding: true,        
+        visible: true,
+    },
+    {
+        id: 'name',
+        label: 'Imię i nazwisko',
+        numeric: false,
+        disablePadding: false,        
+        visible: true,
+    },
+    {
+        id: 'type',
+        label: 'Typ',
+        numeric: false,
+        disablePadding: false,        
+        visible: true,
+    },
+];
 
-// const columns: GridColDef[] = [   
-//     {
-//       field: 'login',
-//       headerName: 'Login',
-//       width: 150,      
-//     },
-//     {
-//       field: 'name',
-//       headerName: 'Imię i nazwisko',
-//       width: 150,      
-//     },
-//     {
-//       field: 'type',
-//       headerName: 'Typ',
-//       //type: 'number',
-//       width: 110,
-//       editable: true,
-//     },
-    
-//   ];
+const rows = [
+    createData(1, 'rafal', 'Rafał Wielicki', 'Administrator'),
+    createData(2, 'andy', 'Andrzej Jurkowski', 'Administrator'),
+    createData(3, 'piotr', 'Piotr Trybuchowicz', 'Administrator'),    
+];
+
+function createData(
+    id: number,
+    login: string,
+    name: string,
+    type: string
+): IRow {
+    return {
+        id,
+        login,
+        name,
+        type
+    };
+}
+
   
 //   const rows = [
 //     { id: 1, login: 'admin', name: 'Rafał Wielicki', type: 'Administrator' },
@@ -70,13 +105,10 @@ const Employees = memo(() => {
             >
                 <CardContent>
                     <DataGrid 
+                        columns={columns}
+                        rows={rows}
                         isCheckbox={false}
                     />
-
-                    
-                    
-
-
                 </CardContent>
             </Card>
         </Box>

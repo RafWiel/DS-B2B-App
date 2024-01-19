@@ -44,7 +44,7 @@ const EmployeesFilter = memo(() => {
                             >
                                 {
                                     employeeType && employeeType.items.map((item) => (
-                                        <MenuItem value={item.id}>{item.text}</MenuItem>                                    
+                                        <MenuItem key={item.id} value={item.id}>{item.text}</MenuItem>                                    
                                     ))
                                 }                                
                             </Select>

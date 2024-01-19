@@ -20,7 +20,6 @@ import { ThemeProvider } from '@emotion/react';
 import './assets/app.css';
 import { useEffect, useState } from 'react';
 import routes from './routes';
-import { Card, CardContent, Grid, TextField } from '@mui/material';
 
 interface AppBarProps extends MuiAppBarProps {
     open?: boolean;
@@ -91,7 +90,7 @@ export default function App() {
         //   }
     });
 
-    const [appBarHeight, setAppBarHeight] = useState(0);
+    const [, setAppBarHeight] = useState(0);
     //const isMobileView = useMediaQuery(theme.breakpoints.down("sm"));        
 
     useEffect(() => {  
@@ -136,7 +135,7 @@ export default function App() {
                     open={isDesktopSideBarOpen} 
                     theme={theme} 
                     elevation={0}>
-                    <Toolbar >
+                    <Toolbar >                        
                         <IconButton
                             color="inherit"
                             aria-label="open drawer"
@@ -164,6 +163,9 @@ export default function App() {
                         </IconButton>
                         <Typography variant="h6" noWrap component="div">
                             {appBarTitle}
+                        </Typography>
+                        <Typography variant="h5" noWrap component="div" sx={{marginLeft: 2}}>
+                            TODO: DataGrid ikona usun 
                         </Typography>
                     </Toolbar>
                 </AppBar>
