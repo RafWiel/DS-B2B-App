@@ -19,6 +19,10 @@ const columns: IColumn[] = [
         numeric: true,
         disablePadding: false,        
         visible: false,
+        width: {
+            mobile: '0',
+            desktop: '0'
+        }
     },
     {
         id: 'login',
@@ -26,6 +30,10 @@ const columns: IColumn[] = [
         numeric: false,
         disablePadding: true,        
         visible: true,
+        width: {
+            mobile: '170px',
+            desktop: '170px'
+        }
     },
     {
         id: 'name',
@@ -33,6 +41,10 @@ const columns: IColumn[] = [
         numeric: false,
         disablePadding: false,        
         visible: true,
+        width: {
+            mobile: '220px',
+            desktop: '220px'
+        }
     },
     {
         id: 'type',
@@ -40,13 +52,17 @@ const columns: IColumn[] = [
         numeric: false,
         disablePadding: false,        
         visible: true,
+        width: {
+            mobile: 'auto',
+            desktop: 'auto'
+        }
     },
 ];
 
 const rows = [
-    createData(1, 'rafal', 'Rafał Wielicki', 'Administrator'),
+    createData(1, 'rafal.wielicki', 'Rafał Wielicki', 'Administrator'),
     createData(2, 'andy', 'Andrzej Jurkowski', 'Administrator'),
-    createData(3, 'piotr', 'Piotr Trybuchowicz', 'Administrator'),    
+    createData(3, 'piotr.trybuchowicz', 'Piotr Trybuchowicz', 'Administrator'),    
 ];
 
 function createData(
@@ -107,7 +123,8 @@ const Employees = memo(() => {
                     <DataGrid 
                         columns={columns}
                         rows={rows}
-                        isCheckbox={false}
+                        isSelection={false}
+                        isDelete={true}
                     />
                 </CardContent>
             </Card>

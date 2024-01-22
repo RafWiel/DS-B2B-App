@@ -165,7 +165,7 @@ export default function App() {
                             {appBarTitle}
                         </Typography>
                         <Typography variant="h5" noWrap component="div" sx={{marginLeft: 2}}>
-                            TODO: DataGrid ikona usun 
+                            TODO: Usun messagebox
                         </Typography>
                     </Toolbar>
                 </AppBar>

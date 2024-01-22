@@ -18,6 +18,8 @@ import Checkbox from '@mui/material/Checkbox';
 //import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import ClearIcon from '@mui/icons-material/Clear';
+import { useTheme } from '@mui/material/styles';
 
 export interface IBaseRow {
     id: number;    
@@ -29,12 +31,17 @@ export interface IColumn {
     numeric: boolean;
     disablePadding: boolean;
     visible: boolean;
+    width: {
+        mobile: string;
+        desktop: string;
+    }
 }
 
 interface IDataGridProps {  
     columns: IColumn[],  
     rows: any[],
-    isCheckbox: boolean;
+    isSelection: boolean;
+    isDelete: boolean;
 }
 
 interface IHeadProps {
@@ -45,7 +52,8 @@ interface IHeadProps {
     order: Order;
     orderBy: string;
     rowCount: number;
-    isCheckbox: boolean;
+    isSelection: boolean;
+    isDelete: boolean;
 }
 
 // interface IEnhancedTableToolbarProps {
@@ -53,16 +61,6 @@ interface IHeadProps {
 // }
   
 type Order = 'asc' | 'desc';
-
-
-
-
-
-
-
-
-
-
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
     if (b[orderBy] < a[orderBy]) {
@@ -105,7 +103,9 @@ function stableSort<T>(array: T[], comparator: (a: T, b: T) => number) {
 }
 
 function EnhancedTableHead(props: IHeadProps) {
-    const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort, isCheckbox, columns } = props;
+    const theme = useTheme();
+
+    const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort, isSelection, isDelete, columns } = props;
   
     const createSortHandler = (property: string) => (event: React.MouseEvent<unknown>) => {
         onRequestSort(event, property);
@@ -115,7 +115,7 @@ function EnhancedTableHead(props: IHeadProps) {
         <TableHead>
             <TableRow>
                 {
-                    isCheckbox &&
+                    isSelection &&
                     <TableCell padding="checkbox">
                         <Checkbox
                             color="primary"
@@ -132,12 +132,16 @@ function EnhancedTableHead(props: IHeadProps) {
                     columns && columns.map((column) => (
                         column.visible && 
                         <TableCell
-                            key={column.id}
+                            key={column.id}                            
                             align={column.numeric ? 'right' : 'left'}
                             padding={column.disablePadding ? 'none' : 'normal'}                            
                             sortDirection={orderBy === column.id ? order : false}
                             sx = {{
-                                paddingLeft: column.disablePadding ? (isCheckbox ? 0 : 1) : 0
+                                paddingLeft: column.disablePadding ? (isSelection ? 0 : 1) : 0,
+                                width: column.width.desktop,
+                                [theme.breakpoints.down('sm')]: {
+                                    width: column.width.mobile,
+                                },  
                             }} 
                         >
                             <TableSortLabel
@@ -159,8 +163,29 @@ function EnhancedTableHead(props: IHeadProps) {
                                     ) : null
                                 }
                             </TableSortLabel>
-                        </TableCell>
+                        </TableCell>                        
                     ))
+                }
+                {                
+                    isDelete &&
+                    <TableCell
+                        scope="row" 
+                        key="deleteButton"
+                        align="right" 
+                        padding="none"   
+                        width="40px"
+                        sx = {{
+                            paddingRight: 1,
+                            paddingTop: 1,
+                            cursor: 'pointer',
+                            color: 'var(--color-grey)',
+                            "&:hover": {
+                                color: 'var(--color-red)'
+                            }
+                        }}                                                                                      
+                    >
+                        <ClearIcon />                                             
+                    </TableCell>                 
                 }
             </TableRow>
         </TableHead>
@@ -220,7 +245,7 @@ function EnhancedTableHead(props: IHeadProps) {
 // }
 
 export default function DataGrid(props: IDataGridProps) {
-    const { columns, rows, isCheckbox } = props;
+    const { columns, rows, isSelection, isDelete } = props;
 
     const [order, setOrder] = React.useState<Order>('asc');    
     const [orderBy, setOrderBy] = React.useState<string>('calories');
@@ -307,7 +332,7 @@ export default function DataGrid(props: IDataGridProps) {
             {/* <EnhancedTableToolbar numSelected={selected.length} /> */}
             <TableContainer>
                 <Table
-                    sx={{ minWidth: 750 }}
+                    sx={{ minWidth: 400 }}
                     aria-labelledby="tableTitle"
                     size='medium'
                 >
@@ -319,7 +344,8 @@ export default function DataGrid(props: IDataGridProps) {
                         onSelectAllClick={handleSelectAllClick}
                         onRequestSort={handleRequestSort}
                         rowCount={rows.length}
-                        isCheckbox={isCheckbox}
+                        isSelection={isSelection}
+                        isDelete={isDelete}
                     />
                     <TableBody>
                     {
@@ -339,7 +365,7 @@ export default function DataGrid(props: IDataGridProps) {
                                     sx={{ cursor: 'pointer' }}
                                 >
                                     {
-                                        isCheckbox &&
+                                        isSelection &&
                                         <TableCell padding="checkbox">                                                                        
                                             <Checkbox
                                                 color="primary"
@@ -354,20 +380,37 @@ export default function DataGrid(props: IDataGridProps) {
                                         columns && columns.map((column, index) => (
                                             column.visible && 
                                             <TableCell
-                                                component="th"
                                                 id={index <= 1 ? labelId : undefined}
                                                 scope="row" 
                                                 key={column.id}
                                                 align={column.numeric ? 'right' : 'left'} 
                                                 padding={column.disablePadding ? 'none' : 'normal'}                                                        
                                                 sx = {{
-                                                    paddingLeft: column.disablePadding ? (isCheckbox ? 0 : 1) : 0
+                                                    paddingLeft: column.disablePadding ? (isSelection ? 0 : 1) : 0
                                                 }}                                               
                                             >
                                                 {Object.values(row)[index]}                                                
                                             </TableCell>
                                         ))
-                                    }                                    
+                                    }   
+                                    {                
+                                        isDelete &&
+                                        <TableCell
+                                            scope="row" 
+                                            key="deleteButton"
+                                            align="right" 
+                                            padding="none"                                        
+                                            sx = {{
+                                                paddingRight: 1,
+                                                color: 'var(--color-grey)',
+                                                "&:hover": {
+                                                    color: 'var(--color-red)'
+                                                }
+                                            }}                                                                                     
+                                        >
+                                            <ClearIcon />                                             
+                                        </TableCell>                 
+                                    }
                                 </TableRow>
                             );
                         })
