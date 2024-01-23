@@ -42,6 +42,8 @@ interface IDataGridProps {
     rows: any[],
     isSelection: boolean;
     isDelete: boolean;
+    deleteRow: (row: object) => void;
+    deleteAllRows: () => void;
 }
 
 interface IHeadProps {
@@ -54,6 +56,7 @@ interface IHeadProps {
     rowCount: number;
     isSelection: boolean;
     isDelete: boolean;
+    deleteAllRows: () => void;
 }
 
 // interface IEnhancedTableToolbarProps {
@@ -105,10 +108,19 @@ function stableSort<T>(array: T[], comparator: (a: T, b: T) => number) {
 function EnhancedTableHead(props: IHeadProps) {
     const theme = useTheme();
 
-    const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort, isSelection, isDelete, columns } = props;
+    const { 
+        onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort, 
+        isSelection, isDelete, columns, deleteAllRows 
+    } = props;
   
     const createSortHandler = (property: string) => (event: React.MouseEvent<unknown>) => {
         onRequestSort(event, property);
+    };
+
+    const handleDeleteAll = (event: React.MouseEvent<unknown>) => {        
+        deleteAllRows();
+
+        event.stopPropagation();
     };
 
     return (
@@ -171,6 +183,7 @@ function EnhancedTableHead(props: IHeadProps) {
                     <TableCell
                         scope="row" 
                         key="deleteButton"
+                        onClick={(event) => handleDeleteAll(event)}
                         align="right" 
                         padding="none"   
                         width="40px"
@@ -245,13 +258,14 @@ function EnhancedTableHead(props: IHeadProps) {
 // }
 
 export default function DataGrid(props: IDataGridProps) {
-    const { columns, rows, isSelection, isDelete } = props;
+    const { columns, rows, isSelection, isDelete, deleteRow, deleteAllRows } = props;
 
     const [order, setOrder] = React.useState<Order>('asc');    
     const [orderBy, setOrderBy] = React.useState<string>('calories');
     const [selected, setSelected] = React.useState<readonly number[]>([]);
     //const [page, setPage] = React.useState(0);  
     //const [rowsPerPage, setRowsPerPage] = React.useState(5);
+    
 
     const handleRequestSort = (
         _: React.MouseEvent<unknown>,
@@ -273,7 +287,8 @@ export default function DataGrid(props: IDataGridProps) {
         setSelected([]);
     };
 
-  const handleClick = (_: React.MouseEvent<unknown>, id: number) => {
+    const handleRowClick = (_: React.MouseEvent<unknown>, id: number) => {
+        console.log('row', id);
         const selectedIndex = selected.indexOf(id);
         let newSelected: readonly number[] = [];
 
@@ -292,6 +307,12 @@ export default function DataGrid(props: IDataGridProps) {
 
         setSelected(newSelected);
     };
+
+    const handleDelete = (event: React.MouseEvent<unknown>, row: object) => {
+        deleteRow(row);
+
+        event.stopPropagation();
+    };    
 
     // const handleChangePage = (event: unknown, newPage: number) => {
     //     setPage(newPage);
@@ -346,6 +367,7 @@ export default function DataGrid(props: IDataGridProps) {
                         rowCount={rows.length}
                         isSelection={isSelection}
                         isDelete={isDelete}
+                        deleteAllRows={deleteAllRows}
                     />
                     <TableBody>
                     {
@@ -356,7 +378,7 @@ export default function DataGrid(props: IDataGridProps) {
                             return (
                                 <TableRow
                                     hover
-                                    onClick={(event) => handleClick(event, Number(row.id))}
+                                    onClick={(event) => handleRowClick(event, Number(row.id))}
                                     role="checkbox"
                                     aria-checked={isItemSelected}
                                     tabIndex={-1}
@@ -398,6 +420,7 @@ export default function DataGrid(props: IDataGridProps) {
                                         <TableCell
                                             scope="row" 
                                             key="deleteButton"
+                                            onClick={(event) => handleDelete(event, row)}
                                             align="right" 
                                             padding="none"                                        
                                             sx = {{

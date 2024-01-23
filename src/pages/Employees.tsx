@@ -5,6 +5,7 @@ import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import DataGrid, { IBaseRow, IColumn } from "../components/DataGrid";
+import { useAppStore } from "../store";
 
 interface IRow extends IBaseRow {
     login: string;
@@ -93,7 +94,24 @@ function createData(
   
   
 const Employees = memo(() => {
-    const theme = useTheme();    
+    const theme = useTheme();   
+    const openMessageDialog = useAppStore((state) => state.openMessageDialog); 
+
+    const handleDelete = (row: object) => {
+        const employee = row as IRow;
+
+        openMessageDialog({
+            title: 'Pracownicy',
+            text: `Czy na pewno usunąć pracownika ${employee.name}?`
+        });
+    }
+
+    const handleDeleteAll = () => {        
+        openMessageDialog({
+            title: 'Pracownicy',
+            text: `Czy na pewno usunąć wszystkich pracowników?`
+        });
+    }
 
     return (
         <Box         
@@ -125,6 +143,8 @@ const Employees = memo(() => {
                         rows={rows}
                         isSelection={false}
                         isDelete={true}
+                        deleteRow={handleDelete}
+                        deleteAllRows={handleDeleteAll}
                     />
                 </CardContent>
             </Card>
