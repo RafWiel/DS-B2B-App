@@ -17,7 +17,7 @@ const EmployeesFilter = memo(() => {
             }}>
             <CardContent>
                 <Grid container spacing={2}>
-                    <Grid item xs={8} sm={10}>                        
+                    <Grid item xs={8} sm={10}>
                         <TextField 
                             id="employee-search"                                 
                             label="Szukaj" 

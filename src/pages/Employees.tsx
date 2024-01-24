@@ -6,6 +6,8 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import DataGrid, { IBaseRow, IColumn } from "../components/DataGrid";
 import { useAppStore } from "../store";
+import { Button, Grid } from "@mui/material";
+import AddIcon from '@mui/icons-material/Add';
 
 interface IRow extends IBaseRow {
     login: string;
@@ -94,23 +96,35 @@ function createData(
   
   
 const Employees = memo(() => {
-    const theme = useTheme();   
-    const openMessageDialog = useAppStore((state) => state.openMessageDialog); 
-
+    const theme = useTheme();     
+    const openQuestionDialog = useAppStore((state) => state.openQuestionDialog); 
+    
     const handleDelete = (row: object) => {
         const employee = row as IRow;
 
-        openMessageDialog({
+        openQuestionDialog({
             title: 'Pracownicy',
-            text: `Czy na pewno usunąć pracownika ${employee.name}?`
+            text: `Czy na pewno usunąć pracownika ${employee.name}?`,            
+            action: deleteUser,
+            actionParameters: employee.id
         });
     }
 
     const handleDeleteAll = () => {        
-        openMessageDialog({
+        openQuestionDialog({
             title: 'Pracownicy',
-            text: `Czy na pewno usunąć wszystkich pracowników?`
+            text: `Czy na pewno usunąć wszystkich pracowników?`,            
+            action: deleteAllUsers,
+            //actionParameters: [1, 2, 3]
         });
+    }
+
+    const deleteUser = (id?: number) => {
+        console.log('delete user ', id);        
+    }
+
+    const deleteAllUsers = () => {
+        console.log('delete all users');        
     }
 
     return (
@@ -138,14 +152,32 @@ const Employees = memo(() => {
                 }}
             >
                 <CardContent>
-                    <DataGrid 
-                        columns={columns}
-                        rows={rows}
-                        isSelection={false}
-                        isDelete={true}
-                        deleteRow={handleDelete}
-                        deleteAllRows={handleDeleteAll}
-                    />
+                    <Grid container spacing={2}>
+                        <Grid item xs={12} sm={12} md={10}>
+                            <DataGrid 
+                                columns={columns}
+                                rows={rows}
+                                isSelection={false}
+                                isDelete={true}
+                                deleteRow={handleDelete}
+                                deleteAllRows={handleDeleteAll}
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={12} md={2}>
+                            <Button                                 
+                                variant="contained"
+                                disableElevation 
+                                startIcon={<AddIcon />}
+                                sx={{
+                                    display: 'inline-flex',
+                                    width: '100%',
+                                    
+                                }}
+                            >
+                                Dodaj
+                            </Button>
+                        </Grid>
+                    </Grid>    
                 </CardContent>
             </Card>
         </Box>

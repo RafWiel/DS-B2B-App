@@ -20,7 +20,10 @@ import { ThemeProvider } from '@emotion/react';
 import './assets/app.css';
 import { useEffect, useState } from 'react';
 import routes from './routes';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import MessageDialog from './components/MessageDialog';
+import QuestionDialog from './components/QuestionDialog';
+
+const todo = "TODO: Przycisk na dole XS";
 
 interface AppBarProps extends MuiAppBarProps {
     open?: boolean;
@@ -54,10 +57,8 @@ export default function App() {
     const openDesktopSideBar = useAppStore((state) => state.openDesktop);
     const openMobileSideBar = useAppStore((state) => state.openMobile);         
     const appBarTitle = useAppStore((state) => state.appBarTitle);         
-    const setAppBarTitle = useAppStore((state) => state.setAppBarTitle);  
-    const messageDialog = useAppStore((state) => state.messageDialog);
-    const closeMessageDialog = useAppStore((state) => state.closeMessageDialog);           
-    
+    const setAppBarTitle = useAppStore((state) => state.setAppBarTitle);          
+
     const theme = createTheme({
         palette: {    
             background: {
@@ -116,7 +117,7 @@ export default function App() {
     }
 
     return (
-        <ThemeProvider theme={theme}>
+        <ThemeProvider theme={theme}>            
             <Box 
                 sx={{ 
                     display: 'flex',
@@ -164,14 +165,30 @@ export default function App() {
                         >
                             <MenuIcon />
                         </IconButton>
-                        <Typography variant="h6" noWrap component="div">
+                        <Typography 
+                            variant="h6" 
+                            noWrap 
+                            component="div"
+                            sx={{ 
+                                width: '50%',                                                              
+                            }}
+                        >
                             {appBarTitle}
-                        </Typography>
-                        <Typography variant="h5" noWrap component="div" sx={{marginLeft: 2}}>
-                            TODO: QuestionDialog
-                        </Typography>
-                    </Toolbar>
-                </AppBar>
+                        </Typography>    
+                        <Typography 
+                            variant="h6" 
+                            noWrap 
+                            component="div" 
+                            sx={{ 
+                                width: '50%',
+                                textAlign: 'right', 
+                                color: 'yellow'                               
+                            }}
+                        >
+                            {todo}
+                        </Typography>                    
+                    </Toolbar>                    
+                </AppBar>                
                 <SideBar />
                 <Box 
                     component="main"                    
@@ -211,26 +228,8 @@ export default function App() {
                         </Route>                                        
                     </Switch>                     
                 </Box>
-                <Dialog
-                    open={messageDialog.isOpen ?? false}
-                    onClose={closeMessageDialog}
-                    aria-labelledby="alert-dialog-title"
-                    aria-describedby="alert-dialog-description"
-                >
-                    <DialogTitle id="alert-dialog-title">
-                        {messageDialog.title}
-                    </DialogTitle>
-                    <DialogContent>
-                        <DialogContentText id="alert-dialog-description">
-                            {messageDialog.text}
-                        </DialogContentText>
-                    </DialogContent>
-                    <DialogActions>
-                        <Button onClick={closeMessageDialog} autoFocus>
-                            OK
-                        </Button>
-                    </DialogActions>
-                </Dialog>
+                <MessageDialog />
+                <QuestionDialog />
             </Box>
         </ThemeProvider>
     );
