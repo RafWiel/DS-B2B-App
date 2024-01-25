@@ -23,7 +23,7 @@ import routes from './routes';
 import MessageDialog from './components/MessageDialog';
 import QuestionDialog from './components/QuestionDialog';
 
-const todo = "TODO: Przycisk na dole XS";
+const todo = "TODO: Scrollable Table";
 
 interface AppBarProps extends MuiAppBarProps {
     open?: boolean;

@@ -65,7 +65,22 @@ const columns: IColumn[] = [
 const rows = [
     createData(1, 'rafal.wielicki', 'Rafał Wielicki', 'Administrator'),
     createData(2, 'andy', 'Andrzej Jurkowski', 'Administrator'),
-    createData(3, 'piotr.trybuchowicz', 'Piotr Trybuchowicz', 'Administrator'),    
+    createData(3, 'piotr.trybuchowicz', 'Piotr Trybuchowicz', 'Administrator'),   
+    createData(4, 'rafal.wielicki', 'Rafał Wielicki', 'Administrator'),
+    createData(5, 'andy', 'Andrzej Jurkowski', 'Administrator'),
+    createData(6, 'piotr.trybuchowicz', 'Piotr Trybuchowicz', 'Administrator'),   
+    createData(7, 'rafal.wielicki', 'Rafał Wielicki', 'Administrator'),
+    createData(8, 'andy', 'Andrzej Jurkowski', 'Administrator'),
+    createData(9, 'piotr.trybuchowicz', 'Piotr Trybuchowicz', 'Administrator'),   
+    createData(10, 'rafal.wielicki', 'Rafał Wielicki', 'Administrator'),
+    createData(11, 'andy', 'Andrzej Jurkowski', 'Administrator'),
+    createData(12, 'piotr.trybuchowicz', 'Piotr Trybuchowicz', 'Administrator'),    
+    createData(13, 'rafal.wielicki', 'Rafał Wielicki', 'Administrator'),
+    createData(14, 'andy', 'Andrzej Jurkowski', 'Administrator'),
+    createData(15, 'piotr.trybuchowicz', 'Piotr Trybuchowicz', 'Administrator'),    
+    createData(16, 'rafal.wielicki', 'Rafał Wielicki', 'Administrator'),
+    createData(17, 'andy', 'Andrzej Jurkowski', 'Administrator'),
+    createData(18, 'piotr.trybuchowicz', 'Piotr Trybuchowicz', 'Administrator'),    
 ];
 
 function createData(
@@ -145,33 +160,70 @@ const Employees = memo(() => {
                 variant="outlined"
                 sx={{    
                     marginTop: 1.5, 
-                    height: '100%',                        
+                    height: '100%',                    
                     [theme.breakpoints.down('sm')]: {
                         border: 'none' 
                     },                    
                 }}
             >
-                <CardContent>
-                    <Grid container spacing={2}>
-                        <Grid item xs={12} sm={12} md={10}>
+                <CardContent sx={{
+                            //backgroundColor: 'red', 
+                            display: 'flex',                            
+                            height: '100%',
+                            [theme.breakpoints.down('md')]: {
+                                padding: 1,
+                                '&:last-child': { 
+                                    paddingBottom: 1 
+                                }
+                            },                                                                                                                
+                        }}>                    
+                    <Grid 
+                        container 
+                        spacing={2}
+                        sx={{
+                            //backgroundColor: 'gainsboro',                                                                                                                                           
+                        }}
+                    >
+                        <Grid 
+                            item 
+                            xs={12} 
+                            sm={12} 
+                            md={10} 
+                            // sx={{
+                            //     //backgroundColor: 'aqua',
+                            //     //flexGrow: 1,
+                            //     //alignSelf: 'flex-start'
+                            // }}
+                        >
                             <DataGrid 
                                 columns={columns}
                                 rows={rows}
                                 isSelection={false}
                                 isDelete={true}
                                 deleteRow={handleDelete}
-                                deleteAllRows={handleDeleteAll}
+                                deleteAllRows={handleDeleteAll}                                
                             />
                         </Grid>
-                        <Grid item xs={12} sm={12} md={2}>
+                        <Grid 
+                            item 
+                            xs={12} 
+                            sm={12} 
+                            md={2}
+                            sx={{
+                                //backgroundColor: 'aqua',                                
+                                alignSelf: 'flex-start',
+                                [theme.breakpoints.down('md')]: {
+                                    alignSelf: 'flex-end',
+                                },  
+                            }}
+                        >
                             <Button                                 
                                 variant="contained"
                                 disableElevation 
                                 startIcon={<AddIcon />}
                                 sx={{
-                                    display: 'inline-flex',
-                                    width: '100%',
-                                    
+                                    display: 'inline-flex',                                                                        
+                                    width: '100%',                                    
                                 }}
                             >
                                 Dodaj

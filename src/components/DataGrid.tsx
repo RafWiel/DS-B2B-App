@@ -344,15 +344,26 @@ export default function DataGrid(props: IDataGridProps) {
         [order, orderBy],
     );
 
+    const tableHeight = window.innerHeight;
+
+    console.log(tableHeight);
+
     return (
         <Box 
             sx={{ 
-                width: '100%' 
+                width: '100%', 
+                       
             }}
         >            
             {/* <EnhancedTableToolbar numSelected={selected.length} /> */}
-            <TableContainer>
+            <TableContainer sx={{ 
+                    width: '100%',
+                    maxHeight: '50vh', 
+                    //overflow: 'auto',   
+                    backgroundColor: 'yellow' 
+                }}>
                 <Table
+                    stickyHeader
                     sx={{ minWidth: 400 }}
                     aria-labelledby="tableTitle"
                     size='medium'
@@ -369,87 +380,96 @@ export default function DataGrid(props: IDataGridProps) {
                         isDelete={isDelete}
                         deleteAllRows={deleteAllRows}
                     />
-                    <TableBody>
-                    {
-                        visibleRows.map((row, index) => {
-                            const isItemSelected = isSelected(Number(row.id));
-                            const labelId = `enhanced-table-checkbox-${index}`;
+                    {/* <Box 
+                        sx={{ 
+                            // width: '100%',
+                            // maxHeight: '500px', 
+                            // overflow: 'auto',
+                            // backgroundColor: 'aqua'               
+                        }}
+                    >    */}
+                        <TableBody>
+                        {
+                            visibleRows.map((row, index) => {
+                                const isItemSelected = isSelected(Number(row.id));
+                                const labelId = `enhanced-table-checkbox-${index}`;
 
-                            return (
-                                <TableRow
-                                    hover
-                                    onClick={(event) => handleRowClick(event, Number(row.id))}
-                                    role="checkbox"
-                                    aria-checked={isItemSelected}
-                                    tabIndex={-1}
-                                    key={row.id}
-                                    selected={isItemSelected}
-                                    sx={{ cursor: 'pointer' }}
-                                >
-                                    {
-                                        isSelection &&
-                                        <TableCell padding="checkbox">                                                                        
-                                            <Checkbox
-                                                color="primary"
-                                                checked={isItemSelected}
-                                                inputProps={{
-                                                    'aria-labelledby': labelId,
-                                                }}
-                                            />                                    
-                                        </TableCell>
-                                    }                                    
-                                    {
-                                        columns && columns.map((column, index) => (
-                                            column.visible && 
-                                            <TableCell
-                                                id={index <= 1 ? labelId : undefined}
-                                                scope="row" 
-                                                key={column.id}
-                                                align={column.numeric ? 'right' : 'left'} 
-                                                padding={column.disablePadding ? 'none' : 'normal'}                                                        
-                                                sx = {{
-                                                    paddingLeft: column.disablePadding ? (isSelection ? 0 : 1) : 0
-                                                }}                                               
-                                            >
-                                                {Object.values(row)[index]}                                                
+                                return (
+                                    <TableRow
+                                        hover
+                                        onClick={(event) => handleRowClick(event, Number(row.id))}
+                                        role="checkbox"
+                                        aria-checked={isItemSelected}
+                                        tabIndex={-1}
+                                        key={row.id}
+                                        selected={isItemSelected}
+                                        sx={{ cursor: 'pointer' }}
+                                    >
+                                        {
+                                            isSelection &&
+                                            <TableCell padding="checkbox">                                                                        
+                                                <Checkbox
+                                                    color="primary"
+                                                    checked={isItemSelected}
+                                                    inputProps={{
+                                                        'aria-labelledby': labelId,
+                                                    }}
+                                                />                                    
                                             </TableCell>
-                                        ))
-                                    }   
-                                    {                
-                                        isDelete &&
-                                        <TableCell
-                                            scope="row" 
-                                            key="deleteButton"
-                                            onClick={(event) => handleDelete(event, row)}
-                                            align="right" 
-                                            padding="none"                                        
-                                            sx = {{
-                                                paddingRight: 1,
-                                                color: 'var(--color-grey)',
-                                                "&:hover": {
-                                                    color: 'var(--color-red)'
-                                                }
-                                            }}                                                                                     
-                                        >
-                                            <ClearIcon />                                             
-                                        </TableCell>                 
-                                    }
+                                        }                                    
+                                        {
+                                            columns && columns.map((column, index) => (
+                                                column.visible && 
+                                                <TableCell
+                                                    id={index <= 1 ? labelId : undefined}
+                                                    scope="row" 
+                                                    key={column.id}
+                                                    align={column.numeric ? 'right' : 'left'} 
+                                                    padding={column.disablePadding ? 'none' : 'normal'}                                                        
+                                                    sx = {{
+                                                        paddingLeft: column.disablePadding ? (isSelection ? 0 : 1) : 0
+                                                    }}                                               
+                                                >
+                                                    {Object.values(row)[index]}                                                
+                                                </TableCell>
+                                            ))
+                                        }   
+                                        {                
+                                            isDelete &&
+                                            <TableCell
+                                                scope="row" 
+                                                key="deleteButton"
+                                                onClick={(event) => handleDelete(event, row)}
+                                                align="right" 
+                                                padding="none"                                        
+                                                sx = {{
+                                                    paddingRight: 1,
+                                                    color: 'var(--color-grey)',
+                                                    "&:hover": {
+                                                        color: 'var(--color-red)'
+                                                    }
+                                                }}                                                                                     
+                                            >
+                                                <ClearIcon />                                             
+                                            </TableCell>                 
+                                        }
+                                    </TableRow>
+                                );
+                            })
+                        }
+                        {/* {
+                            emptyRows > 0 && (
+                                <TableRow
+                                    style={{
+                                        height: 53 * emptyRows,
+                                    }}
+                                >
+                                    <TableCell colSpan={6} />
                                 </TableRow>
-                            );
-                        })
-                    }
-                    {/* {
-                        emptyRows > 0 && (
-                            <TableRow
-                                style={{
-                                    height: 53 * emptyRows,
-                                }}
-                            >
-                                <TableCell colSpan={6} />
-                            </TableRow>
-                        )
-                    } */}
-                    </TableBody>
+                            )
+                        } */}
+                        </TableBody>
+                    {/* </Box> */}
                 </Table>
             </TableContainer>
             {/* <TablePagination
