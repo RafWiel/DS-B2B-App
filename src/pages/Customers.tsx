@@ -13,7 +13,7 @@ const Customers = memo(() => {
             sx={{                
                 display: 'flex',
                 width: 1,
-                height: '100%',
+                height: '90vh',
                 
                 flexDirection: 'column',
                 padding: {
@@ -37,7 +37,7 @@ const Customers = memo(() => {
                     //backgroundColor: 'red', 
                     
                     display: 'flex',
-                    height: '50%',                            
+                    height: '100%',                            
                     maxHeight: '100%',
                     [theme.breakpoints.down('md')]: {
                         padding: 1,

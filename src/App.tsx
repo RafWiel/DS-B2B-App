@@ -23,7 +23,7 @@ import routes from './routes';
 import MessageDialog from './components/MessageDialog';
 import QuestionDialog from './components/QuestionDialog';
 
-const todo = "TODO: Scrollable Table";
+const todo = "TODO: Calculate height";
 
 interface AppBarProps extends MuiAppBarProps {
     open?: boolean;

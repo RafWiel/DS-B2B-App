@@ -147,6 +147,7 @@ const Employees = memo(() => {
             sx={{                
                 width: 1,
                 height: '100%',
+                //maxHeight: '90vh',
                 display: 'flex',
                 flexDirection: 'column',
                 padding: {
@@ -224,7 +225,8 @@ const Employees = memo(() => {
                                 startIcon={<AddIcon />}
                                 sx={{
                                     display: 'inline-flex',                                                                        
-                                    width: '100%',                                    
+                                    width: '100%', 
+                                    height: 40                                   
                                 }}
                             >
                                 Dodaj
