@@ -3,7 +3,96 @@ import { useTheme } from '@mui/material/styles';
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import { Typography } from "@mui/material";
+import EmployeesFilter from "../components/EmployeesFilter";
+import DataGrid, { IBaseRow, IColumn } from "../components/DataGrid";
+
+interface IRow extends IBaseRow {
+    login: string;
+    name: string;
+    type: string;    
+}
+
+const columns: IColumn[] = [
+    {
+        id: 'id',
+        label: 'Id',
+        numeric: true,
+        disablePadding: false,        
+        visible: false,
+        width: {
+            mobile: '0',
+            desktop: '0'
+        }
+    },
+    {
+        id: 'login',
+        label: 'Login',
+        numeric: false,
+        disablePadding: true,        
+        visible: true,
+        width: {
+            mobile: '170px',
+            desktop: '170px'
+        }
+    },
+    {
+        id: 'name',
+        label: 'Imię i nazwisko',
+        numeric: false,
+        disablePadding: false,        
+        visible: true,
+        width: {
+            mobile: '220px',
+            desktop: '220px'
+        }
+    },
+    {
+        id: 'type',
+        label: 'Typ',
+        numeric: false,
+        disablePadding: false,        
+        visible: true,
+        width: {
+            mobile: 'auto',
+            desktop: 'auto'
+        }
+    },
+];
+
+const rows = [
+    createData(1, 'rafal.wielicki', 'Rafał Wielicki', 'Administrator'),
+    createData(2, 'andy', 'Andrzej Jurkowski', 'Administrator'),
+    createData(3, 'piotr.trybuchowicz', 'Piotr Trybuchowicz', 'Administrator'),   
+    createData(4, 'rafal.wielicki', 'Rafał Wielicki', 'Administrator'),
+    createData(5, 'andy', 'Andrzej Jurkowski', 'Administrator'),
+    createData(6, 'piotr.trybuchowicz', 'Piotr Trybuchowicz', 'Administrator'),   
+    createData(7, 'rafal.wielicki', 'Rafał Wielicki', 'Administrator'),
+    createData(8, 'andy', 'Andrzej Jurkowski', 'Administrator'),
+    createData(9, 'piotr.trybuchowicz', 'Piotr Trybuchowicz', 'Administrator'),   
+    createData(10, 'rafal.wielicki', 'Rafał Wielicki', 'Administrator'),
+    createData(11, 'andy', 'Andrzej Jurkowski', 'Administrator'),
+    createData(12, 'piotr.trybuchowicz', 'Piotr Trybuchowicz', 'Administrator'),    
+    createData(13, 'rafal.wielicki', 'Rafał Wielicki', 'Administrator'),
+    createData(14, 'andy', 'Andrzej Jurkowski', 'Administrator'),
+    createData(15, 'piotr.trybuchowicz', 'Piotr Trybuchowicz', 'Administrator'),    
+    createData(16, 'rafal.wielicki', 'Rafał Wielicki', 'Administrator'),
+    createData(17, 'andy', 'Andrzej Jurkowski', 'Administrator'),
+    createData(18, 'piotr.trybuchowicz', 'Piotr Trybuchowicz', 'Administrator'),    
+];
+
+function createData(
+    id: number,
+    login: string,
+    name: string,
+    type: string
+): IRow {
+    return {
+        id,
+        login,
+        name,
+        type
+    };
+}
 
 const Companies = memo(() => {
     const theme = useTheme();    
@@ -21,43 +110,39 @@ const Companies = memo(() => {
                 }
             }}
         >
+            <EmployeesFilter />
             <Card 
                 variant="outlined"
                 sx={{    
-                    height: '100%',                        
+                    marginTop: 1.5, 
+                    height: '100%',                    
                     [theme.breakpoints.down('sm')]: {
                         border: 'none' 
                     },                    
                 }}
             >
-                <CardContent>
-                    <Typography paragraph>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-                        tempor incididunt ut labore et dolore magna aliqua. Rhoncus dolor purus non
-                        enim praesent elementum facilisis leo vel. Risus at ultrices mi tempus
-                        imperdiet. Semper risus in hendrerit gravida rutrum quisque non tellus.
-                        Convallis convallis tellus id interdum velit laoreet id donec ultrices.
-                        Odio morbi quis commodo odio aenean sed adipiscing. Amet nisl suscipit
-                        adipiscing bibendum est ultricies integer quis. Cursus euismod quis viverra
-                        nibh cras. Metus vulputate eu scelerisque felis imperdiet proin fermentum
-                        leo. Mauris commodo quis imperdiet massa tincidunt. Cras tincidunt lobortis
-                        feugiat vivamus at augue. At augue eget arcu dictum varius duis at
-                        consectetur lorem. Velit sed ullamcorper morbi tincidunt. Lorem donec massa
-                        sapien faucibus et molestie ac.
-                    </Typography>
-                    <Typography paragraph>
-                        Consequat mauris nunc congue nisi vitae suscipit. Fringilla est ullamcorper
-                        eget nulla facilisi etiam dignissim diam. Pulvinar elementum integer enim
-                        neque volutpat ac tincidunt. Ornare suspendisse sed nisi lacus sed viverra
-                        tellus. Purus sit amet volutpat consequat mauris. Elementum eu facilisis
-                        sed odio morbi. Euismod lacinia at quis risus sed vulputate odio. Morbi
-                        tincidunt ornare massa eget egestas purus viverra accumsan in. In hendrerit
-                        gravida rutrum quisque non tellus orci ac. Pellentesque nec nam aliquam sem
-                        et tortor. Habitant morbi tristique senectus et. Adipiscing elit duis
-                        tristique sollicitudin nibh sit. Ornare aenean euismod elementum nisi quis
-                        eleifend. Commodo viverra maecenas accumsan lacus vel facilisis. Nulla
-                        posuere sollicitudin aliquam ultrices sagittis orci a.
-                    </Typography>
+                <CardContent sx={{
+                    //backgroundColor: 'red', 
+                    display: 'flex',                            
+                    maxHeight: '100%',
+                    [theme.breakpoints.down('md')]: {
+                        padding: 1,
+                        '&:last-child': { 
+                            paddingBottom: 1 
+                        }
+                    },                                                                                                                
+                }}>                    
+                    
+                    <DataGrid 
+                        columns={columns}
+                        rows={rows}
+                        isSelection={false}
+                        isDelete={true}
+                        deleteRow={() => {}}
+                        deleteAllRows={() => {}}        
+                    />
+                        
+                            
                 </CardContent>
             </Card>
         </Box>

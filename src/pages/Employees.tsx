@@ -169,7 +169,7 @@ const Employees = memo(() => {
                 <CardContent sx={{
                             //backgroundColor: 'red', 
                             display: 'flex',                            
-                            height: '100%',
+                            maxHeight: '100%',
                             [theme.breakpoints.down('md')]: {
                                 padding: 1,
                                 '&:last-child': { 

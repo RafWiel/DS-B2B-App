@@ -351,20 +351,29 @@ export default function DataGrid(props: IDataGridProps) {
     return (
         <Box 
             sx={{ 
+                //display: 'block',
                 width: '100%', 
-                       
+                height: '50%',
+                overflow: 'scroll',  
+                backgroundColor: 'aqua'       
             }}
         >            
             {/* <EnhancedTableToolbar numSelected={selected.length} /> */}
             <TableContainer sx={{ 
-                    width: '100%',
-                    maxHeight: '50vh', 
+                    overflowY: 'auto',
+                    //display: 'block',
+                    //width: '100%',
+                    maxHeight: '50%', 
                     //overflow: 'auto',   
                     backgroundColor: 'yellow' 
                 }}>
                 <Table
                     stickyHeader
-                    sx={{ minWidth: 400 }}
+                    sx={{ 
+                        minWidth: 400,
+                        height: '100%',
+                        overflowY: 'scroll' 
+                    }}
                     aria-labelledby="tableTitle"
                     size='medium'
                 >
