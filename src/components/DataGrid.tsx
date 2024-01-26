@@ -353,9 +353,10 @@ export default function DataGrid(props: IDataGridProps) {
             sx={{ 
                 //display: 'block',
                 width: '100%', 
-                height: '50%',
-                overflow: 'scroll',  
-                backgroundColor: 'aqua'       
+                //height: '40vh',
+                //overflow: 'scroll',  
+                backgroundColor: 'aqua', 
+                
             }}
         >            
             {/* <EnhancedTableToolbar numSelected={selected.length} /> */}
@@ -363,7 +364,7 @@ export default function DataGrid(props: IDataGridProps) {
                     overflowY: 'auto',
                     //display: 'block',
                     //width: '100%',
-                    maxHeight: '50%', 
+                    maxHeight: '100%', 
                     //overflow: 'auto',   
                     backgroundColor: 'yellow' 
                 }}>

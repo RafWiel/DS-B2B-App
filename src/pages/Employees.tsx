@@ -160,7 +160,8 @@ const Employees = memo(() => {
                 variant="outlined"
                 sx={{    
                     marginTop: 1.5, 
-                    height: '100%',                    
+                    height: '100%', 
+                    //maxHeight: '50vh',                   
                     [theme.breakpoints.down('sm')]: {
                         border: 'none' 
                     },                    
@@ -169,7 +170,7 @@ const Employees = memo(() => {
                 <CardContent sx={{
                             //backgroundColor: 'red', 
                             display: 'flex',                            
-                            maxHeight: '100%',
+                            height: '100%',
                             [theme.breakpoints.down('md')]: {
                                 padding: 1,
                                 '&:last-child': { 
