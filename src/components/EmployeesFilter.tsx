@@ -4,6 +4,10 @@ import { useTheme } from '@mui/material/styles';
 import SearchIcon from '@mui/icons-material/Search';
 import employeeType from '../enums/employeeType.ts';
 
+// interface IProps { 
+//     id: string
+// }
+
 const EmployeesFilter = memo(() => {
     const theme = useTheme();
 

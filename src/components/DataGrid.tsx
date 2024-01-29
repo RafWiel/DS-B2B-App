@@ -37,7 +37,8 @@ export interface IColumn {
     }
 }
 
-interface IDataGridProps {  
+interface IDataGridProps { 
+    height: number, 
     columns: IColumn[],  
     rows: any[],
     isSelection: boolean;
@@ -260,7 +261,7 @@ function EnhancedTableHead(props: IHeadProps) {
 // }
 
 export default function DataGrid(props: IDataGridProps) {
-    const { columns, rows, isSelection, isDelete, deleteRow, deleteAllRows } = props;
+    const { height, columns, rows, isSelection, isDelete, deleteRow, deleteAllRows } = props;
 
     const [order, setOrder] = React.useState<Order>('asc');    
     const [orderBy, setOrderBy] = React.useState<string>('calories');
@@ -345,18 +346,13 @@ export default function DataGrid(props: IDataGridProps) {
             stableSort(rows, getComparator(order, orderBy)),
         [order, orderBy],
     );
-
-    const tableHeight = window.innerHeight;
-
-    console.log(tableHeight);
-
+    
     return (
         <Box 
             sx={{ 
                 display: 'flex',
                 width: '100%', 
-                height: '500px',                
-                //backgroundColor: 'aqua',                 
+                height: {height},                                 
             }}
         >            
             {/* <EnhancedTableToolbar numSelected={selected.length} /> */}
@@ -364,8 +360,7 @@ export default function DataGrid(props: IDataGridProps) {
                     display: 'flex',
                     minWidth: 400,
                     maxHeight: '100%', 
-                    overflow: 'auto',   
-                    backgroundColor: 'yellow' 
+                    overflow: 'auto',                       
                 }}>
                 <Table
                     stickyHeader

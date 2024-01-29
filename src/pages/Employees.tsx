@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, useEffect, useState } from "react";
 import { useTheme } from '@mui/material/styles';
 import EmployeesFilter from "../components/EmployeesFilter";
 import Box from "@mui/material/Box";
@@ -6,7 +6,7 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import DataGrid, { IBaseRow, IColumn } from "../components/DataGrid";
 import { useAppStore } from "../store";
-import { Button, Grid } from "@mui/material";
+import { Button, Grid, useMediaQuery } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 
 interface IRow extends IBaseRow {
@@ -113,7 +113,8 @@ function createData(
 const Employees = memo(() => {
     const theme = useTheme();     
     const openQuestionDialog = useAppStore((state) => state.openQuestionDialog); 
-    
+    const isMobileView = useMediaQuery(theme.breakpoints.down("md"));           
+
     const handleDelete = (row: object) => {
         const employee = row as IRow;
 
@@ -142,8 +143,36 @@ const Employees = memo(() => {
         console.log('delete all users');        
     }
 
+    const [dataGridHeight, setDataGridHeight] = useState(0);
+
+    const handleResize = () => {
+        const appBarHeight = document.getElementById("appBar")?.clientHeight ?? 0;
+        const filterHeight = document.getElementById("filter-container")?.clientHeight ?? 0;
+        const datagridMargin = isMobileView ? 74 : 42;  
+        const mainMargin = 12;  
+
+        setDataGridHeight(window.innerHeight - appBarHeight - filterHeight - mainMargin * 3 - datagridMargin);        
+        
+        //console.log('isMobileView', isMobileView);
+        //console.log('containerHeight', document.getElementById("main-container")?.clientHeight);
+        //console.log('calculatedContainerHeight', window.innerHeight - appBarHeight);    
+    }
+
+    useEffect(() => {          
+        handleResize();              
+        window.addEventListener('resize', handleResize);
+        
+        return () => {               
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
+
+
+
+
     return (
-        <Box         
+        <Box 
+            id="main-container"                   
             sx={{                
                 width: 1,
                 height: '100%',
@@ -156,7 +185,9 @@ const Employees = memo(() => {
                 }
             }}
         >
-            <EmployeesFilter />
+            <div id="filter-container">
+                <EmployeesFilter />
+            </div>
             <Card 
                 variant="outlined"
                 sx={{    
@@ -168,17 +199,20 @@ const Employees = memo(() => {
                     },                    
                 }}
             >
-                <CardContent sx={{
-                            //backgroundColor: 'red', 
-                            display: 'flex',                            
-                            height: '100%',
-                            [theme.breakpoints.down('md')]: {
-                                padding: 1,
-                                '&:last-child': { 
-                                    paddingBottom: 1 
-                                }
-                            },                                                                                                                
-                        }}>                    
+                <CardContent 
+                    id="card-content"  
+                    sx={{
+                        //backgroundColor: 'red', 
+                        display: 'flex',                            
+                        height: '100%',
+                        [theme.breakpoints.down('md')]: {
+                            padding: 1,
+                            '&:last-child': { 
+                                paddingBottom: 1 
+                            }
+                        },                                                                                                                
+                    }}
+                >                    
                     <Grid 
                         container 
                         spacing={2}
@@ -203,7 +237,8 @@ const Employees = memo(() => {
                                 isSelection={false}
                                 isDelete={true}
                                 deleteRow={handleDelete}
-                                deleteAllRows={handleDeleteAll}                                
+                                deleteAllRows={handleDeleteAll}  
+                                height={dataGridHeight}                              
                             />
                         </Grid>
                         <Grid 

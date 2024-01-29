@@ -18,12 +18,11 @@ import Employees from './pages/Employees';
 import NotFound from './pages/NotFound';
 import { ThemeProvider } from '@emotion/react';
 import './assets/app.css';
-import { useEffect, useState } from 'react';
 import routes from './routes';
 import MessageDialog from './components/MessageDialog';
 import QuestionDialog from './components/QuestionDialog';
 
-const todo = "TODO: Calculate height";
+const todo = "TODO: Backend";
 
 interface AppBarProps extends MuiAppBarProps {
     open?: boolean;
@@ -94,27 +93,33 @@ export default function App() {
         //   }
     });
 
-    const [, setAppBarHeight] = useState(0);
+    //const [appBarHeight, setAppBarHeight] = useState(0);
     //const isMobileView = useMediaQuery(theme.breakpoints.down("sm"));        
 
-    useEffect(() => {  
-        setAppBarTitle(routes.getText(location[0]));
+    // useEffect(() => {  
+    //     setAppBarTitle(routes.getText(location[0]));
 
-        handleResize();              
-        window.addEventListener('resize', handleResize);
+    //     handleResize();              
+    //     window.addEventListener('resize', handleResize);
         
-        return () => {               
-            window.removeEventListener('resize', handleResize);
-        };
-    }, []);
+    //     return () => {               
+    //         window.removeEventListener('resize', handleResize);
+    //     };
+    // }, []);
 
-    useEffect(() => {  
-        setAppBarTitle(routes.getText(location[0]));
-    }, [location]);
+    // useEffect(() => {  
+    //     setAppBarTitle(routes.getText(location[0]));
+    // }, [location]);
 
-    const handleResize = () => {        
-        setAppBarHeight(document.getElementById("appBar")?.clientHeight ?? 0);
-    }
+    // const handleResize = () => {        
+    //     setAppBarHeight(document.getElementById("appBar")?.clientHeight ?? 0);
+
+    //     //const windowHeight = window.innerHeight;
+
+    //     //console.log('windowHeight', windowHeight);
+    //     console.log('appBarHeight', document.getElementById("appBar")?.clientHeight);
+
+    // }
 
     return (
         <ThemeProvider theme={theme}>            
