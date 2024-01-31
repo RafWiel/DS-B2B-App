@@ -126,7 +126,12 @@ function EnhancedTableHead(props: IHeadProps) {
 
     return (
         <TableHead>
-            <TableRow>
+            <TableRow 
+                sx={{ 
+                    maxHeight: '20px',
+                    backgroundColor: 'aqua'
+                }}
+            >
                 {
                     isSelection &&
                     <TableCell padding="checkbox">
@@ -150,7 +155,12 @@ function EnhancedTableHead(props: IHeadProps) {
                             padding={column.disablePadding ? 'none' : 'normal'}                            
                             sortDirection={orderBy === column.id ? order : false}
                             sx = {{
-                                backgroundColor: 'white',
+                                height: '20px',
+                                maxHeight: '20px',
+                                backgroundColor: 'aqua',
+                                //backgroundColor: 'white',
+
+
                                 paddingLeft: column.disablePadding ? (isSelection ? 0 : 1) : 0,
                                 width: column.width.desktop,
                                 [theme.breakpoints.down('sm')]: {
@@ -190,7 +200,12 @@ function EnhancedTableHead(props: IHeadProps) {
                         padding="none"   
                         width="40px"
                         sx = {{
-                            backgroundColor: 'white',
+                            height: '20px',
+                            maxHeight: '20px',
+                            backgroundColor: 'aqua',
+
+
+                            //backgroundColor: 'white',
                             paddingRight: 1,
                             paddingTop: 1,
                             cursor: 'pointer',
@@ -344,8 +359,10 @@ export default function DataGrid(props: IDataGridProps) {
     const visibleRows = React.useMemo(
         () =>
             stableSort(rows, getComparator(order, orderBy)),
-        [order, orderBy],
+        [rows, order, orderBy],
     );
+
+    console.log('rows', rows);
     
     return (
         <Box 
@@ -362,7 +379,7 @@ export default function DataGrid(props: IDataGridProps) {
                     maxHeight: '100%', 
                     overflow: 'auto',                       
                 }}>
-                <Table
+                <Table                    
                     stickyHeader
                     aria-labelledby="tableTitle"
                     size='medium'
@@ -394,7 +411,10 @@ export default function DataGrid(props: IDataGridProps) {
                                     tabIndex={-1}
                                     key={row.id}
                                     selected={isItemSelected}
-                                    sx={{ cursor: 'pointer' }}
+                                    sx={{ 
+                                        cursor: 'pointer', 
+                                        height: '20px'
+                                    }}
                                 >
                                     {
                                         isSelection &&
@@ -413,7 +433,7 @@ export default function DataGrid(props: IDataGridProps) {
                                             column.visible && 
                                             <TableCell
                                                 id={index <= 1 ? labelId : undefined}
-                                                scope="row" 
+                                                scope="row"                                                 
                                                 key={column.id}
                                                 align={column.numeric ? 'right' : 'left'} 
                                                 padding={column.disablePadding ? 'none' : 'normal'}                                                        
@@ -433,7 +453,7 @@ export default function DataGrid(props: IDataGridProps) {
                                             onClick={(event) => handleDelete(event, row)}
                                             align="right" 
                                             padding="none"                                        
-                                            sx = {{
+                                            sx = {{                                                
                                                 paddingRight: 1,
                                                 color: 'var(--color-grey)',
                                                 "&:hover": {

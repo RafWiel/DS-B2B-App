@@ -1,4 +1,4 @@
-import { memo, useEffect, useState } from "react";
+import { memo, useCallback, useEffect, useState } from "react";
 import { useTheme } from '@mui/material/styles';
 import EmployeesFilter from "../components/EmployeesFilter";
 import Box from "@mui/material/Box";
@@ -8,8 +8,9 @@ import DataGrid, { IBaseRow, IColumn } from "../components/DataGrid";
 import { useAppStore } from "../store";
 import { Button, Grid, useMediaQuery } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
+import { config } from "../config/config";
 
-interface IRow extends IBaseRow {
+interface IEmployee extends IBaseRow {
     login: string;
     name: string;
     type: string;    
@@ -88,7 +89,7 @@ function createData(
     login: string,
     name: string,
     type: string
-): IRow {
+): IEmployee {
     return {
         id,
         login,
@@ -96,27 +97,57 @@ function createData(
         type
     };
 }
-
-  
-//   const rows = [
-//     { id: 1, login: 'admin', name: 'Rafał Wielicki', type: 'Administrator' },
-//     { id: 2, login: 'andy', name: 'Andrzej Jurkowski', type: 'Kierownik' },
-//     { id: 3, login: 'piotr', name: 'Piotr Trybuchowicz', type: 'Administrator' },
-//   ];
-
-
-
-
-
   
   
 const Employees = memo(() => {
     const theme = useTheme();     
     const openQuestionDialog = useAppStore((state) => state.openQuestionDialog); 
+    const openMessageDialog = useAppStore((state) => state.openMessageDialog); 
     const isMobileView = useMediaQuery(theme.breakpoints.down("md"));           
+    const showLoadingIcon = useAppStore((state) => state.showLoadingIcon);
+    const [employees, setEmployees] = useState<IEmployee[]>([]);
+
+    useEffect(() => {
+        const abortController = new AbortController();
+    
+        fetchData('');
+    
+        //cleanup, przerwij wywolanie fetch jesli unmount
+        return () => {
+          showLoadingIcon(false);
+          abortController.abort();
+        }
+    }, []);
+
+    const fetchData = useCallback((value: string) => {                
+        console.log('refresh: ', value);        
+    
+        showLoadingIcon(true);       
+    
+        //fetch(`${config.API_URL}/employees?${String(new URLSearchParams({ search: value }))}`)      
+        fetch(`${config.API_URL}/employees`)      
+        .then((res) => {           
+          if (!res.ok) throw new Error("Nieprawidłowa odpowiedź serwera");    
+          
+          console.log('res', res);
+          return res.json();
+        })
+        .then((res) => {      
+            console.log('res json', res);
+            setEmployees(res as IEmployee[]);        
+        })
+        .catch((error: unknown) => {
+            if ((error as Error).name === 'AbortError') return;
+            openMessageDialog({
+                title: 'Błąd aplikacji',
+                text: (error as Error).message
+            });
+        })
+        .finally(() => showLoadingIcon(false));    
+    }, [openMessageDialog, showLoadingIcon]);
 
     const handleDelete = (row: object) => {
-        const employee = row as IRow;
+        const employee = row as IEmployee;
 
         openQuestionDialog({
             title: 'Pracownicy',
@@ -233,7 +264,7 @@ const Employees = memo(() => {
                         >
                             <DataGrid 
                                 columns={columns}
-                                rows={rows}
+                                rows={employees}
                                 isSelection={false}
                                 isDelete={true}
                                 deleteRow={handleDelete}

@@ -21,6 +21,8 @@ import './assets/app.css';
 import routes from './routes';
 import MessageDialog from './components/MessageDialog';
 import QuestionDialog from './components/QuestionDialog';
+import { useEffect } from 'react';
+import { CircularProgress } from '@mui/material';
 
 const todo = "TODO: Backend";
 
@@ -56,7 +58,8 @@ export default function App() {
     const openDesktopSideBar = useAppStore((state) => state.openDesktop);
     const openMobileSideBar = useAppStore((state) => state.openMobile);         
     const appBarTitle = useAppStore((state) => state.appBarTitle);         
-    const setAppBarTitle = useAppStore((state) => state.setAppBarTitle);          
+    const setAppBarTitle = useAppStore((state) => state.setAppBarTitle);     
+    const isLoadingIcon = useAppStore((state) => state.isLoadingIcon);      
 
     const theme = createTheme({
         palette: {    
@@ -93,23 +96,25 @@ export default function App() {
         //   }
     });
 
+    useEffect(() => {  
+        setAppBarTitle(routes.getText(location[0]));
+    }, [location]);
+    
     //const [appBarHeight, setAppBarHeight] = useState(0);
     //const isMobileView = useMediaQuery(theme.breakpoints.down("sm"));        
 
     // useEffect(() => {  
     //     setAppBarTitle(routes.getText(location[0]));
 
-    //     handleResize();              
-    //     window.addEventListener('resize', handleResize);
+    //     //handleResize();              
+    //     //window.addEventListener('resize', handleResize);
         
-    //     return () => {               
-    //         window.removeEventListener('resize', handleResize);
-    //     };
+    //     //return () => {               
+    //     //    window.removeEventListener('resize', handleResize);
+    //     //};
     // }, []);
 
-    // useEffect(() => {  
-    //     setAppBarTitle(routes.getText(location[0]));
-    // }, [location]);
+    
 
     // const handleResize = () => {        
     //     setAppBarHeight(document.getElementById("appBar")?.clientHeight ?? 0);
@@ -235,6 +240,12 @@ export default function App() {
                 </Box>
                 <MessageDialog />
                 <QuestionDialog />
+                {
+                    isLoadingIcon && 
+                    <div className="center-screen">
+                        <CircularProgress size={60} />
+                    </div>
+                }                                        
             </Box>
         </ThemeProvider>
     );
