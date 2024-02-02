@@ -31,6 +31,18 @@
     transform: -ms-translate(-50%, -50%);
 }
 
+/* .MuiTableRow-root  {
+    padding: 0 14px !important;
+}
+
+tr {
+    height: 10px;
+}
+
+tr td {
+    height: auto !important;
+} */
+
 /* .app {
     margin: 0 auto;          
     min-height: 50vh;

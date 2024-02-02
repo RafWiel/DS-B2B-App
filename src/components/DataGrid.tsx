@@ -20,6 +20,7 @@ import { visuallyHidden } from '@mui/utils';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import ClearIcon from '@mui/icons-material/Clear';
 import { useTheme } from '@mui/material/styles';
+import { styled } from '@mui/material';
 
 export interface IBaseRow {
     id: number;    
@@ -38,7 +39,7 @@ export interface IColumn {
 }
 
 interface IDataGridProps { 
-    height: number, 
+    maxHeight: number, 
     columns: IColumn[],  
     rows: any[],
     isSelection: boolean;
@@ -57,6 +58,7 @@ interface IHeadProps {
     rowCount: number;
     isSelection: boolean;
     isDelete: boolean;
+    isRows: boolean,
     deleteAllRows: () => void;
 }
 
@@ -111,7 +113,7 @@ function EnhancedTableHead(props: IHeadProps) {
 
     const { 
         onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort, 
-        isSelection, isDelete, columns, deleteAllRows 
+        isSelection, isDelete, columns, deleteAllRows, isRows 
     } = props;
   
     const createSortHandler = (property: string) => (event: React.MouseEvent<unknown>) => {
@@ -128,13 +130,29 @@ function EnhancedTableHead(props: IHeadProps) {
         <TableHead>
             <TableRow 
                 sx={{ 
-                    maxHeight: '20px',
-                    backgroundColor: 'aqua'
+                    height: '34px'
+                    // '& .MuiTableCell-root': {
+                    //     //lineHeight: '40px !important',
+                    //     height: '40px !important',
+                    //     //padding: '0 !important',
+
+                    //     //maxHeight: '40px !important',
+                    //     //whiteSpace: 'normal',
+
+                    //  },
+                    //  '&:last-child td, &:last-child th': {
+                    //     border: 0 
+                    //  }
                 }}
             >
                 {
                     isSelection &&
-                    <TableCell padding="checkbox">
+                    <TableCell 
+                        padding="checkbox"
+                        sx={{
+                            backgroundColor: 'white',
+                        }}
+                    >
                         <Checkbox
                             color="primary"
                             indeterminate={numSelected > 0 && numSelected < rowCount}
@@ -142,7 +160,7 @@ function EnhancedTableHead(props: IHeadProps) {
                             onChange={onSelectAllClick}
                             inputProps={{
                                 'aria-label': 'select all desserts',
-                            }}
+                            }}                            
                         />
                     </TableCell>
                 }
@@ -154,13 +172,21 @@ function EnhancedTableHead(props: IHeadProps) {
                             align={column.numeric ? 'right' : 'left'}
                             padding={column.disablePadding ? 'none' : 'normal'}                            
                             sortDirection={orderBy === column.id ? order : false}
-                            sx = {{
-                                height: '20px',
-                                maxHeight: '20px',
-                                backgroundColor: 'aqua',
-                                //backgroundColor: 'white',
+                            sx = {{                                
+                                // '& .MuiTableCell-root': {
+                                //     lineHeight: '30px !important',
+                                //     height: '30px !important',
+                                //     padding: '0 !important',
 
+                                //     maxHeight: '30px !important',
+                                //     whiteSpace: 'normal',
 
+                                // },
+                                // '&:last-child td, &:last-child th': {
+                                //     border: 0 
+                                // },        
+                                backgroundColor: 'white',
+                                padding: 0,  
                                 paddingLeft: column.disablePadding ? (isSelection ? 0 : 1) : 0,
                                 width: column.width.desktop,
                                 [theme.breakpoints.down('sm')]: {
@@ -191,22 +217,30 @@ function EnhancedTableHead(props: IHeadProps) {
                     ))
                 }
                 {                
-                    isDelete &&
+                    isDelete && isRows &&
                     <TableCell
                         scope="row" 
                         key="deleteButton"
                         onClick={(event) => handleDeleteAll(event)}
                         align="right" 
                         padding="none"   
-                        width="40px"
+                        width="30px"
                         sx = {{
-                            height: '20px',
-                            maxHeight: '20px',
-                            backgroundColor: 'aqua',
+                            // backgroundColor: 'aqua',
+                            // '& .MuiTableCell-root': {
+                            //     lineHeight: '30px !important',
+                            //     height: '30px !important',
+                            //     padding: '0 !important',
 
+                            //     maxHeight: '30px !important',
+                            //     whiteSpace: 'normal',
 
-                            //backgroundColor: 'white',
-                            paddingRight: 1,
+                            // },
+                            // '&:last-child td, &:last-child th': {
+                            //     border: 0 
+                            // },
+                            backgroundColor: 'white',
+                            paddingRight: 1,                                                       
                             paddingTop: 1,
                             cursor: 'pointer',
                             color: 'var(--color-grey)',
@@ -276,7 +310,7 @@ function EnhancedTableHead(props: IHeadProps) {
 // }
 
 export default function DataGrid(props: IDataGridProps) {
-    const { height, columns, rows, isSelection, isDelete, deleteRow, deleteAllRows } = props;
+    const { maxHeight, columns, rows, isSelection, isDelete, deleteRow, deleteAllRows } = props;
 
     const [order, setOrder] = React.useState<Order>('asc');    
     const [orderBy, setOrderBy] = React.useState<string>('calories');
@@ -284,6 +318,14 @@ export default function DataGrid(props: IDataGridProps) {
     //const [page, setPage] = React.useState(0);  
     //const [rowsPerPage, setRowsPerPage] = React.useState(5);
     
+    const NoDataText = styled('div')(({ theme }) => ({ 
+        ...theme.typography.subtitle2,
+        fontSize: 13, 
+        fontWeight: 600,      
+        textAlign: 'center',
+        color: theme.palette.grey[400],
+        padding: theme.spacing(3),
+    }));
 
     const handleRequestSort = (
         _: React.MouseEvent<unknown>,
@@ -360,29 +402,28 @@ export default function DataGrid(props: IDataGridProps) {
         () =>
             stableSort(rows, getComparator(order, orderBy)),
         [rows, order, orderBy],
-    );
-
-    console.log('rows', rows);
+    );       
     
     return (
         <Box 
             sx={{ 
                 display: 'flex',
-                width: '100%', 
-                height: {height},                                 
+                flexDirection: 'column',
+                width: '100%',                                 
+                maxHeight: {maxHeight},                                 
             }}
         >            
             {/* <EnhancedTableToolbar numSelected={selected.length} /> */}
             <TableContainer sx={{                     
                     display: 'flex',
                     minWidth: 400,
-                    maxHeight: '100%', 
+                    //maxHeight: '100%', 
                     overflow: 'auto',                       
                 }}>
                 <Table                    
                     stickyHeader
                     aria-labelledby="tableTitle"
-                    size='medium'
+                    size='medium'                                  
                 >
                     <EnhancedTableHead
                         columns={columns}
@@ -394,6 +435,7 @@ export default function DataGrid(props: IDataGridProps) {
                         rowCount={rows.length}
                         isSelection={isSelection}
                         isDelete={isDelete}
+                        isRows={visibleRows.length > 0}
                         deleteAllRows={deleteAllRows}
                     />                   
                     <TableBody>
@@ -402,7 +444,7 @@ export default function DataGrid(props: IDataGridProps) {
                             const isItemSelected = isSelected(Number(row.id));
                             const labelId = `enhanced-table-checkbox-${index}`;
 
-                            return (
+                            return (                                
                                 <TableRow
                                     hover
                                     onClick={(event) => handleRowClick(event, Number(row.id))}
@@ -413,12 +455,19 @@ export default function DataGrid(props: IDataGridProps) {
                                     selected={isItemSelected}
                                     sx={{ 
                                         cursor: 'pointer', 
-                                        height: '20px'
+                                        height: '34px'
+                                        // '& .MuiTableCell-root': {
+                                        //     height: '10px',
+                                        //     padding: '0'
+                                        //  },
+                                        //  '&:last-child td, &:last-child th': {
+                                        //     border: 0 
+                                        //  }
                                     }}
                                 >
                                     {
                                         isSelection &&
-                                        <TableCell padding="checkbox">                                                                        
+                                        <TableCell padding="checkbox">
                                             <Checkbox
                                                 color="primary"
                                                 checked={isItemSelected}
@@ -438,6 +487,7 @@ export default function DataGrid(props: IDataGridProps) {
                                                 align={column.numeric ? 'right' : 'left'} 
                                                 padding={column.disablePadding ? 'none' : 'normal'}                                                        
                                                 sx = {{
+                                                    padding: 0,
                                                     paddingLeft: column.disablePadding ? (isSelection ? 0 : 1) : 0
                                                 }}                                               
                                             >
@@ -446,7 +496,7 @@ export default function DataGrid(props: IDataGridProps) {
                                         ))
                                     }   
                                     {                
-                                        isDelete &&
+                                        isDelete && (visibleRows.length > 0) &&
                                         <TableCell
                                             scope="row" 
                                             key="deleteButton"
@@ -455,6 +505,7 @@ export default function DataGrid(props: IDataGridProps) {
                                             padding="none"                                        
                                             sx = {{                                                
                                                 paddingRight: 1,
+                                                paddingTop: '4px',
                                                 color: 'var(--color-grey)',
                                                 "&:hover": {
                                                     color: 'var(--color-red)'
@@ -464,7 +515,7 @@ export default function DataGrid(props: IDataGridProps) {
                                             <ClearIcon />                                             
                                         </TableCell>                 
                                     }
-                                </TableRow>
+                                </TableRow>                            
                             );
                         })
                     }
@@ -482,6 +533,9 @@ export default function DataGrid(props: IDataGridProps) {
                     </TableBody>
                 </Table>
             </TableContainer>
+            {
+                (!visibleRows || !visibleRows.length) && <NoDataText>Brak danych</NoDataText>
+            }
             {/* <TablePagination
                 rowsPerPageOptions={[5, 10, 25]}
                 component="div"
