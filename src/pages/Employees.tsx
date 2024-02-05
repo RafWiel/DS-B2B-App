@@ -62,60 +62,6 @@ const columns: IColumn[] = [
         }
     },
 ];
-
-const rows = [
-    createData(1, 'rafal.wielicki', 'Rafał Wielicki', 'Administrator'),
-    createData(2, 'andy', 'Andrzej Jurkowski', 'Administrator'),
-    createData(3, 'piotr.trybuchowicz', 'Piotr Trybuchowicz', 'Administrator'),   
-    createData(4, 'rafal.wielicki', 'Rafał Wielicki', 'Administrator'),
-    createData(5, 'andy', 'Andrzej Jurkowski', 'Administrator'),
-    createData(6, 'piotr.trybuchowicz', 'Piotr Trybuchowicz', 'Administrator'),   
-    createData(7, 'rafal.wielicki', 'Rafał Wielicki', 'Administrator'),
-    createData(8, 'andy', 'Andrzej Jurkowski', 'Administrator'),
-    createData(9, 'piotr.trybuchowicz', 'Piotr Trybuchowicz', 'Administrator'),   
-    createData(10, 'rafal.wielicki', 'Rafał Wielicki', 'Administrator'),
-    createData(11, 'andy', 'Andrzej Jurkowski', 'Administrator'),
-    createData(12, 'piotr.trybuchowicz', 'Piotr Trybuchowicz', 'Administrator'),    
-    createData(13, 'rafal.wielicki', 'Rafał Wielicki', 'Administrator'),
-    createData(14, 'andy', 'Andrzej Jurkowski', 'Administrator'),
-    createData(15, 'piotr.trybuchowicz', 'Piotr Trybuchowicz', 'Administrator'),    
-    createData(16, 'rafal.wielicki', 'Rafał Wielicki', 'Administrator'),
-    createData(17, 'andy', 'Andrzej Jurkowski', 'Administrator'),
-    createData(18, 'piotr.trybuchowicz', 'Piotr Trybuchowicz', 'Administrator'), 
-    createData(19, 'rafal.wielicki', 'Rafał Wielicki', 'Administrator'),
-    createData(20, 'andy', 'Andrzej Jurkowski', 'Administrator'),
-    createData(21, 'piotr.trybuchowicz', 'Piotr Trybuchowicz', 'Administrator'),   
-    createData(22, 'rafal.wielicki', 'Rafał Wielicki', 'Administrator'),
-    createData(23, 'andy', 'Andrzej Jurkowski', 'Administrator'),
-    createData(24, 'piotr.trybuchowicz', 'Piotr Trybuchowicz', 'Administrator'),   
-    createData(25, 'rafal.wielicki', 'Rafał Wielicki', 'Administrator'),
-    createData(26, 'andy', 'Andrzej Jurkowski', 'Administrator'),
-    createData(27, 'piotr.trybuchowicz', 'Piotr Trybuchowicz', 'Administrator'),   
-    createData(28, 'rafal.wielicki', 'Rafał Wielicki', 'Administrator'),
-    createData(29, 'andy', 'Andrzej Jurkowski', 'Administrator'),
-    createData(30, 'piotr.trybuchowicz', 'Piotr Trybuchowicz', 'Administrator'),    
-    createData(31, 'rafal.wielicki', 'Rafał Wielicki', 'Administrator'),
-    createData(32, 'andy', 'Andrzej Jurkowski', 'Administrator'),
-    createData(33, 'piotr.trybuchowicz', 'Piotr Trybuchowicz', 'Administrator'),    
-    createData(34, 'rafal.wielicki', 'Rafał Wielicki', 'Administrator'),
-    createData(35, 'andy', 'Andrzej Jurkowski', 'Administrator'),
-    createData(36, 'piotr.trybuchowicz', 'Piotr Trybuchowicz', 'Administrator'),    
-];
-
-function createData(
-    id: number,
-    login: string,
-    name: string,
-    type: string
-): IEmployee {
-    return {
-        id,
-        login,
-        name,
-        type
-    };
-}
-  
   
 const Employees = memo(() => {
     const theme = useTheme();     
@@ -124,11 +70,12 @@ const Employees = memo(() => {
     const isMobileView = useMediaQuery(theme.breakpoints.down("md"));           
     const showLoadingIcon = useAppStore((state) => state.showLoadingIcon);
     const [employees, setEmployees] = useState<IEmployee[]>([]);
+    const [page, setPage] = useState(1);
 
     useEffect(() => {
         const abortController = new AbortController();
     
-        fetchData('');
+        fetchData('test123');
     
         //cleanup, przerwij wywolanie fetch jesli unmount
         return () => {
@@ -138,21 +85,24 @@ const Employees = memo(() => {
     }, []);
 
     const fetchData = useCallback((value: string) => {                
-        console.log('refresh: ', value);        
+        console.log('refresh: ', value);   
+        console.log('page: ', page);        
     
         showLoadingIcon(true);       
     
-        //fetch(`${config.API_URL}/employees?${String(new URLSearchParams({ search: value }))}`)      
-        fetch(`${config.API_URL}/employees`)      
+        fetch(`${config.API_URL}/employees?${String(new URLSearchParams({ 
+            search: value,
+            page: page.toString()
+        }))}`)              
         .then((res) => {           
           if (!res.ok) throw new Error("Nieprawidłowa odpowiedź serwera");    
           
-          console.log('res', res);
+          //console.log('res', res);
           return res.json();
         })
-        .then((res) => {      
-            console.log('res json', res);
-            setEmployees(res as IEmployee[]);        
+        .then((res) => {   
+            //append array
+            setEmployees([...employees, ...(res as IEmployee[])]);            
         })
         .catch((error: unknown) => {
             if ((error as Error).name === 'AbortError') return;
@@ -161,8 +111,12 @@ const Employees = memo(() => {
                 text: (error as Error).message
             });
         })
-        .finally(() => showLoadingIcon(false));    
-    }, [openMessageDialog, showLoadingIcon]);
+        .finally(() => {
+            showLoadingIcon(false);
+            console.log('setpage', page + 1);
+            setPage(page + 1);
+        });    
+    }, [employees, page, openMessageDialog, showLoadingIcon]);
 
     const handleDelete = (row: object) => {
         const employee = row as IEmployee;
@@ -306,6 +260,7 @@ const Employees = memo(() => {
                             <Button                                 
                                 variant="contained"
                                 disableElevation 
+                                onClick={() => fetchData('')}                                
                                 startIcon={<AddIcon />}
                                 sx={{
                                     display: 'inline-flex',                                                                        
