@@ -21,6 +21,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import ClearIcon from '@mui/icons-material/Clear';
 import { useTheme } from '@mui/material/styles';
 import { styled } from '@mui/material';
+import { InView } from 'react-intersection-observer';
 
 export interface IBaseRow {
     id: number;    
@@ -46,6 +47,7 @@ interface IDataGridProps {
     isDelete: boolean;
     deleteRow: (row: object) => void;
     deleteAllRows: () => void;
+    fetchData: () => void;
 }
 
 interface IHeadProps {
@@ -310,7 +312,16 @@ function EnhancedTableHead(props: IHeadProps) {
 // }
 
 export default function DataGrid(props: IDataGridProps) {
-    const { maxHeight, columns, rows, isSelection, isDelete, deleteRow, deleteAllRows } = props;
+    const { 
+        maxHeight, 
+        columns, 
+        rows, 
+        isSelection, 
+        isDelete, 
+        deleteRow,
+        deleteAllRows, 
+        fetchData 
+    } = props;
 
     const [order, setOrder] = React.useState<Order>('asc');    
     const [orderBy, setOrderBy] = React.useState<string>('calories');
@@ -373,6 +384,14 @@ export default function DataGrid(props: IDataGridProps) {
 
         event.stopPropagation();
     };    
+
+    const handleIntersect = (inView: boolean) => {
+        if (!inView || !rows.length) {
+            return;
+        }
+
+        fetchData();
+    }
 
     // const handleChangePage = (event: unknown, newPage: number) => {
     //     setPage(newPage);
@@ -440,9 +459,9 @@ export default function DataGrid(props: IDataGridProps) {
                     />                   
                     <TableBody>
                     {
-                        visibleRows.map((row, index) => {
+                        visibleRows.map((row, rowIndex) => {
                             const isItemSelected = isSelected(Number(row.id));
-                            const labelId = `enhanced-table-checkbox-${index}`;
+                            const labelId = `enhanced-table-checkbox-${rowIndex}`;
 
                             return (                                
                                 <TableRow
@@ -478,10 +497,10 @@ export default function DataGrid(props: IDataGridProps) {
                                         </TableCell>
                                     }                                    
                                     {
-                                        columns && columns.map((column, index) => (
+                                        columns && columns.map((column, columnIndex) => (
                                             column.visible && 
                                             <TableCell
-                                                id={index <= 1 ? labelId : undefined}
+                                                id={columnIndex === 1 ? labelId : undefined}
                                                 scope="row"                                                 
                                                 key={column.id}
                                                 align={column.numeric ? 'right' : 'left'} 
@@ -491,7 +510,13 @@ export default function DataGrid(props: IDataGridProps) {
                                                     paddingLeft: column.disablePadding ? (isSelection ? 0 : 1) : 0
                                                 }}                                               
                                             >
-                                                {Object.values(row)[index]}                                                
+                                                {Object.values(row)[columnIndex]}                                                 
+                                                {
+                                                    //instersection object - trigger event to fetch another data chunk
+                                                    columnIndex === 1 && 
+                                                    rowIndex === (visibleRows.length - 1) && 
+                                                    <InView onChange={(inView: boolean) => handleIntersect(inView)} />
+                                                }
                                             </TableCell>
                                         ))
                                     }   
@@ -519,6 +544,14 @@ export default function DataGrid(props: IDataGridProps) {
                             );
                         })
                     }
+                    {/* {
+                        visibleRows && (visibleRows.length > 0) &&
+                        <TableRow >
+                            <TableCell >
+                                <InView onChange={(inView: boolean) => handleIntersect(inView)} />
+                            </TableCell>
+                        </TableRow>
+                    } */}
                     {/* {
                         emptyRows > 0 && (
                             <TableRow

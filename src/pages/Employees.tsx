@@ -9,6 +9,7 @@ import { useAppStore } from "../store";
 import { Button, Grid, useMediaQuery } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import { config } from "../config/config";
+import employeeType from "../enums/employeeType";
 
 interface IEmployee extends IBaseRow {
     login: string;
@@ -75,7 +76,7 @@ const Employees = memo(() => {
     useEffect(() => {
         const abortController = new AbortController();
     
-        fetchData('test123');
+        fetchDataChunk();
     
         //cleanup, przerwij wywolanie fetch jesli unmount
         return () => {
@@ -83,6 +84,10 @@ const Employees = memo(() => {
           abortController.abort();
         }
     }, []);
+    
+    const fetchDataChunk = () => {
+        fetchData('');
+    };
 
     const fetchData = useCallback((value: string) => {                
         console.log('refresh: ', value);   
@@ -100,9 +105,20 @@ const Employees = memo(() => {
           //console.log('res', res);
           return res.json();
         })
-        .then((res) => {   
+        .then((res) => {  
+            const newEmployees = res as IEmployee[];
+            if (newEmployees.length === 0) {
+                return;
+            }
+
+            //update type text
+            newEmployees.forEach(u => {
+                u.type = employeeType.getText(Number(u.type));                
+            });
+            
             //append array
-            setEmployees([...employees, ...(res as IEmployee[])]);            
+            setEmployees([...employees, ...newEmployees]); 
+            setPage(page + 1);           
         })
         .catch((error: unknown) => {
             if ((error as Error).name === 'AbortError') return;
@@ -112,9 +128,7 @@ const Employees = memo(() => {
             });
         })
         .finally(() => {
-            showLoadingIcon(false);
-            console.log('setpage', page + 1);
-            setPage(page + 1);
+            showLoadingIcon(false);                        
         });    
     }, [employees, page, openMessageDialog, showLoadingIcon]);
 
@@ -239,9 +253,10 @@ const Employees = memo(() => {
                                 rows={employees}
                                 isSelection={false}
                                 isDelete={true}
-                                deleteRow={handleDelete}
-                                deleteAllRows={handleDeleteAll}  
                                 maxHeight={dataGridHeight}                              
+                                deleteRow={handleDelete}
+                                deleteAllRows={handleDeleteAll} 
+                                fetchData={fetchDataChunk}                                 
                             />
                         </Grid>
                         <Grid 
@@ -260,7 +275,7 @@ const Employees = memo(() => {
                             <Button                                 
                                 variant="contained"
                                 disableElevation 
-                                onClick={() => fetchData('')}                                
+                                onClick={() => fetchDataChunk()}                                
                                 startIcon={<AddIcon />}
                                 sx={{
                                     display: 'inline-flex',                                                                        
