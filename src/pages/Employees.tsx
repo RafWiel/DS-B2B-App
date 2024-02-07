@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { useTheme } from '@mui/material/styles';
 import EmployeesFilter from "../components/EmployeesFilter";
 import Box from "@mui/material/Box";
@@ -10,6 +10,8 @@ import { Button, Grid, useMediaQuery } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import { config } from "../config/config";
 import employeeType from "../enums/employeeType";
+import debounce from 'lodash/debounce';
+import { KeyboardDoubleArrowRightSharp } from "@mui/icons-material";
 
 interface IEmployee extends IBaseRow {
     login: string;
@@ -63,6 +65,12 @@ const columns: IColumn[] = [
         }
     },
 ];
+
+type FetchState = {
+    search: string,
+    page: number,
+    isReset: boolean
+}
   
 const Employees = memo(() => {
     const theme = useTheme();     
@@ -71,12 +79,19 @@ const Employees = memo(() => {
     const isMobileView = useMediaQuery(theme.breakpoints.down("md"));           
     const showLoadingIcon = useAppStore((state) => state.showLoadingIcon);
     const [employees, setEmployees] = useState<IEmployee[]>([]);
-    const [page, setPage] = useState(1);
+    const [state, setState] = useState<FetchState>({
+        search: '',
+        page: 1,
+        isReset: true
+    });
+    
+   
+    //console.log('render', state.page);
 
     useEffect(() => {
         const abortController = new AbortController();
     
-        fetchDataChunk();
+        fetchData(state);
     
         //cleanup, przerwij wywolanie fetch jesli unmount
         return () => {
@@ -86,18 +101,55 @@ const Employees = memo(() => {
     }, []);
     
     const fetchDataChunk = () => {
-        fetchData('');
+        console.log('fetchDataChunk');
+        console.log('search', state.search);
+        console.log('page', state.page);
+        fetchData(state);
+
+        tutaj kurwa
+
     };
 
-    const fetchData = useCallback((value: string) => {                
-        console.log('refresh: ', value);   
-        console.log('page: ', page);        
+    const setSearch = (value: string) => {
+        console.log('fetchDataFilter');
+        //setSearch(search);
+
+        console.log('new search', value);
+        console.log('search', state.search);
+        console.log('page', state.page);
+
+        const newState = {
+            ...state,             
+            search: value,
+            page: 1, 
+            isReset: true
+        };
+        
+        setState(newState);
+        //fetchData(newState);
+        debounceRefresh(newState); 
+    };
+
+    const debounceRefresh = debounce((stateValue: FetchState) => { fetchData(stateValue); }, 500);
+
+    // unmount
+    useEffect(() => {
+        return () => {
+            debounceRefresh.cancel();
+        }
+    }, []);
+
+
+    const fetchData = useCallback((stateValue: FetchState) => {                
+        console.log('fetchData');
+        console.log('search: ', stateValue.search);   
+        console.log('page: ', stateValue.page);        
     
         showLoadingIcon(true);       
     
         fetch(`${config.API_URL}/employees?${String(new URLSearchParams({ 
-            search: value,
-            page: page.toString()
+            search: stateValue.search,
+            page: stateValue.page.toString()
         }))}`)              
         .then((res) => {           
           if (!res.ok) throw new Error("Nieprawidłowa odpowiedź serwera");    
@@ -116,9 +168,18 @@ const Employees = memo(() => {
                 u.type = employeeType.getText(Number(u.type));                
             });
             
-            //append array
-            setEmployees([...employees, ...newEmployees]); 
-            setPage(page + 1);           
+            if (stateValue.isReset) {
+                setEmployees(newEmployees);
+            }
+            else {
+                //append array
+                setEmployees([...employees, ...newEmployees]); 
+            }            
+            
+            setState({...state, 
+                page: state.page + 1,
+                isReset: false
+            });
         })
         .catch((error: unknown) => {
             if ((error as Error).name === 'AbortError') return;
@@ -130,7 +191,7 @@ const Employees = memo(() => {
         .finally(() => {
             showLoadingIcon(false);                        
         });    
-    }, [employees, page, openMessageDialog, showLoadingIcon]);
+    }, [state, employees, openMessageDialog, showLoadingIcon]);
 
     const handleDelete = (row: object) => {
         const employee = row as IEmployee;
@@ -184,9 +245,6 @@ const Employees = memo(() => {
         };
     }, []);
 
-
-
-
     return (
         <Box 
             id="main-container"                   
@@ -203,7 +261,11 @@ const Employees = memo(() => {
             }}
         >
             <div id="filter-container">
-                <EmployeesFilter />
+                <EmployeesFilter 
+                    search={state.search}                     
+                    setSearch={setSearch}
+                    
+                />
             </div>
             <Card 
                 variant="outlined"

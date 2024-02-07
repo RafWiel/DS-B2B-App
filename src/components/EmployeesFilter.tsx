@@ -4,12 +4,19 @@ import { useTheme } from '@mui/material/styles';
 import SearchIcon from '@mui/icons-material/Search';
 import employeeType from '../enums/employeeType.ts';
 
-// interface IProps { 
-//     id: string
-// }
 
-const EmployeesFilter = memo(() => {
+type ComponentProps = { 
+    search: string,  
+    setSearch(value: string): void;        
+};  
+
+const EmployeesFilter = memo(({search, setSearch}: ComponentProps) => {
     const theme = useTheme();
+    
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {   
+        setSearch(e.target.value);                         
+        
+    };        
 
     return (
         <Card 
@@ -25,6 +32,8 @@ const EmployeesFilter = memo(() => {
                         <TextField 
                             id="employee-search"                                 
                             label="Szukaj" 
+                            value={search} 
+                            onChange={handleChange}                          
                             fullWidth                                 
                             variant="standard" 
                             InputProps={{
