@@ -106,16 +106,13 @@ const Employees = memo(() => {
         console.log('page', state.page);
         fetchData(state);
 
-        tutaj kurwa
+        
 
     };
 
     const setSearch = (value: string) => {
-        console.log('fetchDataFilter');
-        //setSearch(search);
-
-        console.log('new search', value);
-        console.log('search', state.search);
+        console.log('setSearch');        
+        console.log('search', value);        
         console.log('page', state.page);
 
         const newState = {
@@ -126,11 +123,15 @@ const Employees = memo(() => {
         };
         
         setState(newState);
-        //fetchData(newState);
-        debounceRefresh(newState); 
+
+        tutaj debounce nie dziala
+        fetchData(newState);
+        //debounceRefresh(); 
     };
 
-    const debounceRefresh = debounce((stateValue: FetchState) => { fetchData(stateValue); }, 500);
+    //const debounceRefresh = debounce((stateValue: FetchState) => { fetchData(stateValue); }, 500);
+
+    const debounceRefresh = debounce(() => { fetchDataChunk(); }, 1000);
 
     // unmount
     useEffect(() => {
@@ -140,10 +141,12 @@ const Employees = memo(() => {
     }, []);
 
 
-    const fetchData = useCallback((stateValue: FetchState) => {                
+    const fetchData = useCallback((stateValue: FetchState) => {                        
         console.log('fetchData');
-        console.log('search: ', stateValue.search);   
-        console.log('page: ', stateValue.page);        
+        // console.log('new search: ', stateValue.search);   
+        // console.log('new page: ', stateValue.page);     
+        // console.log('search: ', state.search);   
+        // console.log('page: ', state.page);        
     
         showLoadingIcon(true);       
     
@@ -177,7 +180,8 @@ const Employees = memo(() => {
             }            
             
             setState({...state, 
-                page: state.page + 1,
+                search: stateValue.search,
+                page: stateValue.page + 1,
                 isReset: false
             });
         })
@@ -264,7 +268,7 @@ const Employees = memo(() => {
                 <EmployeesFilter 
                     search={state.search}                     
                     setSearch={setSearch}
-                    
+                    fetchData={fetchDataChunk}
                 />
             </div>
             <Card 
