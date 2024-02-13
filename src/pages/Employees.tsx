@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useMemo, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTheme } from '@mui/material/styles';
 import EmployeesFilter from "../components/EmployeesFilter";
 import Box from "@mui/material/Box";
@@ -11,7 +11,6 @@ import AddIcon from '@mui/icons-material/Add';
 import { config } from "../config/config";
 import employeeType from "../enums/employeeType";
 import debounce from 'lodash/debounce';
-import { KeyboardDoubleArrowRightSharp } from "@mui/icons-material";
 
 interface IEmployee extends IBaseRow {
     login: string;
@@ -100,20 +99,25 @@ const Employees = memo(() => {
         }
     }, []);
     
-    const fetchDataChunk = () => {
-        console.log('fetchDataChunk');
-        console.log('search', state.search);
-        console.log('page', state.page);
-        fetchData(state);
-
+    const fetchNextData = () => {
+        console.log('fetchNextData');
+        //console.log('search', state.search);
+        //console.log('page', state.page);
         
+        const newState = {
+            ...state,             
+            page: state.page + 1,
+            isReset: false
+        };        
 
+        setState(newState);    
+        fetchData(newState);
     };
 
-    const setSearch = (value: string) => {
-        console.log('setSearch');        
-        console.log('search', value);        
-        console.log('page', state.page);
+    const setFilter = (value: string) => {
+        console.log('setFilter');        
+        //console.log('search', value);        
+        //console.log('page', state.page);
 
         const newState = {
             ...state,             
@@ -122,16 +126,15 @@ const Employees = memo(() => {
             isReset: true
         };
         
-        setState(newState);
-
-        tutaj debounce nie dziala
-        fetchData(newState);
-        //debounceRefresh(); 
+        setState(newState);            
+        debounceRefresh(newState); 
     };
-
-    //const debounceRefresh = debounce((stateValue: FetchState) => { fetchData(stateValue); }, 500);
-
-    const debounceRefresh = debounce(() => { fetchDataChunk(); }, 1000);
+    
+    const debounceRefresh = useRef(
+        debounce((stateValue: FetchState) => { 
+            fetchData(stateValue); 
+        }, 500)
+    ).current;
 
     // unmount
     useEffect(() => {
@@ -143,10 +146,8 @@ const Employees = memo(() => {
 
     const fetchData = useCallback((stateValue: FetchState) => {                        
         console.log('fetchData');
-        // console.log('new search: ', stateValue.search);   
-        // console.log('new page: ', stateValue.page);     
-        // console.log('search: ', state.search);   
-        // console.log('page: ', state.page);        
+        console.log('search: ', stateValue.search, ' | ', state.search);   
+        //console.log('page: ', stateValue.page, ' | ', state.page);           
     
         showLoadingIcon(true);       
     
@@ -162,7 +163,8 @@ const Employees = memo(() => {
         })
         .then((res) => {  
             const newEmployees = res as IEmployee[];
-            if (newEmployees.length === 0) {
+            if (newEmployees.length === 0 && 
+                !stateValue.isReset) {
                 return;
             }
 
@@ -177,13 +179,7 @@ const Employees = memo(() => {
             else {
                 //append array
                 setEmployees([...employees, ...newEmployees]); 
-            }            
-            
-            setState({...state, 
-                search: stateValue.search,
-                page: stateValue.page + 1,
-                isReset: false
-            });
+            }                      
         })
         .catch((error: unknown) => {
             if ((error as Error).name === 'AbortError') return;
@@ -267,8 +263,7 @@ const Employees = memo(() => {
             <div id="filter-container">
                 <EmployeesFilter 
                     search={state.search}                     
-                    setSearch={setSearch}
-                    fetchData={fetchDataChunk}
+                    setFilter={setFilter}
                 />
             </div>
             <Card 
@@ -322,7 +317,7 @@ const Employees = memo(() => {
                                 maxHeight={dataGridHeight}                              
                                 deleteRow={handleDelete}
                                 deleteAllRows={handleDeleteAll} 
-                                fetchData={fetchDataChunk}                                 
+                                fetchData={fetchNextData}        
                             />
                         </Grid>
                         <Grid 

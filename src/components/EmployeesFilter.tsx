@@ -7,16 +7,14 @@ import employeeType from '../enums/employeeType.ts';
 
 type ComponentProps = { 
     search: string,  
-    setSearch(value: string): void;
-    fetchData(): void;        
+    setFilter(value: string): void;           
 };  
 
-const EmployeesFilter = memo(({search, setSearch, fetchData}: ComponentProps) => {
+const EmployeesFilter = memo(({search, setFilter}: ComponentProps) => {
     const theme = useTheme();
     
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {   
-        setSearch(e.target.value);                         
-        //fetchData();
+        setFilter(e.target.value);         
     };        
 
     return (
