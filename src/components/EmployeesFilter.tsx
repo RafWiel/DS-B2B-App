@@ -1,4 +1,4 @@
-import { Card, CardContent, FormControl, Grid, InputAdornment, InputLabel, MenuItem, Select, TextField } from "@mui/material";
+import { Card, CardContent, FormControl, Grid, InputAdornment, InputLabel, MenuItem, Select, SelectChangeEvent, TextField } from "@mui/material";
 import { memo } from "react";
 import { useTheme } from '@mui/material/styles';
 import SearchIcon from '@mui/icons-material/Search';
@@ -7,15 +7,20 @@ import employeeType from '../enums/employeeType.ts';
 
 type ComponentProps = { 
     search: string,  
-    setFilter(value: string): void;           
+    type: string,
+    setFilter(search: string, type: string): void;           
 };  
 
-const EmployeesFilter = memo(({search, setFilter}: ComponentProps) => {
+const EmployeesFilter = memo(({search, type, setFilter}: ComponentProps) => {
     const theme = useTheme();
     
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {   
-        setFilter(e.target.value);         
-    };        
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {           
+        setFilter(e.target.value, type);
+    };  
+    
+    const handleChangeSelect = (e: SelectChangeEvent<string>) => {           
+        setFilter(search, e.target.value);     
+    };  
 
     return (
         <Card 
@@ -50,8 +55,8 @@ const EmployeesFilter = memo(({search, setFilter}: ComponentProps) => {
                             <Select
                                 labelId="employee-type-label"
                                 id="employee-type"
-                                //value={age}
-                                //onChange={handleChange}
+                                value={type}
+                                onChange={handleChangeSelect}
                                 label="Age"
                             >
                                 {

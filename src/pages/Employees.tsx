@@ -67,6 +67,7 @@ const columns: IColumn[] = [
 
 type FetchState = {
     search: string,
+    type: string,
     page: number,
     isReset: boolean
 }
@@ -80,6 +81,7 @@ const Employees = memo(() => {
     const [employees, setEmployees] = useState<IEmployee[]>([]);
     const [state, setState] = useState<FetchState>({
         search: '',
+        type: '0',
         page: 1,
         isReset: true
     });
@@ -114,14 +116,15 @@ const Employees = memo(() => {
         fetchData(newState);
     };
 
-    const setFilter = (value: string) => {
+    const setFilter = (search: string, type: string) => {
         console.log('setFilter');        
         //console.log('search', value);        
         //console.log('page', state.page);
 
         const newState = {
             ...state,             
-            search: value,
+            search: search,
+            type: type,
             page: 1, 
             isReset: true
         };
@@ -147,12 +150,14 @@ const Employees = memo(() => {
     const fetchData = useCallback((stateValue: FetchState) => {                        
         console.log('fetchData');
         console.log('search: ', stateValue.search, ' | ', state.search);   
+        console.log('type: ', stateValue.type, ' | ', state.type);   
         //console.log('page: ', stateValue.page, ' | ', state.page);           
     
         showLoadingIcon(true);       
     
         fetch(`${config.API_URL}/employees?${String(new URLSearchParams({ 
             search: stateValue.search,
+            type: stateValue.type,
             page: stateValue.page.toString()
         }))}`)              
         .then((res) => {           
@@ -262,7 +267,8 @@ const Employees = memo(() => {
         >
             <div id="filter-container">
                 <EmployeesFilter 
-                    search={state.search}                     
+                    search={state.search}
+                    type={state.type}
                     setFilter={setFilter}
                 />
             </div>
