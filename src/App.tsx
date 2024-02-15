@@ -24,7 +24,7 @@ import QuestionDialog from './components/QuestionDialog';
 import { useEffect } from 'react';
 import { CircularProgress } from '@mui/material';
 
-const todo = "TODO: Filtrowanie, Sortowanie";
+const todo = "TODO: Zapisz filtr i sort w adresie";
 
 interface AppBarProps extends MuiAppBarProps {
     open?: boolean;

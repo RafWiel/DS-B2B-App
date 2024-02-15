@@ -47,7 +47,8 @@ interface IDataGridProps {
     isDelete: boolean;
     deleteRow: (row: object) => void;
     deleteAllRows: () => void;
-    fetchData: () => void;
+    fetchNextData: () => void;
+    setSorting: (column: string, order: string) => void;
 }
 
 interface IHeadProps {
@@ -320,11 +321,12 @@ export default function DataGrid(props: IDataGridProps) {
         isDelete, 
         deleteRow,
         deleteAllRows, 
-        fetchData 
+        fetchNextData,
+        setSorting 
     } = props;
 
     const [order, setOrder] = React.useState<Order>('asc');    
-    const [orderBy, setOrderBy] = React.useState<string>('calories');
+    const [orderBy, setOrderBy] = React.useState<string>('');
     const [selected, setSelected] = React.useState<readonly number[]>([]);
     //const [page, setPage] = React.useState(0);  
     //const [rowsPerPage, setRowsPerPage] = React.useState(5);
@@ -340,12 +342,14 @@ export default function DataGrid(props: IDataGridProps) {
 
     const handleRequestSort = (
         _: React.MouseEvent<unknown>,
-        property: string,
+        column: string,
     ) => {
-        const isAsc = orderBy === property && order === 'asc';
-        
-        setOrder(isAsc ? 'desc' : 'asc');
-        setOrderBy(property);
+        const isAsc = orderBy === column && order === 'asc';
+        const newOrder = isAsc ? 'desc' : 'asc';
+
+        setOrder(newOrder);
+        setOrderBy(column);
+        setSorting(column, newOrder);
     };
 
     const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -390,7 +394,7 @@ export default function DataGrid(props: IDataGridProps) {
             return;
         }
 
-        fetchData();
+        fetchNextData();
     }
 
     // const handleChangePage = (event: unknown, newPage: number) => {

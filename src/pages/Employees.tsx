@@ -69,6 +69,8 @@ type FetchState = {
     search: string,
     type: string,
     page: number,
+    sortColumn: string | null,
+    sortOrder: string | null,
     isReset: boolean
 }
   
@@ -83,6 +85,8 @@ const Employees = memo(() => {
         search: '',
         type: '0',
         page: 1,
+        sortColumn: null,
+        sortOrder: null,        
         isReset: true
     });
     
@@ -116,7 +120,7 @@ const Employees = memo(() => {
         fetchData(newState);
     };
 
-    const setFilter = (search: string, type: string) => {
+    const setFilter = (search: string, type: string, isDebouncedUpdate: boolean) => {
         console.log('setFilter');        
         //console.log('search', value);        
         //console.log('page', state.page);
@@ -129,11 +133,31 @@ const Employees = memo(() => {
             isReset: true
         };
         
-        setState(newState);            
-        debounceRefresh(newState); 
+        setState(newState);    
+        
+        if (isDebouncedUpdate) {
+            debounceFetchData(newState);
+        } else {
+            fetchData(newState); 
+        }
     };
+
+    const setSorting = (column: string, order: string) => {
+        console.log('sorting: ', column, order);
+
+        const newState = {
+            ...state,             
+            sortColumn: column,
+            sortOrder: order,
+            page: 1, 
+            isReset: true
+        };
+
+        setState(newState);            
+        fetchData(newState); 
+    }
     
-    const debounceRefresh = useRef(
+    const debounceFetchData = useRef(
         debounce((stateValue: FetchState) => { 
             fetchData(stateValue); 
         }, 500)
@@ -142,7 +166,7 @@ const Employees = memo(() => {
     // unmount
     useEffect(() => {
         return () => {
-            debounceRefresh.cancel();
+            debounceFetchData.cancel();
         }
     }, []);
 
@@ -158,6 +182,8 @@ const Employees = memo(() => {
         fetch(`${config.API_URL}/employees?${String(new URLSearchParams({ 
             search: stateValue.search,
             type: stateValue.type,
+            'sort-column': stateValue.sortColumn ?? 'id',
+            'sort-order': stateValue.sortOrder ?? 'asc',
             page: stateValue.page.toString()
         }))}`)              
         .then((res) => {           
@@ -323,7 +349,8 @@ const Employees = memo(() => {
                                 maxHeight={dataGridHeight}                              
                                 deleteRow={handleDelete}
                                 deleteAllRows={handleDeleteAll} 
-                                fetchData={fetchNextData}        
+                                fetchNextData={fetchNextData}        
+                                setSorting={setSorting}
                             />
                         </Grid>
                         <Grid 

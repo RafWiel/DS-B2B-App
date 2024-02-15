@@ -8,18 +8,18 @@ import employeeType from '../enums/employeeType.ts';
 type ComponentProps = { 
     search: string,  
     type: string,
-    setFilter(search: string, type: string): void;           
+    setFilter(search: string, type: string, isDebouncedUpdate: boolean): void;           
 };  
 
 const EmployeesFilter = memo(({search, type, setFilter}: ComponentProps) => {
     const theme = useTheme();
     
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {           
-        setFilter(e.target.value, type);
+        setFilter(e.target.value, type, true);
     };  
     
     const handleChangeSelect = (e: SelectChangeEvent<string>) => {           
-        setFilter(search, e.target.value);     
+        setFilter(search, e.target.value, false);     
     };  
 
     return (
