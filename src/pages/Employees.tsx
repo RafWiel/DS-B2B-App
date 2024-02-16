@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { useTheme } from '@mui/material/styles';
 import EmployeesFilter from "../components/EmployeesFilter";
 import Box from "@mui/material/Box";
@@ -11,6 +11,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { config } from "../config/config";
 import employeeType from "../enums/employeeType";
 import debounce from 'lodash/debounce';
+import queryString from 'query-string';
 
 interface IEmployee extends IBaseRow {
     login: string;
@@ -95,13 +96,14 @@ const Employees = memo(() => {
 
     useEffect(() => {
         const abortController = new AbortController();
-    
-        fetchData(state);
+            
+        parseUrl();        
     
         //cleanup, przerwij wywolanie fetch jesli unmount
         return () => {
           showLoadingIcon(false);
           abortController.abort();
+          debounceFetchData.cancel();          
         }
     }, []);
     
@@ -153,7 +155,7 @@ const Employees = memo(() => {
             isReset: true
         };
 
-        setState(newState);            
+        setState(newState);
         fetchData(newState); 
     }
     
@@ -163,13 +165,42 @@ const Employees = memo(() => {
         }, 500)
     ).current;
 
-    // unmount
-    useEffect(() => {
-        return () => {
-            debounceFetchData.cancel();
-        }
-    }, []);
+    const parseUrl = () => {
+        const url = queryString.parse(location.search);
+        console.log(url);
+        
+        const newState: FetchState = {
+            ...state,
+            search: (url.search ?? '').toString(),
+            type: (url.type ?? 0).toString(),
+            sortColumn: url['sort-column']?.toString() ?? null,
+            sortOrder: url['sort-order']?.toString() ?? null,        
+            page: 1,            
+            isReset: true
+        };
+        
+        setState(newState);
+        fetchData(newState);
 
+        jeszcze pokaz znacznik sortowania w datagrid
+    }
+
+    const setUrl = (stateValue: FetchState) => {
+        let url = queryString.stringify({
+            search: stateValue.search.length > 0 ? stateValue.search : null, 
+            type: Number(stateValue.type) > 0 ? stateValue.type : null, 
+            'sort-column': stateValue.sortColumn, 
+            'sort-order': stateValue.sortOrder
+        }, {
+            skipNull: true
+        });
+        
+        if (url.length > 0) {
+            url = `/employees?${url}`;
+        }
+
+        window.history.replaceState(null, '', url);
+    }
 
     const fetchData = useCallback((stateValue: FetchState) => {                        
         console.log('fetchData');
@@ -177,6 +208,8 @@ const Employees = memo(() => {
         console.log('type: ', stateValue.type, ' | ', state.type);   
         //console.log('page: ', stateValue.page, ' | ', state.page);           
     
+        setUrl(stateValue);        
+
         showLoadingIcon(true);       
     
         fetch(`${config.API_URL}/employees?${String(new URLSearchParams({ 
