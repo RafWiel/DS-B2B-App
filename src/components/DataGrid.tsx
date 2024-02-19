@@ -48,7 +48,11 @@ interface IDataGridProps {
     deleteRow: (row: object) => void;
     deleteAllRows: () => void;
     fetchNextData: () => void;
-    setSorting: (column: string, order: string) => void;
+    setSorting: (column: string, order: Order) => void;
+}
+
+export interface IDataGridRef { 
+    updateSorting: (column: string | null, order: Order | null) => void; 
 }
 
 interface IHeadProps {
@@ -69,7 +73,7 @@ interface IHeadProps {
 //     numSelected: number;
 // }
   
-type Order = 'asc' | 'desc';
+export type Order = 'asc' | 'desc';
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
     if (b[orderBy] < a[orderBy]) {
@@ -312,7 +316,7 @@ function EnhancedTableHead(props: IHeadProps) {
 //     );
 // }
 
-export default function DataGrid(props: IDataGridProps) {
+const DataGrid = React.forwardRef((props: IDataGridProps, ref) => {
     const { 
         maxHeight, 
         columns, 
@@ -351,6 +355,17 @@ export default function DataGrid(props: IDataGridProps) {
         setOrderBy(column);
         setSorting(column, newOrder);
     };
+
+    React.useImperativeHandle(ref, () => ({
+        updateSorting(column: string | null, order: Order | null) {
+            if (!column || !order) {
+                return;
+            }
+                        
+            setOrder(order);
+            setOrderBy(column);
+        }    
+      }));
 
     const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.checked) {
@@ -589,4 +604,6 @@ export default function DataGrid(props: IDataGridProps) {
             /> */}
         </Box>
     );
-}
+});
+
+export default DataGrid;

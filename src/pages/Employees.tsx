@@ -4,7 +4,7 @@ import EmployeesFilter from "../components/EmployeesFilter";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import DataGrid, { IBaseRow, IColumn } from "../components/DataGrid";
+import DataGrid, { IBaseRow, IColumn, IDataGridRef, Order } from "../components/DataGrid";
 import { useAppStore } from "../store";
 import { Button, Grid, useMediaQuery } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
@@ -71,7 +71,7 @@ type FetchState = {
     type: string,
     page: number,
     sortColumn: string | null,
-    sortOrder: string | null,
+    sortOrder: Order | null,
     isReset: boolean
 }
   
@@ -81,6 +81,7 @@ const Employees = memo(() => {
     const openMessageDialog = useAppStore((state) => state.openMessageDialog); 
     const isMobileView = useMediaQuery(theme.breakpoints.down("md"));           
     const showLoadingIcon = useAppStore((state) => state.showLoadingIcon);
+    const dataGridRef = useRef<IDataGridRef>();
     const [employees, setEmployees] = useState<IEmployee[]>([]);
     const [state, setState] = useState<FetchState>({
         search: '',
@@ -144,7 +145,7 @@ const Employees = memo(() => {
         }
     };
 
-    const setSorting = (column: string, order: string) => {
+    const setSorting = (column: string, order: Order) => {
         console.log('sorting: ', column, order);
 
         const newState = {
@@ -156,7 +157,7 @@ const Employees = memo(() => {
         };
 
         setState(newState);
-        fetchData(newState); 
+        fetchData(newState);         
     }
     
     const debounceFetchData = useRef(
@@ -167,22 +168,22 @@ const Employees = memo(() => {
 
     const parseUrl = () => {
         const url = queryString.parse(location.search);
-        console.log(url);
+        //console.log(url);
         
         const newState: FetchState = {
             ...state,
             search: (url.search ?? '').toString(),
             type: (url.type ?? 0).toString(),
             sortColumn: url['sort-column']?.toString() ?? null,
-            sortOrder: url['sort-order']?.toString() ?? null,        
+            sortOrder: url['sort-order']?.toString() as Order ?? null,        
             page: 1,            
             isReset: true
         };
         
         setState(newState);
-        fetchData(newState);
-
-        jeszcze pokaz znacznik sortowania w datagrid
+        fetchData(newState);   
+        
+        dataGridRef.current?.updateSorting(newState.sortColumn, newState.sortOrder);
     }
 
     const setUrl = (stateValue: FetchState) => {
@@ -375,6 +376,7 @@ const Employees = memo(() => {
                             // }}
                         >
                             <DataGrid 
+                                ref={dataGridRef}
                                 columns={columns}
                                 rows={employees}
                                 isSelection={false}
@@ -402,7 +404,7 @@ const Employees = memo(() => {
                             <Button                                 
                                 variant="contained"
                                 disableElevation 
-                                onClick={() => fetchDataChunk()}                                
+                                onClick={() => fetchNextData()}                                
                                 startIcon={<AddIcon />}
                                 sx={{
                                     display: 'inline-flex',                                                                        
