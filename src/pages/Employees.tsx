@@ -264,7 +264,7 @@ const Employees = memo(() => {
         openQuestionDialog({
             title: 'Pracownicy',
             text: `Czy na pewno usunąć pracownika ${employee.name}?`,            
-            action: deleteUser,
+            action: deleteOne,
             actionParameters: employee.id
         });
     }
@@ -273,17 +273,54 @@ const Employees = memo(() => {
         openQuestionDialog({
             title: 'Pracownicy',
             text: `Czy na pewno usunąć wszystkich pracowników?`,            
-            action: deleteAllUsers,
+            action: deleteAll,
             //actionParameters: [1, 2, 3]
         });
     }
 
-    const deleteUser = (id?: number) => {
-        console.log('delete user ', id);        
+    const deleteOne = async (id?: number) => {
+        const result = await deleteAsync(`${config.API_URL}/employees/${id}`, 'Nieudane usunięcie pracownika');        
+        if (!result) {            
+            return;
+        }
+
+        setEmployees(employees.filter(u => u.id !== id));     
     }
 
-    const deleteAllUsers = () => {
-        console.log('delete all users');        
+    const deleteAll = async () => {
+        const result = await deleteAsync(`${config.API_URL}/employees`, 'Nieudane usunięcie wszystkich pracowników');        
+        if (!result) {            
+            return;
+        }
+
+        setEmployees([]);         
+    }
+
+    const deleteAsync = async (url: string, errorMessage: string) => {
+        showLoadingIcon(true);       
+        
+        const result = await fetch(url, { method: 'DELETE' })              
+        .then((res) => {           
+            if (!res.ok) throw new Error(errorMessage);    
+          
+            return true;
+        })        
+        .catch((error: unknown) => {
+            if ((error as Error).name === 'AbortError') return;
+            
+            openMessageDialog({
+                title: 'Błąd aplikacji',
+                text: (error as Error).message
+            });
+
+            return false;
+        })
+        .finally(() => {
+            showLoadingIcon(false);                        
+        });   
+        
+        console.log('result', result);
+        return result;
     }
 
     const [dataGridHeight, setDataGridHeight] = useState(0);

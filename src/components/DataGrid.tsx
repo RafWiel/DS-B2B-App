@@ -361,11 +361,11 @@ const DataGrid = React.forwardRef((props: IDataGridProps, ref) => {
             if (!column || !order) {
                 return;
             }
-                        
+
             setOrder(order);
             setOrderBy(column);
         }    
-      }));
+    }));
 
     const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.checked) {
