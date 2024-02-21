@@ -15,6 +15,7 @@ import RegistrationRequests from './pages/RegistrationRequests';
 import Customers from './pages/Customers';
 import Companies from './pages/Companies';
 import Employees from './pages/Employees';
+import Employee from './pages/Employee';
 import NotFound from './pages/NotFound';
 import { ThemeProvider } from '@emotion/react';
 import './assets/app.css';
@@ -24,7 +25,7 @@ import QuestionDialog from './components/QuestionDialog';
 import { useEffect } from 'react';
 import { CircularProgress } from '@mui/material';
 
-const todo = "TODO: Zapisz filtr i sort w adresie";
+const todo = "TODO: SetAppBarTitle";
 
 interface AppBarProps extends MuiAppBarProps {
     open?: boolean;
@@ -97,6 +98,7 @@ export default function App() {
     });
 
     useEffect(() => {  
+        console.log('setAppBarTitle Main');
         setAppBarTitle(routes.getText(location[0]));
     }, [location]);
     
@@ -232,7 +234,10 @@ export default function App() {
                         </Route>
                         <Route path={routes.employees}>
                             <Employees />
-                        </Route>                    
+                        </Route>
+                        <Route path={routes.employee}>
+                            <Employee />
+                        </Route>
                         <Route>
                             <NotFound />
                         </Route>                                        

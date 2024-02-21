@@ -49,6 +49,7 @@ interface IDataGridProps {
     deleteAllRows: () => void;
     fetchNextData: () => void;
     setSorting: (column: string, order: Order) => void;
+    onRowClick: (id: number) => void;
 }
 
 export interface IDataGridRef { 
@@ -326,7 +327,8 @@ const DataGrid = React.forwardRef((props: IDataGridProps, ref) => {
         deleteRow,
         deleteAllRows, 
         fetchNextData,
-        setSorting 
+        setSorting,
+        onRowClick 
     } = props;
 
     const [order, setOrder] = React.useState<Order>('asc');    
@@ -368,6 +370,10 @@ const DataGrid = React.forwardRef((props: IDataGridProps, ref) => {
     }));
 
     const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (!isSelection) {
+            return;
+        }
+                
         if (event.target.checked) {
             const newSelected = rows.map((n: IBaseRow) => n.id);
             setSelected(newSelected);
@@ -378,7 +384,14 @@ const DataGrid = React.forwardRef((props: IDataGridProps, ref) => {
     };
 
     const handleRowClick = (_: React.MouseEvent<unknown>, id: number) => {
-        console.log('row', id);
+        onRowClick(id);
+    };
+
+    const handleRowSelect = (e: React.MouseEvent<unknown>, id: number) => {
+        if (!isSelection) {
+            return;
+        }
+        
         const selectedIndex = selected.indexOf(id);
         let newSelected: readonly number[] = [];
 
@@ -396,6 +409,8 @@ const DataGrid = React.forwardRef((props: IDataGridProps, ref) => {
         }
 
         setSelected(newSelected);
+
+        e.stopPropagation();
     };
 
     const handleDelete = (event: React.MouseEvent<unknown>, row: object) => {
@@ -508,6 +523,7 @@ const DataGrid = React.forwardRef((props: IDataGridProps, ref) => {
                                         <TableCell padding="checkbox">
                                             <Checkbox
                                                 color="primary"
+                                                onClick={(event) => handleRowSelect(event, Number(row.id))}
                                                 checked={isItemSelected}
                                                 inputProps={{
                                                     'aria-labelledby': labelId,

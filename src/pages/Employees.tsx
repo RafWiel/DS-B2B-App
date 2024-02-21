@@ -12,6 +12,7 @@ import { config } from "../config/config";
 import employeeType from "../enums/employeeType";
 import debounce from 'lodash/debounce';
 import queryString from 'query-string';
+import { useLocation } from 'wouter';
 
 interface IEmployee extends IBaseRow {
     login: string;
@@ -83,6 +84,9 @@ const Employees = memo(() => {
     const showLoadingIcon = useAppStore((state) => state.showLoadingIcon);
     const dataGridRef = useRef<IDataGridRef>();
     const [employees, setEmployees] = useState<IEmployee[]>([]);
+    const [, navigate] = useLocation();
+    const abortController = useRef(new AbortController()).current;  
+
     const [state, setState] = useState<FetchState>({
         search: '',
         type: '0',
@@ -95,9 +99,7 @@ const Employees = memo(() => {
    
     //console.log('render', state.page);
 
-    useEffect(() => {
-        const abortController = new AbortController();
-            
+    useEffect(() => {                    
         parseUrl();        
     
         //cleanup, przerwij wywolanie fetch jesli unmount
@@ -219,7 +221,9 @@ const Employees = memo(() => {
             'sort-column': stateValue.sortColumn ?? 'id',
             'sort-order': stateValue.sortOrder ?? 'asc',
             page: stateValue.page.toString()
-        }))}`)              
+        }))}`, { 
+            signal: abortController.signal 
+        })              
         .then((res) => {           
           if (!res.ok) throw new Error("Nieprawidłowa odpowiedź serwera");    
           
@@ -412,7 +416,7 @@ const Employees = memo(() => {
                             //     //alignSelf: 'flex-start'
                             // }}
                         >
-                            <DataGrid 
+                            <DataGrid                             
                                 ref={dataGridRef}
                                 columns={columns}
                                 rows={employees}
@@ -423,6 +427,7 @@ const Employees = memo(() => {
                                 deleteAllRows={handleDeleteAll} 
                                 fetchNextData={fetchNextData}        
                                 setSorting={setSorting}
+                                onRowClick={(id: number) => navigate(`/employees/${id}`)}
                             />
                         </Grid>
                         <Grid 

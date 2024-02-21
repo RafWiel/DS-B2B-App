@@ -12,6 +12,7 @@ const registrationRequests = '/registration-requests';
 const customers = '/customers';
 const companies = '/companies';
 const employees = '/employees';
+const employee = '/employees/:id';
 
 const routes = {
     home,
@@ -21,6 +22,7 @@ const routes = {
     customers,
     companies,
     employees,
+    employee,
 
     items: [{
         id: home, 
@@ -68,6 +70,10 @@ const routes = {
         renderIcon: () => {
             return <BadgeIcon />;
         }
+    }, {
+        id: employee,
+        text: 'Pracownik',
+        isSidebarItem: false        
     }],
     
     getText(id: string): string {
