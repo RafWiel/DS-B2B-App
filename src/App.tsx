@@ -25,7 +25,7 @@ import QuestionDialog from './components/QuestionDialog';
 import { useEffect } from 'react';
 import { CircularProgress } from '@mui/material';
 
-const todo = "TODO: SetAppBarTitle";
+const todo = "TODO: Usuwanie, ustaw flage isActive";
 
 interface AppBarProps extends MuiAppBarProps {
     open?: boolean;

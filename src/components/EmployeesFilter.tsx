@@ -60,9 +60,10 @@ const EmployeesFilter = memo(({search, type, setFilter}: ComponentProps) => {
                                 label="Age"
                             >
                                 {
-                                    employeeType && employeeType.items.map((item) => (
-                                        <MenuItem key={item.id} value={item.id}>{item.text}</MenuItem>                                    
-                                    ))
+                                    employeeType && employeeType.items                                        
+                                        .map((item) => (
+                                            <MenuItem key={item.id} value={item.id}>{employeeType.getFilterText(item.id)}</MenuItem>                                    
+                                        ))
                                 }                                
                             </Select>
                         </FormControl>                        

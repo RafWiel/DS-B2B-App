@@ -1,17 +1,17 @@
-const all = 0;
+const none = 0;
 const administrator = 1;
 const supervisor = 2;
 const employee = 3;
 
 const employeeType = {
-    all,
+    none,
     administrator,
     supervisor,
     employee,
 
     items: [{
-        id: all, 
-        text: 'Wszyscy'
+        id: none, 
+        text: ''
     }, {
         id: administrator,
         text: 'Administrator'
@@ -27,6 +27,14 @@ const employeeType = {
         const item = this.items.find((u) => u.id === Number(id));
 
         return item ? item.text : '';
+    },
+
+    getFilterText(id: number): string {
+        if (id === none) {
+            return 'Wszyscy';
+        }
+
+        return this.getText(id);
     },
 };
 

@@ -89,7 +89,7 @@ const Employees = memo(() => {
 
     const [state, setState] = useState<FetchState>({
         search: '',
-        type: '0',
+        type: employeeType.none.toString(),
         page: 1,
         sortColumn: null,
         sortOrder: null,        
@@ -175,7 +175,7 @@ const Employees = memo(() => {
         const newState: FetchState = {
             ...state,
             search: (url.search ?? '').toString(),
-            type: (url.type ?? 0).toString(),
+            type: (url.type ?? employeeType.none).toString(),
             sortColumn: url['sort-column']?.toString() ?? null,
             sortOrder: url['sort-order']?.toString() as Order ?? null,        
             page: 1,            
@@ -304,24 +304,24 @@ const Employees = memo(() => {
         showLoadingIcon(true);       
         
         const result = await fetch(url, { method: 'DELETE' })              
-        .then((res) => {           
-            if (!res.ok) throw new Error(errorMessage);    
-          
-            return true;
-        })        
-        .catch((error: unknown) => {
-            if ((error as Error).name === 'AbortError') return;
+            .then((res) => {           
+                if (!res.ok) throw new Error(errorMessage);    
             
-            openMessageDialog({
-                title: 'Błąd aplikacji',
-                text: (error as Error).message
-            });
+                return true;
+            })        
+            .catch((error: unknown) => {
+                if ((error as Error).name === 'AbortError') return;
+                
+                openMessageDialog({
+                    title: 'Błąd aplikacji',
+                    text: (error as Error).message
+                });
 
-            return false;
-        })
-        .finally(() => {
-            showLoadingIcon(false);                        
-        });   
+                return false;
+            })
+            .finally(() => {
+                showLoadingIcon(false);                        
+            });   
         
         console.log('result', result);
         return result;
