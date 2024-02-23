@@ -57,7 +57,6 @@ const EmployeesFilter = memo(({search, type, setFilter}: ComponentProps) => {
                                 id="employee-type"
                                 value={type}
                                 onChange={handleChangeSelect}
-                                label="Age"
                             >
                                 {
                                     employeeType && employeeType.items                                        

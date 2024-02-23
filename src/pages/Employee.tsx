@@ -4,7 +4,7 @@ import { useTheme } from '@mui/material/styles';
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import { Button, Grid, TextField } from "@mui/material";
+import { Button, FormControl, Grid, InputLabel, MenuItem, Select, TextField } from "@mui/material";
 import { useAppStore } from "../store";
 import { IEmployee } from '../interfaces/IEmployee.ts';
 import { useLocation, useRoute } from "wouter";
@@ -12,6 +12,7 @@ import { config } from "../config/config";
 import employeeType from "../enums/employeeType.ts";
 import { Formik, FormikProps, FormikHelpers, Form } from 'formik';
 import * as yup from 'yup';
+import boolEnum from "../enums/boolEnum.ts";
 
 const Employee = memo(() => {
     const theme = useTheme();  
@@ -147,17 +148,31 @@ const Employee = memo(() => {
                     height: '100%',                        
                     [theme.breakpoints.down('sm')]: {
                         border: 'none' 
-                    },                    
+                    },  
+                    backgroundColor: 'blue',                   
+                    padding: 0,
+                    margin: 0,
                 }}
             >
-                <CardContent>
-
-
+                <CardContent sx={{
+                    backgroundColor: 'yellow', 
+                    display: 'flex',                            
+                    height: '100%',
+                    [theme.breakpoints.down('md')]: {
+                        padding: 1,
+                        '&:last-child': { 
+                            paddingBottom: 1 
+                        }
+                    },                                                                                                                
+                }}>                    
                     <Grid 
                         container 
                         spacing={2}
                         sx={{
-                            backgroundColor: 'gainsboro',                                                                                                                                           
+                            margin: 0,
+                            padding: 0,
+                            height: '100%',
+                            backgroundColor: 'gainsboro',
                         }}
                     >
                         <Grid 
@@ -166,34 +181,34 @@ const Employee = memo(() => {
                             sm={12} 
                             md={10} 
                             sx={{
-                                backgroundColor: 'aqua',
-                                
+                                margin: 0,
+                                padding: 0,
+                                backgroundColor: 'aqua',                                
                             }}
-                        >                            
-                            <Grid item xs={8} sm={10}>
+                        >                                                        
+                            <Formik
+                                enableReinitialize={true}
+                                initialValues={employee}
+                                validationSchema={schema} 
+                                validateOnChange={true}
+                                validateOnBlur={true}           
+                                onSubmit={handleSubmit}>                    
+                                {(props: FormikProps<IEmployee>) => {
+                                    const { handleSubmit, handleChange, values, errors, touched, isSubmitting } = props;                            
 
+                                    //console.log('render Formik');
+                                    //console.log('touched', touched);                        
 
-
-
-
-
-
-                                <Formik
-                                    enableReinitialize={true}
-                                    initialValues={employee}
-                                    validationSchema={schema} 
-                                    validateOnChange={true}
-                                    validateOnBlur={true}           
-                                    onSubmit={handleSubmit}>                    
-                                    {(props: FormikProps<IEmployee>) => {
-                                        const { handleSubmit, handleChange, values, errors, touched, isSubmitting } = props;                            
-
-                                        //console.log('render Formik');
-                                        //console.log('touched', touched);                        
-
-                                        return (                               
-                                            
-
+                                    return (                                                                           
+                                        <Grid 
+                                        
+                                            container 
+                                            spacing={2}
+                                            // sx={{
+                                            //     backgroundColor: 'gainsboro',                                                                                                                                           
+                                            // }}
+                                        >
+                                            <Grid item xs={4}>
                                                 <TextField 
                                                     name="login"                                                    
                                                     value={values.login} 
@@ -202,18 +217,78 @@ const Employee = memo(() => {
                                                     fullWidth                                 
                                                     variant="standard"                                 
                                                 />  
-
-                                                                                                                                                                                        
-                                            
-                                        );
-                                    }}
-                                </Formik>  
-
-              
-                            </Grid>
-
-
-
+                                            </Grid>
+                                            <Grid item xs={4}>
+                                                <TextField 
+                                                    name="name"                                                    
+                                                    value={values.name} 
+                                                    label="Imię i nazwisko" 
+                                                    onChange={handleChange}                          
+                                                    fullWidth                                 
+                                                    variant="standard"                                 
+                                                />  
+                                            </Grid>
+                                            <Grid item xs={4}>
+                                                <FormControl variant="standard" fullWidth>
+                                                    <InputLabel id="type">Typ</InputLabel>
+                                                    <Select
+                                                        labelId="type"
+                                                        name="type"
+                                                        value={values.type}
+                                                        onChange={handleChange}
+                                                    >
+                                                        {
+                                                            employeeType && employeeType.items   
+                                                                .filter(u => u.id != employeeType.none)                                     
+                                                                .map((item) => (
+                                                                    <MenuItem key={item.id} value={item.id}>{item.text}</MenuItem>                                    
+                                                                ))
+                                                        }                                
+                                                    </Select>
+                                                </FormControl>   
+                                            </Grid>
+                                            <Grid item xs={4}>
+                                                <TextField 
+                                                    name="phoneNumber"                                                    
+                                                    value={values.phoneNumber} 
+                                                    label="Numer telefonu" 
+                                                    onChange={handleChange}                          
+                                                    fullWidth                                 
+                                                    variant="standard"                                 
+                                                />  
+                                            </Grid>
+                                            <Grid item xs={4}>
+                                                <TextField 
+                                                    name="email"                                                    
+                                                    value={values.email} 
+                                                    label="e-mail" 
+                                                    onChange={handleChange}                          
+                                                    fullWidth                                 
+                                                    variant="standard"                                 
+                                                />  
+                                            </Grid>
+                                            <Grid item xs={4}>
+                                                <FormControl variant="standard" fullWidth>
+                                                    <InputLabel id="isMailing">Typ</InputLabel>
+                                                    <Select
+                                                        labelId="isMailing"
+                                                        name="isMailing"
+                                                        value={Number(values.isMailing)}
+                                                        onChange={handleChange}
+                                                    >
+                                                        {
+                                                            boolEnum && boolEnum.items                                      
+                                                                .map((item) => (
+                                                                    <MenuItem key={item.id} value={item.id}>{item.text}</MenuItem>                                    
+                                                                ))
+                                                        }                                
+                                                    </Select>
+                                                </FormControl>   
+                                            </Grid>
+                                        </Grid>                                                                                                                                                                                                                            
+                                    );
+                                }}
+                            </Formik>  
                         </Grid>
                         <Grid 
                             item 
@@ -242,11 +317,7 @@ const Employee = memo(() => {
                                 Zapisz
                             </Button>
                         </Grid>
-                    </Grid>  
-
-
-
-                    
+                    </Grid>
                 </CardContent>
             </Card>
         </Box>
