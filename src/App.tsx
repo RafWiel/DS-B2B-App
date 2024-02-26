@@ -19,13 +19,14 @@ import Employee from './pages/Employee';
 import NotFound from './pages/NotFound';
 import { ThemeProvider } from '@emotion/react';
 import './assets/app.css';
+import './assets/fonts.css';
 import routes from './routes';
 import MessageDialog from './components/MessageDialog';
 import QuestionDialog from './components/QuestionDialog';
 import { useEffect } from 'react';
 import { CircularProgress } from '@mui/material';
 
-const todo = "TODO: Usuwanie, ustaw flage isActive";
+const todo = 'Rozmiar czcionek';
 
 interface AppBarProps extends MuiAppBarProps {
     open?: boolean;
@@ -69,33 +70,72 @@ export default function App() {
             }                    
         },
         typography: {
-          fontFamily: [
-            '-apple-system',
-            'Montserrat',
-            '"Segoe UI"',
-            'Roboto',
-            '"Helvetica Neue"',
-            'Arial',
-            'sans-serif',
-            '"Apple Color Emoji"',
-            '"Segoe UI Emoji"',
-            '"Segoe UI Symbol"',
-          ].join(','),
-          fontSize: 12,
+            fontFamily: [
+                '-apple-system',
+                //'Montserrat',
+                'Nunito',
+                '"Segoe UI"',
+                'Roboto',
+                '"Helvetica Neue"',
+                'Arial',
+                'sans-serif',
+                '"Apple Color Emoji"',
+                '"Segoe UI Emoji"',
+                '"Segoe UI Symbol"',
+            ].join(','),
+            fontSize: 16,
         },
-        // components: {
-        //     MuiToolbar: {
-        //         styleOverrides: {
-        //           regular: {                                                            
-        //             minHeight: "64px", 
-        //             "@media (max-width: 600px)": {
-        //                 minHeight: "56px",
-        //             },                                       
-        //           },
-        //         },
-        //       },
-        //   }
+        components: {
+            MuiTextField: {
+                styleOverrides: {
+                    root: {
+                        '& .MuiInputBase-root, & .MuiInputLabel-root': {
+                            fontSize: '0.8rem'
+                        },
+                        '& .MuiInputLabel-root.MuiInputLabel-shrink': {                                            
+                            transform: 'translate(0, 2px) scale(0.9)'
+                        }
+                    }
+                }
+            },
+            MuiButton: {
+                styleOverrides: {
+                    root: {
+                        fontSize: '0.8rem',
+                    },
+                },
+            },
+            MuiSelect: {
+                styleOverrides: {
+                    root: {
+                        fontSize: '0.8rem',                
+                    },
+                    // select: {
+                    //     ":focus": {
+                    //         backgroundColor: "green", // Just for the demo
+                    //         border: '3px solid #A6CBF3',
+                    //     },
+                    // },                    
+                },                
+            },
+            MuiMenuItem: {
+                styleOverrides: {
+                    root: {
+                        fontSize: '0.8rem',
+                    },
+                },
+            },
+            MuiInputLabel: {
+                styleOverrides: {
+                    root: {
+                        //fontSize: '1rem',
+                        transform: 'translate(0, 2px) scale(0.63)'             
+                    }
+                }
+            },
+        }
     });
+    
 
     useEffect(() => {  
         console.log('setAppBarTitle Main');

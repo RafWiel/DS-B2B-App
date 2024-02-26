@@ -148,14 +148,10 @@ const Employee = memo(() => {
                     height: '100%',                        
                     [theme.breakpoints.down('sm')]: {
                         border: 'none' 
-                    },  
-                    backgroundColor: 'blue',                   
-                    padding: 0,
-                    margin: 0,
+                    },                     
                 }}
             >
-                <CardContent sx={{
-                    backgroundColor: 'yellow', 
+                <CardContent sx={{                    
                     display: 'flex',                            
                     height: '100%',
                     [theme.breakpoints.down('md')]: {
@@ -166,25 +162,21 @@ const Employee = memo(() => {
                     },                                                                                                                
                 }}>                    
                     <Grid 
-                        container 
+                        container                         
                         spacing={2}
-                        sx={{
-                            margin: 0,
-                            padding: 0,
-                            height: '100%',
-                            backgroundColor: 'gainsboro',
-                        }}
+                        // sx={{
+                        //     height: '100%',                            
+                        // }}
                     >
+                        {/* Content grid */}
                         <Grid 
                             item 
                             xs={12} 
                             sm={12} 
                             md={10} 
-                            sx={{
-                                margin: 0,
-                                padding: 0,
-                                backgroundColor: 'aqua',                                
-                            }}
+                            // sx={{                                
+                            //     backgroundColor: 'aqua',                                
+                            // }}
                         >                                                        
                             <Formik
                                 enableReinitialize={true}
@@ -200,11 +192,10 @@ const Employee = memo(() => {
                                     //console.log('touched', touched);                        
 
                                     return (                                                                           
-                                        <Grid 
-                                        
+                                        <Grid                                         
                                             container 
                                             spacing={2}
-                                            // sx={{
+                                            // sx={{                                                
                                             //     backgroundColor: 'gainsboro',                                                                                                                                           
                                             // }}
                                         >
@@ -215,7 +206,8 @@ const Employee = memo(() => {
                                                     label="Login" 
                                                     onChange={handleChange}                          
                                                     fullWidth                                 
-                                                    variant="standard"                                 
+                                                    variant="standard"                                                                                     
+                                                    // inputProps={{ style: { fontSize: '14px' } }}
                                                 />  
                                             </Grid>
                                             <Grid item xs={4}>
@@ -230,7 +222,7 @@ const Employee = memo(() => {
                                             </Grid>
                                             <Grid item xs={4}>
                                                 <FormControl variant="standard" fullWidth>
-                                                    <InputLabel id="type">Typ</InputLabel>
+                                                    <InputLabel id="type">Imię i nazwisko</InputLabel>
                                                     <Select
                                                         labelId="type"
                                                         name="type"
@@ -269,7 +261,7 @@ const Employee = memo(() => {
                                             </Grid>
                                             <Grid item xs={4}>
                                                 <FormControl variant="standard" fullWidth>
-                                                    <InputLabel id="isMailing">Typ</InputLabel>
+                                                    <InputLabel id="isMailing">Powiadomienia e-mail</InputLabel>
                                                     <Select
                                                         labelId="isMailing"
                                                         name="isMailing"
@@ -290,16 +282,16 @@ const Employee = memo(() => {
                                 }}
                             </Formik>  
                         </Grid>
-                        <Grid 
+                        {/* Buttons grid */}
+                        <Grid                             
                             item 
                             xs={12} 
                             sm={12} 
                             md={2}
-                            sx={{
-                                backgroundColor: 'green',
+                            sx={{                                
                                 alignSelf: 'flex-start',
                                 [theme.breakpoints.down('md')]: {
-                                    alignSelf: 'flex-end',
+                                    alignSelf: 'flex-end'
                                 },  
                             }}
                         >
@@ -315,6 +307,40 @@ const Employee = memo(() => {
                                 }}
                             >
                                 Zapisz
+                            </Button>
+                            <Button                                 
+                                variant="contained"
+                                disableElevation 
+                                // onClick={() => fetchNextData()}                                
+                                // startIcon={<AddIcon />}
+                                sx={{
+                                    display: 'inline-flex',                                                                        
+                                    width: '100%', 
+                                    height: 40,
+                                    marginTop: '4px',
+                                    [theme.breakpoints.down('sm')]: {
+                                        marginTop: '1px',
+                                    },
+                                }}
+                            >
+                                Usuń
+                            </Button>
+                            <Button                                 
+                                variant="contained"
+                                disableElevation 
+                                // onClick={() => fetchNextData()}                                
+                                // startIcon={<AddIcon />}
+                                sx={{
+                                    display: 'inline-flex',                                                                        
+                                    width: '100%', 
+                                    height: 40,
+                                    marginTop: '4px',
+                                    [theme.breakpoints.down('sm')]: {
+                                        marginTop: '1px',
+                                    },                                   
+                                }}
+                            >
+                                Zresetuj hasło
                             </Button>
                         </Grid>
                     </Grid>
