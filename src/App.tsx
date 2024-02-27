@@ -63,6 +63,8 @@ export default function App() {
     const setAppBarTitle = useAppStore((state) => state.setAppBarTitle);     
     const isLoadingIcon = useAppStore((state) => state.isLoadingIcon);      
 
+    const fontSize = '0.8rem';
+
     const theme = createTheme({
         palette: {    
             background: {
@@ -83,14 +85,14 @@ export default function App() {
                 '"Segoe UI Emoji"',
                 '"Segoe UI Symbol"',
             ].join(','),
-            fontSize: 16,
+            fontSize: 13,
         },
         components: {
             MuiTextField: {
                 styleOverrides: {
                     root: {
                         '& .MuiInputBase-root, & .MuiInputLabel-root': {
-                            fontSize: '0.8rem'
+                            fontSize: fontSize
                         },
                         '& .MuiInputLabel-root.MuiInputLabel-shrink': {                                            
                             transform: 'translate(0, 2px) scale(0.9)'
@@ -101,14 +103,14 @@ export default function App() {
             MuiButton: {
                 styleOverrides: {
                     root: {
-                        fontSize: '0.8rem',
+                        fontSize: fontSize,
                     },
                 },
             },
             MuiSelect: {
                 styleOverrides: {
                     root: {
-                        fontSize: '0.8rem',                
+                        fontSize: fontSize,                
                     },
                     // select: {
                     //     ":focus": {
@@ -121,26 +123,34 @@ export default function App() {
             MuiMenuItem: {
                 styleOverrides: {
                     root: {
-                        fontSize: '0.8rem',
+                        fontSize: fontSize,
                     },
                 },
             },
             MuiInputLabel: {
                 styleOverrides: {
                     root: {
-                        //fontSize: '1rem',
-                        transform: 'translate(0, 2px) scale(0.63)'             
+                        fontSize: '0.8rem',
+                        transform: 'translate(0, 2px) scale(0.9)'             
                     }
                 }
             },
+            MuiTableCell: {
+                styleOverrides: {
+                    root: {
+                        fontSize: fontSize,
+                    },
+                },
+            },            
         }
     });
     
 
-    useEffect(() => {  
-        console.log('setAppBarTitle Main');
-        setAppBarTitle(routes.getText(location[0]));
-    }, [location]);
+    useEffect(() => {          
+        if (routes.isText(location[0])) {
+            setAppBarTitle(routes.getText(location[0]));
+        }
+    }, [location, setAppBarTitle]);
     
     //const [appBarHeight, setAppBarHeight] = useState(0);
     //const isMobileView = useMediaQuery(theme.breakpoints.down("sm"));        

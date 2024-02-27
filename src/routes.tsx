@@ -50,18 +50,18 @@ const routes = {
             return <PersonAddIcon />;
         }
     }, {
-        id: customers,
-        text: 'Klienci',
-        isSidebarItem: true,
-        renderIcon: () => {
-            return <PeopleAltIcon />;
-        }
-    }, {
         id: companies,
         text: 'Firmy',
         isSidebarItem: true,
         renderIcon: () => {
             return <FactoryIcon />;
+        }
+    }, {
+        id: customers,
+        text: 'Klienci',
+        isSidebarItem: true,
+        renderIcon: () => {
+            return <PeopleAltIcon />;
         }
     }, {
         id: employees,
@@ -76,14 +76,21 @@ const routes = {
         isSidebarItem: false        
     }],
     
-    getText(id: string): string {
+    getText(id: string): string {        
         const item = this.items.find((u) => u.id === String(id));
 
         return item ? item.text : '';
     },
+
     getTextUpper(id: string): string {
         return this.getText(id).toUpperCase();
-    }
+    },
+
+    isText(id: string): boolean {        
+        const item = this.items.find((u) => u.id === String(id));
+
+        return item ? item.isSidebarItem : false;
+    },
 };
 
 export default routes;

@@ -45,9 +45,8 @@ const Employee = memo(() => {
     }); 
 
     useEffect(() => {                        
-        fetchData();
-        
-        setAppBarTitle(`Pracownik ${employeeId}`);   
+        setAppBarTitle('Pracownik');   
+        fetchData();                
         
         return () => {            
             abortController.abort();            
@@ -75,7 +74,7 @@ const Employee = memo(() => {
 
             console.log('load:', JSON.stringify(res, null, 2));
             
-            setAppBarTitle(`Pracownik ${employee.name}`);        
+            setAppBarTitle(`Pracownik ${res.name}`);        
         })
         .catch((error: unknown) => {
             if ((error as Error).name === 'AbortError') return;
@@ -199,7 +198,7 @@ const Employee = memo(() => {
                                             //     backgroundColor: 'gainsboro',                                                                                                                                           
                                             // }}
                                         >
-                                            <Grid item xs={4}>
+                                            <Grid item sm={4} xs={6}>
                                                 <TextField 
                                                     name="login"                                                    
                                                     value={values.login} 
@@ -210,7 +209,7 @@ const Employee = memo(() => {
                                                     // inputProps={{ style: { fontSize: '14px' } }}
                                                 />  
                                             </Grid>
-                                            <Grid item xs={4}>
+                                            <Grid item sm={4} xs={6}>
                                                 <TextField 
                                                     name="name"                                                    
                                                     value={values.name} 
@@ -220,9 +219,29 @@ const Employee = memo(() => {
                                                     variant="standard"                                 
                                                 />  
                                             </Grid>
-                                            <Grid item xs={4}>
+                                            <Grid item sm={4} xs={6}>
+                                                <TextField 
+                                                    name="email"                                                    
+                                                    value={values.email} 
+                                                    label="e-mail" 
+                                                    onChange={handleChange}                          
+                                                    fullWidth                                 
+                                                    variant="standard"                                 
+                                                />  
+                                            </Grid>                                            
+                                            <Grid item sm={4} xs={6}>
+                                                <TextField 
+                                                    name="phoneNumber"                                                    
+                                                    value={values.phoneNumber} 
+                                                    label="Numer telefonu" 
+                                                    onChange={handleChange}                          
+                                                    fullWidth                                 
+                                                    variant="standard"                                 
+                                                />  
+                                            </Grid>
+                                            <Grid item sm={4} xs={6}>
                                                 <FormControl variant="standard" fullWidth>
-                                                    <InputLabel id="type">Imię i nazwisko</InputLabel>
+                                                    <InputLabel id="type">Typ</InputLabel>
                                                     <Select
                                                         labelId="type"
                                                         name="type"
@@ -239,27 +258,7 @@ const Employee = memo(() => {
                                                     </Select>
                                                 </FormControl>   
                                             </Grid>
-                                            <Grid item xs={4}>
-                                                <TextField 
-                                                    name="phoneNumber"                                                    
-                                                    value={values.phoneNumber} 
-                                                    label="Numer telefonu" 
-                                                    onChange={handleChange}                          
-                                                    fullWidth                                 
-                                                    variant="standard"                                 
-                                                />  
-                                            </Grid>
-                                            <Grid item xs={4}>
-                                                <TextField 
-                                                    name="email"                                                    
-                                                    value={values.email} 
-                                                    label="e-mail" 
-                                                    onChange={handleChange}                          
-                                                    fullWidth                                 
-                                                    variant="standard"                                 
-                                                />  
-                                            </Grid>
-                                            <Grid item xs={4}>
+                                            <Grid item sm={4} xs={6}>
                                                 <FormControl variant="standard" fullWidth>
                                                     <InputLabel id="isMailing">Powiadomienia e-mail</InputLabel>
                                                     <Select
