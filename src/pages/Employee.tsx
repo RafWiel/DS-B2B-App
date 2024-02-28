@@ -15,7 +15,6 @@ import * as yup from 'yup';
 import boolEnum from "../enums/boolEnum.ts";
 import CheckIcon from '@mui/icons-material/Check';
 import ClearIcon from '@mui/icons-material/Clear';
-import PasswordIcon from '@mui/icons-material/Password';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
 
 const Employee = memo(() => {
@@ -38,7 +37,7 @@ const Employee = memo(() => {
     });
 
     const [employee, setEmployee] = useState<IEmployee>({         
-        id: Number(params?.id as unknown),        
+        id: Number(params?.id),        
         type: employeeType.employee,
         login: '',
         name: '',
