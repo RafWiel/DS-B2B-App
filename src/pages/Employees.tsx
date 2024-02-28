@@ -268,7 +268,7 @@ const Employees = memo(() => {
         openQuestionDialog({
             title: 'Pracownicy',
             text: `Czy na pewno usunąć pracownika ${employee.name}?`,            
-            action: deleteOne,
+            action: deleteSingle,
             actionParameters: employee.id
         });
     }
@@ -282,7 +282,7 @@ const Employees = memo(() => {
         });
     }
 
-    const deleteOne = async (id?: number) => {
+    const deleteSingle = async (id: number) => {
         const result = await deleteAsync(`${config.API_URL}/employees/${id}`, 'Nieudane usunięcie pracownika');        
         if (!result) {            
             return;
@@ -446,7 +446,7 @@ const Employees = memo(() => {
                             <Button                                 
                                 variant="contained"
                                 disableElevation 
-                                onClick={() => fetchNextData()}                                
+                                onClick={() => navigate('/employees/0')} 
                                 startIcon={<AddIcon />}
                                 sx={{
                                     display: 'inline-flex',                                                                        

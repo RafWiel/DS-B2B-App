@@ -13,16 +13,20 @@ import employeeType from "../enums/employeeType.ts";
 import { Formik, FormikProps, FormikHelpers, Form } from 'formik';
 import * as yup from 'yup';
 import boolEnum from "../enums/boolEnum.ts";
+import CheckIcon from '@mui/icons-material/Check';
+import ClearIcon from '@mui/icons-material/Clear';
+import PasswordIcon from '@mui/icons-material/Password';
+import VpnKeyIcon from '@mui/icons-material/VpnKey';
 
 const Employee = memo(() => {
     const theme = useTheme();  
     const setAppBarTitle = useAppStore((state) => state.setAppBarTitle);       
     const showLoadingIcon = useAppStore((state) => state.showLoadingIcon);
     const openMessageDialog = useAppStore((state) => state.openMessageDialog); 
+    const openQuestionDialog = useAppStore((state) => state.openQuestionDialog); 
     const [, params] = useRoute("/employees/:id");
-    const [, navigate] = useLocation();
-    const [employeeId, setEmployeeId] = useState(Number(params?.id as unknown));      
-    const abortController = useRef(new AbortController()).current;  
+    const [, navigate] = useLocation();    
+    const abortController = useRef(new AbortController()).current;      
 
     const schema = yup.object().shape({                                        
         type: yup.number().required().min(employeeType.administrator).max(employeeType.employee),
@@ -34,13 +38,12 @@ const Employee = memo(() => {
     });
 
     const [employee, setEmployee] = useState<IEmployee>({         
-        id: 0,        
+        id: Number(params?.id as unknown),        
         type: employeeType.employee,
         login: '',
         name: '',
         phoneNumber: '',
         email: '',
-        isActive: true,
         isMailing: false
     }); 
 
@@ -52,15 +55,13 @@ const Employee = memo(() => {
             abortController.abort();            
         }
     }, []);
-
     
     const fetchData = useCallback(() => {
-        if (!employeeId) return;
-
+        if (!employee.id) return;
                
         showLoadingIcon(true);
         
-        fetch(`${config.API_URL}/employees/${employeeId}`, { signal: abortController.signal })      
+        fetch(`${config.API_URL}/employees/${employee.id}`, { signal: abortController.signal })      
         .then((res: Response) => {           
             if (!res.ok) {
                 throw new Error("Nieprawidłowa odpowiedź serwera");                       
@@ -86,13 +87,12 @@ const Employee = memo(() => {
             navigate('/employees');
         })
         .finally(() => showLoadingIcon(false));         
-    }, [employeeId]);
+    }, [employee.id]);
     
-    const handleSubmit = useCallback((employee: IEmployee, { setSubmitting }: FormikHelpers<IEmployee>) => {                
-        //setIsSubmitting(true);        
+    const handleSubmit = useCallback((employee: IEmployee, { setSubmitting }: FormikHelpers<IEmployee>) => {                     
         showLoadingIcon(true);
 
-        console.log('submit', employeeId);
+        console.log('submit', employee.id);
         console.log('handleSubmit:', JSON.stringify(employee, null, 2)); 
                         
         // fetch(`${config.API_URL}/certificates`, {
@@ -126,8 +126,41 @@ const Employee = memo(() => {
         //         setSubmitting(false);  
         //         showLoadingIcon(false);            
         //     });
-    }, [employeeId]);
+    }, [employee.id]);
     
+    const handleDelete = () => {        
+        openQuestionDialog({
+            title: 'Pracownicy',
+            text: `Czy na pewno usunąć pracownika ${employee.name}?`,            
+            action: deleteSingle,
+            actionParameters: employee.id
+        });
+    }
+
+    const deleteSingle = (id: number) => {
+        showLoadingIcon(true);       
+        
+        fetch(`${config.API_URL}/employees/${id}`, { method: 'DELETE' })              
+            .then((res) => {           
+                if (!res.ok) throw new Error('Nieudane usunięcie pracownika');    
+            
+                navigate('/employees');
+            })        
+            .catch((error: unknown) => {
+                if ((error as Error).name === 'AbortError') return;
+                
+                openMessageDialog({
+                    title: 'Błąd aplikacji',
+                    text: (error as Error).message
+                });
+
+                return false;
+            })
+            .finally(() => {
+                showLoadingIcon(false);                        
+            });               
+    }    
+
     return (
         <Box         
             sx={{                
@@ -159,38 +192,38 @@ const Employee = memo(() => {
                             paddingBottom: 1 
                         }
                     },                                                                                                                
-                }}>                    
-                    <Grid 
-                        container                         
-                        spacing={2}
-                        // sx={{
-                        //     height: '100%',                            
-                        // }}
-                    >
-                        {/* Content grid */}
-                        <Grid 
-                            item 
-                            xs={12} 
-                            sm={12} 
-                            md={10} 
-                            // sx={{                                
-                            //     backgroundColor: 'aqua',                                
-                            // }}
-                        >                                                        
-                            <Formik
-                                enableReinitialize={true}
-                                initialValues={employee}
-                                validationSchema={schema} 
-                                validateOnChange={true}
-                                validateOnBlur={true}           
-                                onSubmit={handleSubmit}>                    
-                                {(props: FormikProps<IEmployee>) => {
-                                    const { handleSubmit, handleChange, values, errors, touched, isSubmitting } = props;                            
+                }}>     
+                    <Formik
+                        enableReinitialize={true}
+                        initialValues={employee}
+                        validationSchema={schema} 
+                        validateOnChange={true}
+                        validateOnBlur={true}           
+                        onSubmit={handleSubmit}>                    
+                        {(props: FormikProps<IEmployee>) => {
+                            const { handleSubmit, handleChange, values, errors, touched, isSubmitting } = props;                            
 
-                                    //console.log('render Formik');
-                                    //console.log('touched', touched);                        
+                            //console.log('render Formik');
+                            //console.log('touched', touched);                        
 
-                                    return (                                                                           
+                            return (                                                                                  
+                                <Grid 
+                                    container                         
+                                    spacing={2}
+                                    // sx={{
+                                    //     height: '100%',                            
+                                    // }}
+                                >
+                                    {/* Content grid */}
+                                    <Grid 
+                                        item 
+                                        xs={12} 
+                                        sm={12} 
+                                        md={10} 
+                                        // sx={{                                
+                                        //     backgroundColor: 'aqua',                                
+                                        // }}
+                                    >                                                                                                                                                             
                                         <Grid                                         
                                             container 
                                             spacing={2}
@@ -200,10 +233,12 @@ const Employee = memo(() => {
                                         >
                                             <Grid item sm={4} xs={6}>
                                                 <TextField 
+                                                    error={!!errors?.login && touched?.login}
                                                     name="login"                                                    
                                                     value={values.login} 
                                                     label="Login" 
                                                     onChange={handleChange}                          
+                                                    helperText="Podaj login"
                                                     fullWidth                                 
                                                     variant="standard"                                                                                     
                                                     // inputProps={{ style: { fontSize: '14px' } }}
@@ -276,73 +311,75 @@ const Employee = memo(() => {
                                                     </Select>
                                                 </FormControl>   
                                             </Grid>
-                                        </Grid>                                                                                                                                                                                                                            
-                                    );
-                                }}
-                            </Formik>  
-                        </Grid>
-                        {/* Buttons grid */}
-                        <Grid                             
-                            item 
-                            xs={12} 
-                            sm={12} 
-                            md={2}
-                            sx={{                                
-                                alignSelf: 'flex-start',
-                                [theme.breakpoints.down('md')]: {
-                                    alignSelf: 'flex-end'
-                                },  
-                            }}
-                        >
-                            <Button                                 
-                                variant="contained"
-                                disableElevation 
-                                //onClick={() => fetchNextData()}                                
-                                //startIcon={<AddIcon />}
-                                sx={{
-                                    display: 'inline-flex',                                                                        
-                                    width: '100%', 
-                                    height: 40                                   
-                                }}
-                            >
-                                Zapisz
-                            </Button>
-                            <Button                                 
-                                variant="contained"
-                                disableElevation 
-                                // onClick={() => fetchNextData()}                                
-                                // startIcon={<AddIcon />}
-                                sx={{
-                                    display: 'inline-flex',                                                                        
-                                    width: '100%', 
-                                    height: 40,
-                                    marginTop: '4px',
-                                    [theme.breakpoints.down('sm')]: {
-                                        marginTop: '1px',
-                                    },
-                                }}
-                            >
-                                Usuń
-                            </Button>
-                            <Button                                 
-                                variant="contained"
-                                disableElevation 
-                                // onClick={() => fetchNextData()}                                
-                                // startIcon={<AddIcon />}
-                                sx={{
-                                    display: 'inline-flex',                                                                        
-                                    width: '100%', 
-                                    height: 40,
-                                    marginTop: '4px',
-                                    [theme.breakpoints.down('sm')]: {
-                                        marginTop: '1px',
-                                    },                                   
-                                }}
-                            >
-                                Zresetuj hasło
-                            </Button>
-                        </Grid>
-                    </Grid>
+                                        </Grid>                                    
+                                    </Grid>
+                                    {/* Buttons grid */}
+                                    <Grid                             
+                                        item 
+                                        xs={12} 
+                                        sm={12} 
+                                        md={2}
+                                        sx={{                                
+                                            alignSelf: 'flex-start',
+                                            [theme.breakpoints.down('md')]: {
+                                                alignSelf: 'flex-end'
+                                            },  
+                                        }}
+                                    >
+                                        <Button                                 
+                                            variant="contained"
+                                            disableElevation 
+                                            onClick={() => handleSubmit()}                                
+                                            startIcon={<CheckIcon />}
+                                            sx={{
+                                                display: 'inline-flex',                                                                        
+                                                width: '100%', 
+                                                height: 40                                   
+                                            }}
+                                        >
+                                            Zapisz
+                                        </Button>
+                                        <Button                                 
+                                            variant="contained"
+                                            disableElevation 
+                                            disabled={!employee.id}
+                                            onClick={() => handleDelete()}                                
+                                            startIcon={<ClearIcon />}
+                                            sx={{
+                                                display: 'inline-flex',                                                                        
+                                                width: '100%', 
+                                                height: 40,
+                                                marginTop: '4px',
+                                                [theme.breakpoints.down('sm')]: {
+                                                    marginTop: '1px',
+                                                },
+                                            }}
+                                        >
+                                            Usuń
+                                        </Button>
+                                        <Button                                 
+                                            variant="contained"
+                                            disableElevation 
+                                            disabled={!employee.id}
+                                            // onClick={() => fetchNextData()}                                
+                                            startIcon={<VpnKeyIcon />}
+                                            sx={{
+                                                display: 'inline-flex',                                                                        
+                                                width: '100%', 
+                                                height: 40,
+                                                marginTop: '4px',
+                                                [theme.breakpoints.down('sm')]: {
+                                                    marginTop: '1px',
+                                                },                                   
+                                            }}
+                                        >
+                                            Zresetuj hasło
+                                        </Button>
+                                    </Grid>                                    
+                                </Grid>
+                            );
+                        }}
+                    </Formik>  
                 </CardContent>
             </Card>
         </Box>

@@ -5,6 +5,5 @@ export interface IEmployee {
     name: string;
     phoneNumber: string;
     email: string;
-    isActive: boolean;
     isMailing: boolean;         
 }
