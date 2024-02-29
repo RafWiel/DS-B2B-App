@@ -130,7 +130,7 @@ export default function App() {
             MuiInputLabel: {
                 styleOverrides: {
                     root: {
-                        fontSize: '0.8rem',
+                        fontSize: fontSize,
                         transform: 'translate(0, 2px) scale(0.9)'             
                     }
                 }
@@ -141,7 +141,21 @@ export default function App() {
                         fontSize: fontSize,
                     },
                 },
-            },            
+            },  
+            MuiDialogTitle: {
+                styleOverrides: {
+                    root: {
+                        fontSize: '0.9rem',
+                    },
+                },
+            },  
+            MuiDialogContentText: {
+                styleOverrides: {
+                    root: {
+                        fontSize: fontSize,
+                    },
+                },
+            }, 
         }
     });
     

@@ -8,6 +8,8 @@ const MessageDialog = memo(() => {
 
     return (
         <Dialog
+            fullWidth
+            maxWidth="xs"
             open={messageDialog.isOpen ?? false}
             onClose={closeMessageDialog}
             aria-labelledby="message-dialog-title"

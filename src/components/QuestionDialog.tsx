@@ -9,6 +9,8 @@ const QuestionDialog = memo(() => {
 
     return (
         <Dialog
+            fullWidth
+            maxWidth="xs"
             open={questionDialog.isOpen ?? false}
             onClose={cancelQuestionDialog}
             aria-labelledby="question-dialog-title"

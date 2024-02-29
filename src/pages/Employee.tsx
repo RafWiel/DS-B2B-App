@@ -4,18 +4,19 @@ import { useTheme } from '@mui/material/styles';
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import { Button, FormControl, Grid, InputLabel, MenuItem, Select, TextField } from "@mui/material";
+import { Button, FormControl, FormHelperText, Grid, InputLabel, MenuItem, Select, TextField } from "@mui/material";
 import { useAppStore } from "../store";
 import { IEmployee } from '../interfaces/IEmployee.ts';
 import { useLocation, useRoute } from "wouter";
 import { config } from "../config/config";
 import employeeType from "../enums/employeeType.ts";
-import { Formik, FormikProps, FormikHelpers, Form } from 'formik';
+import { Formik, FormikProps, FormikHelpers } from 'formik';
 import * as yup from 'yup';
 import boolEnum from "../enums/boolEnum.ts";
 import CheckIcon from '@mui/icons-material/Check';
 import ClearIcon from '@mui/icons-material/Clear';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
+import { IIdResponse } from "../interfaces/IIdResponse.ts";
 
 const Employee = memo(() => {
     const theme = useTheme();  
@@ -27,18 +28,21 @@ const Employee = memo(() => {
     const [, navigate] = useLocation();    
     const abortController = useRef(new AbortController()).current;      
 
+    const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
+
+    
     const schema = yup.object().shape({                                        
-        type: yup.number().required().min(employeeType.administrator).max(employeeType.employee),
-        login: yup.string().required(),
-        name: yup.string().required(),
-        phoneNumber: yup.string().required(),
-        email: yup.string().required(),
-        isMailing: yup.string().required(),                        
+        type: yup.number().required().min(employeeType.administrator, 'Podaj typ').max(employeeType.employee, 'Podaj typ'),
+        login: yup.string().required('Podaj login'),
+        name: yup.string().required('Podaj imię i nazwisko'),
+        phoneNumber: yup.string().required('Podaj numer telefonu').matches(phoneRegExp, 'Nieprawidłowy numer telefonu'),
+        email: yup.string().required('Podaj e-mail').email('Nieprawidłowy e-mail'),
+        isMailing: yup.boolean().required(),                        
     });
 
     const [employee, setEmployee] = useState<IEmployee>({         
         id: Number(params?.id),        
-        type: employeeType.employee,
+        type: employeeType.none,
         login: '',
         name: '',
         phoneNumber: '',
@@ -94,37 +98,46 @@ const Employee = memo(() => {
         console.log('submit', employee.id);
         console.log('handleSubmit:', JSON.stringify(employee, null, 2)); 
                         
-        // fetch(`${config.API_URL}/certificates`, {
-        //     method: !certificateId ? 'POST' : 'PUT',            
-        //     headers: { "Content-Type": "application/json" },
-        //     body: JSON.stringify(values),
-        //     signal: abortController.signal 
-        // })       
-        //     .then((res) => {
-        //         if (!res.ok) throw new Error("Nieprawidłowa odpowiedź serwera");                                       
-                                
-        //         return res.json();             
-        //     })      
-        //     .then((res: IIdResponse) => {                              
-        //         //odswiez dane z nowymi id
-        //         setCertificateId(res.id);
+        fetch(`${config.API_URL}/employees`, {
+            method: !employee.id ? 'POST' : 'PUT',            
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(employee),
+            signal: abortController.signal 
+        })       
+            .then((res) => {                
+                if (!res.ok) {
+                    if (res.status === 404) {
+                        throw new Error('Nie znaleziono użytkownika w bazie danych');
+                    }
 
-        //         openMessageModal({
-        //             title: 'Komunikat',
-        //             text: 'Zapisano'
-        //         });
-        //     })
-        //     .catch((error: unknown) => {
-        //         if ((error as Error).name === 'AbortError') return;
-        //         openMessageModal({
-        //             title: 'Błąd aplikacji',
-        //             text: (error as Error).message
-        //         });
-        //     })        
-        //     .finally(() => {           
-        //         setSubmitting(false);  
-        //         showLoadingIcon(false);            
-        //     });
+                    if (res.status === 409) {
+                        throw new Error('Użytkownik o takich danych już istnieje');
+                    }
+
+                    throw new Error('Nieprawidłowa odpowiedź serwera');
+                }
+
+                return res.json();             
+            })      
+            .then((res: IIdResponse) => {                                              
+                setEmployee({...employee, id: res.id});
+
+                openMessageDialog({
+                    title: 'Komunikat',
+                    text: 'Zapisano'
+                });
+            })
+            .catch((error: unknown) => {
+                if ((error as Error).name === 'AbortError') return;
+                openMessageDialog({
+                    title: 'Błąd aplikacji',
+                    text: (error as Error).message
+                });
+            })        
+            .finally(() => {           
+                setSubmitting(false);  
+                showLoadingIcon(false);            
+            });
     }, [employee.id]);
     
     const handleDelete = () => {        
@@ -203,7 +216,8 @@ const Employee = memo(() => {
                             const { handleSubmit, handleChange, values, errors, touched, isSubmitting } = props;                            
 
                             //console.log('render Formik');
-                            //console.log('touched', touched);                        
+                            console.log('errors', errors);
+                            console.log('touched', touched);
 
                             return (                                                                                  
                                 <Grid 
@@ -232,12 +246,12 @@ const Employee = memo(() => {
                                         >
                                             <Grid item sm={4} xs={6}>
                                                 <TextField 
-                                                    error={!!errors?.login && touched?.login}
+                                                    error={touched?.login && !!errors?.login}
+                                                    helperText={touched?.login && errors?.login}
                                                     name="login"                                                    
                                                     value={values.login} 
                                                     label="Login" 
-                                                    onChange={handleChange}                          
-                                                    helperText="Podaj login"
+                                                    onChange={handleChange}                                                                              
                                                     fullWidth                                 
                                                     variant="standard"                                                                                     
                                                     // inputProps={{ style: { fontSize: '14px' } }}
@@ -245,57 +259,70 @@ const Employee = memo(() => {
                                             </Grid>
                                             <Grid item sm={4} xs={6}>
                                                 <TextField 
+                                                    error={touched?.name && !!errors?.name}
+                                                    helperText={touched?.name && errors?.name}
                                                     name="name"                                                    
                                                     value={values.name} 
                                                     label="Imię i nazwisko" 
-                                                    onChange={handleChange}                          
+                                                    onChange={handleChange}                                                     
                                                     fullWidth                                 
                                                     variant="standard"                                 
                                                 />  
                                             </Grid>
                                             <Grid item sm={4} xs={6}>
                                                 <TextField 
+                                                    error={touched?.email && !!errors?.email}
+                                                    helperText={touched?.email && errors?.email}           
                                                     name="email"                                                    
                                                     value={values.email} 
                                                     label="e-mail" 
-                                                    onChange={handleChange}                          
+                                                    onChange={handleChange}                                                               
                                                     fullWidth                                 
                                                     variant="standard"                                 
                                                 />  
                                             </Grid>                                            
                                             <Grid item sm={4} xs={6}>
                                                 <TextField 
+                                                    error={touched?.phoneNumber && !!errors?.phoneNumber}
+                                                    helperText={touched?.phoneNumber && errors?.phoneNumber}                        
                                                     name="phoneNumber"                                                    
                                                     value={values.phoneNumber} 
                                                     label="Numer telefonu" 
-                                                    onChange={handleChange}                          
+                                                    onChange={handleChange}                                                     
                                                     fullWidth                                 
                                                     variant="standard"                                 
                                                 />  
                                             </Grid>
                                             <Grid item sm={4} xs={6}>
-                                                <FormControl variant="standard" fullWidth>
+                                                <FormControl 
+                                                    error={touched?.type && !!errors?.type}
+                                                    variant="standard" 
+                                                    fullWidth 
+                                                >
                                                     <InputLabel id="type">Typ</InputLabel>
                                                     <Select
+                                                        displayEmpty                                                        
                                                         labelId="type"
                                                         name="type"
                                                         value={values.type}
                                                         onChange={handleChange}
                                                     >
                                                         {
-                                                            employeeType && employeeType.items   
-                                                                .filter(u => u.id != employeeType.none)                                     
+                                                            employeeType && employeeType.items                                                                   
                                                                 .map((item) => (
-                                                                    <MenuItem key={item.id} value={item.id}>{item.text}</MenuItem>                                    
+                                                                    <MenuItem key={item.id} value={item.id}>{item.text}&nbsp;</MenuItem>                                    
                                                                 ))
                                                         }                                
                                                     </Select>
+                                                    <FormHelperText>
+                                                        {touched?.type && errors?.type}
+                                                    </FormHelperText>
                                                 </FormControl>   
                                             </Grid>
                                             <Grid item sm={4} xs={6}>
                                                 <FormControl variant="standard" fullWidth>
                                                     <InputLabel id="isMailing">Powiadomienia e-mail</InputLabel>
-                                                    <Select
+                                                    <Select                                                        
                                                         labelId="isMailing"
                                                         name="isMailing"
                                                         value={Number(values.isMailing)}
