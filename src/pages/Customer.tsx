@@ -5,11 +5,11 @@ import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import { Button, FormControl, FormHelperText, Grid, InputLabel, MenuItem, Select, TextField } from "@mui/material";
-import { useAppStore } from "../store";
-import { IEmployee } from '../interfaces/IEmployee.ts';
+import { useAppStore } from "../store.ts";
+import { ICustomer } from '../interfaces/ICustomer.ts';
 import { useLocation, useRoute } from "wouter";
-import { config } from "../config/config";
-import employeeType from "../enums/employeeType.ts";
+import { config } from "../config/config.ts";
+import customerType from "../enums/customerType.ts";
 import { Formik, FormikProps, FormikHelpers } from 'formik';
 import * as yup from 'yup';
 import boolEnum from "../enums/boolEnum.ts";
@@ -18,20 +18,20 @@ import ClearIcon from '@mui/icons-material/Clear';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import { IIdResponse } from "../interfaces/IIdResponse.ts";
 
-const Employee = memo(() => {
+const Customer = memo(() => {
     const theme = useTheme();  
     const setAppBarTitle = useAppStore((state) => state.setAppBarTitle);       
     const showLoadingIcon = useAppStore((state) => state.showLoadingIcon);
     const openMessageDialog = useAppStore((state) => state.openMessageDialog); 
     const openQuestionDialog = useAppStore((state) => state.openQuestionDialog); 
-    const [, params] = useRoute("/employees/:id");
+    const [, params] = useRoute("/customers/:id");
     const [, navigate] = useLocation();    
     const abortController = useRef(new AbortController()).current;      
 
     const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
-
+    
     const schema = yup.object().shape({                                        
-        type: yup.number().required().min(employeeType.administrator, 'Podaj typ').max(employeeType.employee, 'Podaj typ'),
+        type: yup.number().required().min(customerType.supervisor, 'Podaj typ').max(customerType.employee, 'Podaj typ'),
         login: yup.string().required('Podaj login'),
         name: yup.string().required('Podaj imię i nazwisko'),
         phoneNumber: yup.string().required('Podaj numer telefonu').matches(phoneRegExp, 'Nieprawidłowy numer telefonu'),
@@ -39,9 +39,9 @@ const Employee = memo(() => {
         isMailing: yup.boolean().required(),                        
     });
 
-    const [employee, setEmployee] = useState<IEmployee>({         
+    const [customer, setCustomer] = useState<ICustomer>({
         id: Number(params?.id),        
-        type: employeeType.none,
+        type: customerType.none,
         login: '',
         name: '',
         phoneNumber: '',
@@ -50,7 +50,7 @@ const Employee = memo(() => {
     }); 
 
     useEffect(() => {                        
-        setAppBarTitle('Pracownik');   
+        setAppBarTitle('Klient');   
         fetchData();                
         
         return () => {            
@@ -59,11 +59,11 @@ const Employee = memo(() => {
     }, []);
     
     const fetchData = useCallback(() => {
-        if (!employee.id) return;
+        if (!customer.id) return;
                
         showLoadingIcon(true);
         
-        fetch(`${config.API_URL}/employees/${employee.id}`, { signal: abortController.signal })      
+        fetch(`${config.API_URL}/customers/${customer.id}`, { signal: abortController.signal })      
         .then((res: Response) => {           
             if (!res.ok) {
                 throw new Error("Nieprawidłowa odpowiedź serwera");                       
@@ -72,12 +72,12 @@ const Employee = memo(() => {
 
             return res.json();
         })
-        .then((res: IEmployee) => {                                                                 
-            setEmployee(res);                        
+        .then((res: ICustomer) => {                                                                 
+            setCustomer(res);                        
 
             console.log('load:', JSON.stringify(res, null, 2));
             
-            setAppBarTitle(`Pracownik ${res.name}`);        
+            setAppBarTitle(`Klient ${res.name}`);        
         })
         .catch((error: unknown) => {
             if ((error as Error).name === 'AbortError') return;
@@ -86,21 +86,21 @@ const Employee = memo(() => {
                 text: (error as Error).message
             });
 
-            navigate('/employees');
+            navigate('/customers');
         })
         .finally(() => showLoadingIcon(false));         
-    }, [employee.id]);
+    }, [customer.id]);
     
-    const handleSubmit = useCallback((employee: IEmployee, { setSubmitting }: FormikHelpers<IEmployee>) => {                     
+    const handleSubmit = useCallback((customer: ICustomer, { setSubmitting }: FormikHelpers<ICustomer>) => {                     
         showLoadingIcon(true);
 
-        console.log('submit', employee.id);
-        console.log('handleSubmit:', JSON.stringify(employee, null, 2)); 
+        console.log('submit', customer.id);
+        console.log('handleSubmit:', JSON.stringify(customer, null, 2)); 
                         
-        fetch(`${config.API_URL}/employees`, {
-            method: !employee.id ? 'POST' : 'PUT',            
+        fetch(`${config.API_URL}/customers`, {
+            method: !customer.id ? 'POST' : 'PUT',            
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(employee),
+            body: JSON.stringify(customer),
             signal: abortController.signal 
         })       
             .then((res) => {                
@@ -119,7 +119,7 @@ const Employee = memo(() => {
                 return res.json();             
             })      
             .then((res: IIdResponse) => {                                              
-                setEmployee({...employee, id: res.id});
+                setCustomer({...customer, id: res.id});
 
                 openMessageDialog({
                     title: 'Komunikat',
@@ -137,25 +137,25 @@ const Employee = memo(() => {
                 setSubmitting(false);  
                 showLoadingIcon(false);            
             });
-    }, [employee.id]);
+    }, [customer.id]);
     
     const handleDelete = () => {        
         openQuestionDialog({
-            title: 'Pracownik',
-            text: `Czy na pewno usunąć pracownika ${employee.name}?`,            
+            title: 'Klient',
+            text: `Czy na pewno usunąć klienta ${customer.name}?`,            
             action: deleteSingle,
-            actionParameters: employee.id
+            actionParameters: customer.id
         });
     }
 
     const deleteSingle = (id: number) => {
         showLoadingIcon(true);       
         
-        fetch(`${config.API_URL}/employees/${id}`, { method: 'DELETE' })              
+        fetch(`${config.API_URL}/customers/${id}`, { method: 'DELETE' })              
             .then((res) => {           
-                if (!res.ok) throw new Error('Nieudane usunięcie pracownika');    
+                if (!res.ok) throw new Error('Nieudane usunięcie klienta');    
             
-                navigate('/employees');
+                navigate('/customers');
             })        
             .catch((error: unknown) => {
                 if ((error as Error).name === 'AbortError') return;
@@ -206,12 +206,12 @@ const Employee = memo(() => {
                 }}>     
                     <Formik
                         enableReinitialize={true}
-                        initialValues={employee}
+                        initialValues={customer}
                         validationSchema={schema} 
                         validateOnChange={true}
                         validateOnBlur={true}           
                         onSubmit={handleSubmit}>                    
-                        {(props: FormikProps<IEmployee>) => {
+                        {(props: FormikProps<ICustomer>) => {
                             const { handleSubmit, handleChange, values, errors, touched, isSubmitting } = props;                            
 
                             //console.log('render Formik');
@@ -231,17 +231,11 @@ const Employee = memo(() => {
                                         item 
                                         xs={12} 
                                         sm={12} 
-                                        md={10} 
-                                        // sx={{                                
-                                        //     backgroundColor: 'aqua',                                
-                                        // }}
+                                        md={10}                                         
                                     >                                                                                                                                                             
                                         <Grid                                         
                                             container 
-                                            spacing={2}
-                                            // sx={{                                                
-                                            //     backgroundColor: 'gainsboro',                                                                                                                                           
-                                            // }}
+                                            spacing={2}                                            
                                         >
                                             <Grid item sm={4} xs={6}>
                                                 <TextField 
@@ -307,7 +301,7 @@ const Employee = memo(() => {
                                                         onChange={handleChange}
                                                     >
                                                         {
-                                                            employeeType && employeeType.items                                                                   
+                                                            customerType && customerType.items                                                                   
                                                                 .map((item) => (
                                                                     <MenuItem key={item.id} value={item.id}>{item.text}&nbsp;</MenuItem>                                    
                                                                 ))
@@ -367,7 +361,7 @@ const Employee = memo(() => {
                                         <Button                                 
                                             variant="contained"
                                             disableElevation 
-                                            disabled={!employee.id}
+                                            disabled={!customer.id}
                                             onClick={() => handleDelete()}                                
                                             startIcon={<ClearIcon />}
                                             sx={{
@@ -385,7 +379,7 @@ const Employee = memo(() => {
                                         <Button                                 
                                             variant="contained"
                                             disableElevation 
-                                            disabled={!employee.id}
+                                            disabled={!customer.id}
                                             // onClick={() => fetchNextData()}                                
                                             startIcon={<VpnKeyIcon />}
                                             sx={{
@@ -411,4 +405,4 @@ const Employee = memo(() => {
     );
 });
 
-export default Employee;
+export default Customer;

@@ -25,8 +25,9 @@ import MessageDialog from './components/MessageDialog';
 import QuestionDialog from './components/QuestionDialog';
 import { useEffect } from 'react';
 import { CircularProgress } from '@mui/material';
+import Customer from './pages/Customer';
 
-const todo = 'Rozmiar czcionek';
+const todo = 'Dodaj AutoMessage';
 
 interface AppBarProps extends MuiAppBarProps {
     open?: boolean;
@@ -292,6 +293,9 @@ export default function App() {
                         </Route>
                         <Route path={routes.customers}>
                             <Customers />
+                        </Route>
+                        <Route path={routes.customer}>
+                            <Customer />
                         </Route>
                         <Route path={routes.companies}>
                             <Companies />

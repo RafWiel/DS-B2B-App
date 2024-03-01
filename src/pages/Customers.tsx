@@ -1,6 +1,6 @@
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { useTheme } from '@mui/material/styles';
-import EmployeesFilter from "../components/EmployeesFilter";
+import CustomersFilter from "../components/CustomersFilter";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
@@ -9,12 +9,12 @@ import { useAppStore } from "../store";
 import { Button, Grid, useMediaQuery } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import { config } from "../config/config";
-import employeeType from "../enums/employeeType";
+import customerType from "../enums/customerType";
 import debounce from 'lodash/debounce';
 import queryString from 'query-string';
 import { useLocation } from 'wouter';
 
-interface IEmployee extends IBaseRow {
+interface ICustomer extends IBaseRow {
     login: string;
     name: string;
     type: string;    
@@ -83,13 +83,13 @@ const Customers = memo(() => {
     const isMobileView = useMediaQuery(theme.breakpoints.down("md"));           
     const showLoadingIcon = useAppStore((state) => state.showLoadingIcon);
     const dataGridRef = useRef<IDataGridRef>();
-    const [employees, setEmployees] = useState<IEmployee[]>([]);
+    const [customers, setCustomers] = useState<ICustomer[]>([]);
     const [, navigate] = useLocation();
     const abortController = useRef(new AbortController()).current;  
 
     const [state, setState] = useState<FetchState>({
         search: '',
-        type: employeeType.none.toString(),
+        type: customerType.none.toString(),
         page: 1,
         sortColumn: null,
         sortOrder: null,        
@@ -101,12 +101,14 @@ const Customers = memo(() => {
 
     useEffect(() => {                    
         parseUrl();        
+        handleResize();              
+        window.addEventListener('resize', handleResize);
     
-        //cleanup, przerwij wywolanie fetch jesli unmount
         return () => {
           showLoadingIcon(false);
           abortController.abort();
-          debounceFetchData.cancel();          
+          debounceFetchData.cancel();    
+          window.removeEventListener('resize', handleResize);      
         }
     }, []);
     
@@ -175,7 +177,7 @@ const Customers = memo(() => {
         const newState: FetchState = {
             ...state,
             search: (url.search ?? '').toString(),
-            type: (url.type ?? employeeType.none).toString(),
+            type: (url.type ?? customerType.none).toString(),
             sortColumn: url['sort-column']?.toString() ?? null,
             sortOrder: url['sort-order']?.toString() as Order ?? null,        
             page: 1,            
@@ -199,7 +201,7 @@ const Customers = memo(() => {
         });
         
         if (url.length > 0) {
-            url = `/employees?${url}`;
+            url = `/customers?${url}`;
         }
 
         window.history.replaceState(null, '', url);
@@ -215,7 +217,7 @@ const Customers = memo(() => {
 
         showLoadingIcon(true);       
     
-        fetch(`${config.API_URL}/employees?${String(new URLSearchParams({ 
+        fetch(`${config.API_URL}/customers?${String(new URLSearchParams({ 
             search: stateValue.search,
             type: stateValue.type,
             'sort-column': stateValue.sortColumn ?? 'id',
@@ -231,23 +233,22 @@ const Customers = memo(() => {
           return res.json();
         })
         .then((res) => {  
-            const newEmployees = res as IEmployee[];
-            if (newEmployees.length === 0 && 
+            const newCustomers = res as ICustomer[];
+            if (newCustomers.length === 0 && 
                 !stateValue.isReset) {
                 return;
             }
 
             //update type text
-            newEmployees.forEach(u => {
-                u.type = employeeType.getText(Number(u.type));                
+            newCustomers.forEach(u => {
+                u.type = customerType.getText(Number(u.type));                
             });
             
             if (stateValue.isReset) {
-                setEmployees(newEmployees);
+                setCustomers(newCustomers);
             }
             else {
-                //append array
-                setEmployees([...employees, ...newEmployees]); 
+                setCustomers([...customers, ...newCustomers]); 
             }                      
         })
         .catch((error: unknown) => {
@@ -260,44 +261,44 @@ const Customers = memo(() => {
         .finally(() => {
             showLoadingIcon(false);                        
         });    
-    }, [state, employees, openMessageDialog, showLoadingIcon]);
+    }, [state, customers, openMessageDialog, showLoadingIcon, abortController]);
 
     const handleDelete = (row: object) => {
-        const employee = row as IEmployee;
+        const customer = row as ICustomer;
 
         openQuestionDialog({
-            title: 'Pracownicy',
-            text: `Czy na pewno usunąć pracownika ${employee.name}?`,            
+            title: 'Klienci',
+            text: `Czy na pewno usunąć klienta ${customer.name}?`,            
             action: deleteOne,
-            actionParameters: employee.id
+            actionParameters: customer.id
         });
     }
 
     const handleDeleteAll = () => {        
         openQuestionDialog({
-            title: 'Pracownicy',
-            text: `Czy na pewno usunąć wszystkich pracowników?`,            
+            title: 'Klienci',
+            text: 'Czy na pewno usunąć wszystkich klientów?',
             action: deleteAll,
             //actionParameters: [1, 2, 3]
         });
     }
 
     const deleteOne = async (id?: number) => {
-        const result = await deleteAsync(`${config.API_URL}/employees/${id}`, 'Nieudane usunięcie pracownika');        
+        const result = await deleteAsync(`${config.API_URL}/customers/${id}`, 'Nieudane usunięcie klienta');        
         if (!result) {            
             return;
         }
 
-        setEmployees(employees.filter(u => u.id !== id));     
+        setCustomers(customers.filter(u => u.id !== id));     
     }
 
     const deleteAll = async () => {
-        const result = await deleteAsync(`${config.API_URL}/employees`, 'Nieudane usunięcie wszystkich pracowników');        
+        const result = await deleteAsync(`${config.API_URL}/customers`, 'Nieudane usunięcie wszystkich klientów');        
         if (!result) {            
             return;
         }
 
-        setEmployees([]);         
+        setCustomers([]);         
     }
 
     const deleteAsync = async (url: string, errorMessage: string) => {
@@ -340,16 +341,7 @@ const Customers = memo(() => {
         //console.log('isMobileView', isMobileView);
         //console.log('containerHeight', document.getElementById("main-container")?.clientHeight);
         //console.log('calculatedContainerHeight', window.innerHeight - appBarHeight);    
-    }
-
-    useEffect(() => {          
-        handleResize();              
-        window.addEventListener('resize', handleResize);
-        
-        return () => {               
-            window.removeEventListener('resize', handleResize);
-        };
-    }, []);
+    }    
 
     return (
         <Box 
@@ -367,7 +359,7 @@ const Customers = memo(() => {
             }}
         >
             <div id="filter-container">
-                <EmployeesFilter 
+                <CustomersFilter 
                     search={state.search}
                     type={state.type}
                     setFilter={setFilter}
@@ -419,7 +411,7 @@ const Customers = memo(() => {
                             <DataGrid                             
                                 ref={dataGridRef}
                                 columns={columns}
-                                rows={employees}
+                                rows={customers}
                                 isSelection={false}
                                 isDelete={true}
                                 maxHeight={dataGridHeight}                              
@@ -427,7 +419,7 @@ const Customers = memo(() => {
                                 deleteAllRows={handleDeleteAll} 
                                 fetchNextData={fetchNextData}        
                                 setSorting={setSorting}
-                                onRowClick={(id: number) => navigate(`/employees/${id}`)}
+                                onRowClick={(id: number) => navigate(`/customers/${id}`)}
                             />
                         </Grid>
                         <Grid 

@@ -10,6 +10,7 @@ const serviceRequests = '/service-requests';
 const phoneConsultations = '/phone-consultations';
 const registrationRequests = '/registration-requests';
 const customers = '/customers';
+const customer = '/customers/:id';
 const companies = '/companies';
 const employees = '/employees';
 const employee = '/employees/:id';
@@ -20,6 +21,7 @@ const routes = {
     phoneConsultations,
     registrationRequests,
     customers,
+    customer,
     companies,
     employees,
     employee,
@@ -63,6 +65,10 @@ const routes = {
         renderIcon: () => {
             return <PeopleAltIcon />;
         }
+    }, {
+        id: customer,
+        text: 'Klient',
+        isSidebarItem: false        
     }, {
         id: employees,
         text: 'Pracownicy',

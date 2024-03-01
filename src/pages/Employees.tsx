@@ -101,12 +101,14 @@ const Employees = memo(() => {
 
     useEffect(() => {                    
         parseUrl();        
-    
-        //cleanup, przerwij wywolanie fetch jesli unmount
+        handleResize();              
+        window.addEventListener('resize', handleResize);
+
         return () => {
           showLoadingIcon(false);
           abortController.abort();
-          debounceFetchData.cancel();          
+          debounceFetchData.cancel();   
+          window.removeEventListener('resize', handleResize);       
         }
     }, []);
     
@@ -246,7 +248,6 @@ const Employees = memo(() => {
                 setEmployees(newEmployees);
             }
             else {
-                //append array
                 setEmployees([...employees, ...newEmployees]); 
             }                      
         })
@@ -260,7 +261,7 @@ const Employees = memo(() => {
         .finally(() => {
             showLoadingIcon(false);                        
         });    
-    }, [state, employees, openMessageDialog, showLoadingIcon]);
+    }, [state, employees, openMessageDialog, showLoadingIcon, abortController]);
 
     const handleDelete = (row: object) => {
         const employee = row as IEmployee;
@@ -276,7 +277,7 @@ const Employees = memo(() => {
     const handleDeleteAll = () => {        
         openQuestionDialog({
             title: 'Pracownicy',
-            text: `Czy na pewno usunąć wszystkich pracowników?`,            
+            text: 'Czy na pewno usunąć wszystkich pracowników?',
             action: deleteAll,
             //actionParameters: [1, 2, 3]
         });
@@ -340,16 +341,7 @@ const Employees = memo(() => {
         //console.log('isMobileView', isMobileView);
         //console.log('containerHeight', document.getElementById("main-container")?.clientHeight);
         //console.log('calculatedContainerHeight', window.innerHeight - appBarHeight);    
-    }
-
-    useEffect(() => {          
-        handleResize();              
-        window.addEventListener('resize', handleResize);
-        
-        return () => {               
-            window.removeEventListener('resize', handleResize);
-        };
-    }, []);
+    }    
 
     return (
         <Box 
