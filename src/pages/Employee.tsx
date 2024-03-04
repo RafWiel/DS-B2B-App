@@ -22,6 +22,7 @@ const Employee = memo(() => {
     const theme = useTheme();  
     const setAppBarTitle = useAppStore((state) => state.setAppBarTitle);       
     const showLoadingIcon = useAppStore((state) => state.showLoadingIcon);
+    const openAutoMessageDialog = useAppStore((state) => state.openAutoMessageDialog); 
     const openMessageDialog = useAppStore((state) => state.openMessageDialog); 
     const openQuestionDialog = useAppStore((state) => state.openQuestionDialog); 
     const [, params] = useRoute("/employees/:id");
@@ -121,9 +122,10 @@ const Employee = memo(() => {
             .then((res: IIdResponse) => {                                              
                 setEmployee({...employee, id: res.id});
 
-                openMessageDialog({
+                openAutoMessageDialog({
                     title: 'Komunikat',
-                    text: 'Zapisano'
+                    text: 'Zapisano',
+                    delay: 1000
                 });
             })
             .catch((error: unknown) => {
@@ -374,7 +376,7 @@ const Employee = memo(() => {
                                                 display: 'inline-flex',                                                                        
                                                 width: '100%', 
                                                 height: 40,
-                                                marginTop: '4px',
+                                                marginTop: '16px',
                                                 [theme.breakpoints.down('sm')]: {
                                                     marginTop: '1px',
                                                 },

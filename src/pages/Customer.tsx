@@ -16,12 +16,16 @@ import boolEnum from "../enums/boolEnum.ts";
 import CheckIcon from '@mui/icons-material/Check';
 import ClearIcon from '@mui/icons-material/Clear';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
+import ArticleIcon from '@mui/icons-material/Article';
+import PhoneIcon from '@mui/icons-material/Phone';
+import AddIcon from '@mui/icons-material/Add';
 import { IIdResponse } from "../interfaces/IIdResponse.ts";
 
 const Customer = memo(() => {
     const theme = useTheme();  
     const setAppBarTitle = useAppStore((state) => state.setAppBarTitle);       
     const showLoadingIcon = useAppStore((state) => state.showLoadingIcon);
+    const openAutoMessageDialog = useAppStore((state) => state.openAutoMessageDialog); 
     const openMessageDialog = useAppStore((state) => state.openMessageDialog); 
     const openQuestionDialog = useAppStore((state) => state.openQuestionDialog); 
     const [, params] = useRoute("/customers/:id");
@@ -121,9 +125,10 @@ const Customer = memo(() => {
             .then((res: IIdResponse) => {                                              
                 setCustomer({...customer, id: res.id});
 
-                openMessageDialog({
+                openAutoMessageDialog({
                     title: 'Komunikat',
-                    text: 'Zapisano'
+                    text: 'Zapisano',
+                    delay: 1000
                 });
             })
             .catch((error: unknown) => {
@@ -231,7 +236,7 @@ const Customer = memo(() => {
                                         item 
                                         xs={12} 
                                         sm={12} 
-                                        md={10}                                         
+                                        md={9}                                         
                                     >                                                                                                                                                             
                                         <Grid                                         
                                             container 
@@ -337,7 +342,7 @@ const Customer = memo(() => {
                                         item 
                                         xs={12} 
                                         sm={12} 
-                                        md={2}
+                                        md={3}
                                         sx={{                                
                                             alignSelf: 'flex-start',
                                             [theme.breakpoints.down('md')]: {
@@ -368,7 +373,7 @@ const Customer = memo(() => {
                                                 display: 'inline-flex',                                                                        
                                                 width: '100%', 
                                                 height: 40,
-                                                marginTop: '4px',
+                                                marginTop: '16px',
                                                 [theme.breakpoints.down('sm')]: {
                                                     marginTop: '1px',
                                                 },
@@ -393,6 +398,60 @@ const Customer = memo(() => {
                                             }}
                                         >
                                             Zresetuj hasło
+                                        </Button>
+                                        <Button                                 
+                                            variant="contained"
+                                            disableElevation 
+                                            disabled={!customer.id}
+                                            // onClick={() => fetchNextData()}                                
+                                            startIcon={<ArticleIcon />}
+                                            sx={{
+                                                display: 'inline-flex',                                                                        
+                                                width: '100%', 
+                                                height: 40,
+                                                marginTop: '16px',
+                                                [theme.breakpoints.down('sm')]: {
+                                                    marginTop: '1px',
+                                                },                                   
+                                            }}
+                                        >
+                                            Pokaż zlecenia serwisowe
+                                        </Button>
+                                        <Button                                 
+                                            variant="contained"
+                                            disableElevation 
+                                            disabled={!customer.id}
+                                            // onClick={() => fetchNextData()}                                
+                                            startIcon={<PhoneIcon />}
+                                            sx={{
+                                                display: 'inline-flex',                                                                        
+                                                width: '100%', 
+                                                height: 40,
+                                                marginTop: '4px',
+                                                [theme.breakpoints.down('sm')]: {
+                                                    marginTop: '1px',
+                                                },                                   
+                                            }}
+                                        >
+                                            Pokaż konsultacje telefoniczne
+                                        </Button>
+                                        <Button                                 
+                                            variant="contained"
+                                            disableElevation 
+                                            disabled={!customer.id}
+                                            // onClick={() => fetchNextData()}                                
+                                            startIcon={<AddIcon />}
+                                            sx={{
+                                                display: 'inline-flex',                                                                        
+                                                width: '100%', 
+                                                height: 40,
+                                                marginTop: '16px',
+                                                [theme.breakpoints.down('sm')]: {
+                                                    marginTop: '1px',
+                                                },                                   
+                                            }}
+                                        >
+                                            Utwórz zlecenie serwisowe
                                         </Button>
                                     </Grid>                                    
                                 </Grid>

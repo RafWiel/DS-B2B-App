@@ -26,8 +26,9 @@ import QuestionDialog from './components/QuestionDialog';
 import { useEffect } from 'react';
 import { CircularProgress } from '@mui/material';
 import Customer from './pages/Customer';
+import AutoMessageDialog from './components/AutoMessageDialog';
 
-const todo = 'Dodaj AutoMessage';
+const todo = 'Firmy';
 
 interface AppBarProps extends MuiAppBarProps {
     open?: boolean;
@@ -311,6 +312,7 @@ export default function App() {
                         </Route>                                        
                     </Switch>                     
                 </Box>
+                <AutoMessageDialog />
                 <MessageDialog />
                 <QuestionDialog />
                 {
