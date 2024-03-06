@@ -14,7 +14,7 @@ import debounce from 'lodash/debounce';
 import queryString from 'query-string';
 import { useLocation } from 'wouter';
 
-interface ICustomer extends IBaseRow {
+interface ICustomerRow extends IBaseRow {
     login: string;
     name: string;
     type: string;    
@@ -83,7 +83,7 @@ const Customers = memo(() => {
     const isMobileView = useMediaQuery(theme.breakpoints.down("md"));           
     const showLoadingIcon = useAppStore((state) => state.showLoadingIcon);
     const dataGridRef = useRef<IDataGridRef>();
-    const [customers, setCustomers] = useState<ICustomer[]>([]);
+    const [customers, setCustomers] = useState<Array<ICustomerRow>>([]);
     const [, navigate] = useLocation();
     const abortController = useRef(new AbortController()).current;  
 
@@ -233,7 +233,7 @@ const Customers = memo(() => {
           return res.json();
         })
         .then((res) => {  
-            const newCustomers = res as ICustomer[];
+            const newCustomers = res as Array<ICustomerRow>;
             if (newCustomers.length === 0 && 
                 !stateValue.isReset) {
                 return;
@@ -264,7 +264,7 @@ const Customers = memo(() => {
     }, [state, customers, openMessageDialog, showLoadingIcon, abortController]);
 
     const handleDelete = (row: object) => {
-        const customer = row as ICustomer;
+        const customer = row as ICustomerRow;
 
         openQuestionDialog({
             title: 'Klienci',

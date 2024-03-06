@@ -1,15 +1,23 @@
-import { memo } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { useTheme } from '@mui/material/styles';
+import EmployeesFilter from "../components/EmployeesFilter"; tutaj
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import EmployeesFilter from "../components/EmployeesFilter";
-import DataGrid, { IBaseRow, IColumn } from "../components/DataGrid";
+import DataGrid, { IBaseRow, IColumn, IDataGridRef, Order } from "../components/DataGrid";
+import { useAppStore } from "../store";
+import { Button, Grid, useMediaQuery } from "@mui/material";
+import AddIcon from '@mui/icons-material/Add';
+import { config } from "../config/config";
+import debounce from 'lodash/debounce';
+import queryString from 'query-string';
+import { useLocation } from 'wouter';
 
-interface IRow extends IBaseRow {
-    login: string;
+interface ICompanyRow extends IBaseRow {
+    erpId: number;
     name: string;
-    type: string;    
+    taxNumber: string;    
+    city: string;    
 }
 
 const columns: IColumn[] = [
@@ -25,19 +33,19 @@ const columns: IColumn[] = [
         }
     },
     {
-        id: 'login',
-        label: 'Login',
+        id: 'erpId',
+        label: 'ERP Id',
         numeric: false,
         disablePadding: true,        
         visible: true,
         width: {
-            mobile: '170px',
-            desktop: '170px'
+            mobile: '100px',
+            desktop: '100px'
         }
     },
     {
         id: 'name',
-        label: 'Imię i nazwisko',
+        label: 'Nazwa',
         numeric: false,
         disablePadding: false,        
         visible: true,
@@ -47,8 +55,19 @@ const columns: IColumn[] = [
         }
     },
     {
-        id: 'type',
-        label: 'Typ',
+        id: 'taxNumber',
+        label: 'NIP',
+        numeric: false,
+        disablePadding: false,        
+        visible: true,
+        width: {
+            mobile: '220px',
+            desktop: '220px'
+        }
+    },
+    {
+        id: 'city',
+        label: 'Miasto',
         numeric: false,
         disablePadding: false,        
         visible: true,
@@ -59,67 +78,278 @@ const columns: IColumn[] = [
     },
 ];
 
-const rows = [
-    createData(1, 'rafal.wielicki', 'Rafał Wielicki', 'Administrator'),
-    createData(2, 'andy', 'Andrzej Jurkowski', 'Administrator'),
-    createData(3, 'piotr.trybuchowicz', 'Piotr Trybuchowicz', 'Administrator'),   
-    createData(4, 'rafal.wielicki', 'Rafał Wielicki', 'Administrator'),
-    createData(5, 'andy', 'Andrzej Jurkowski', 'Administrator'),
-    createData(6, 'piotr.trybuchowicz', 'Piotr Trybuchowicz', 'Administrator'),   
-    createData(7, 'rafal.wielicki', 'Rafał Wielicki', 'Administrator'),
-    createData(8, 'andy', 'Andrzej Jurkowski', 'Administrator'),
-    createData(9, 'piotr.trybuchowicz', 'Piotr Trybuchowicz', 'Administrator'),   
-    createData(10, 'rafal.wielicki', 'Rafał Wielicki', 'Administrator'),
-    createData(11, 'andy', 'Andrzej Jurkowski', 'Administrator'),
-    createData(12, 'piotr.trybuchowicz', 'Piotr Trybuchowicz', 'Administrator'),    
-    createData(13, 'rafal.wielicki', 'Rafał Wielicki', 'Administrator'),
-    createData(14, 'andy', 'Andrzej Jurkowski', 'Administrator'),
-    createData(15, 'piotr.trybuchowicz', 'Piotr Trybuchowicz', 'Administrator'),    
-    createData(16, 'rafal.wielicki', 'Rafał Wielicki', 'Administrator'),
-    createData(17, 'andy', 'Andrzej Jurkowski', 'Administrator'),
-    createData(18, 'piotr.trybuchowicz', 'Piotr Trybuchowicz', 'Administrator'),    
-    createData(19, 'rafal.wielicki', 'Rafał Wielicki', 'Administrator'),
-    createData(20, 'andy', 'Andrzej Jurkowski', 'Administrator'),
-    createData(21, 'piotr.trybuchowicz', 'Piotr Trybuchowicz', 'Administrator'),   
-    createData(22, 'rafal.wielicki', 'Rafał Wielicki', 'Administrator'),
-    createData(23, 'andy', 'Andrzej Jurkowski', 'Administrator'),
-    createData(24, 'piotr.trybuchowicz', 'Piotr Trybuchowicz', 'Administrator'),   
-    createData(25, 'rafal.wielicki', 'Rafał Wielicki', 'Administrator'),
-    createData(26, 'andy', 'Andrzej Jurkowski', 'Administrator'),
-    createData(27, 'piotr.trybuchowicz', 'Piotr Trybuchowicz', 'Administrator'),   
-    createData(28, 'rafal.wielicki', 'Rafał Wielicki', 'Administrator'),
-    createData(29, 'andy', 'Andrzej Jurkowski', 'Administrator'),
-    createData(30, 'piotr.trybuchowicz', 'Piotr Trybuchowicz', 'Administrator'),    
-    createData(31, 'rafal.wielicki', 'Rafał Wielicki', 'Administrator'),
-    createData(32, 'andy', 'Andrzej Jurkowski', 'Administrator'),
-    createData(33, 'piotr.trybuchowicz', 'Piotr Trybuchowicz', 'Administrator'),    
-    createData(34, 'rafal.wielicki', 'Rafał Wielicki', 'Administrator'),
-    createData(35, 'andy', 'Andrzej Jurkowski', 'Administrator'),
-    createData(36, 'piotr.trybuchowicz', 'Piotr Trybuchowicz', 'Administrator'),  
-];
-
-function createData(
-    id: number,
-    login: string,
-    name: string,
-    type: string
-): IRow {
-    return {
-        id,
-        login,
-        name,
-        type
-    };
+type FetchState = {
+    search: string,
+    page: number,
+    sortColumn: string | null,
+    sortOrder: Order | null,
+    isReset: boolean
 }
-
+  
 const Companies = memo(() => {
-    const theme = useTheme();    
+    const theme = useTheme();     
+    const openQuestionDialog = useAppStore((state) => state.openQuestionDialog); 
+    const openMessageDialog = useAppStore((state) => state.openMessageDialog); 
+    const isMobileView = useMediaQuery(theme.breakpoints.down("md"));           
+    const showLoadingIcon = useAppStore((state) => state.showLoadingIcon);
+    const dataGridRef = useRef<IDataGridRef>();
+    const [companies, setCompanies] = useState<ICompanyRow[]>([]);
+    const [, navigate] = useLocation();
+    const abortController = useRef(new AbortController()).current;  
+
+    const [state, setState] = useState<FetchState>({
+        search: '',
+        page: 1,
+        sortColumn: null,
+        sortOrder: null,        
+        isReset: true
+    });
+    
+   
+    //console.log('render', state.page);
+
+    useEffect(() => {                    
+        parseUrl();        
+        handleResize();              
+        window.addEventListener('resize', handleResize);
+
+        return () => {
+          showLoadingIcon(false);
+          abortController.abort();
+          debounceFetchData.cancel();   
+          window.removeEventListener('resize', handleResize);       
+        }
+    }, []);
+    
+    const fetchNextData = () => {
+        console.log('fetchNextData');
+        //console.log('search', state.search);
+        //console.log('page', state.page);
+        
+        const newState = {
+            ...state,             
+            page: state.page + 1,
+            isReset: false
+        };        
+
+        setState(newState);    
+        fetchData(newState);
+    };
+
+    const setFilter = (search: string, isDebouncedUpdate: boolean) => {
+        console.log('setFilter');        
+        //console.log('search', value);        
+        //console.log('page', state.page);
+
+        const newState = {
+            ...state,             
+            search: search,
+            page: 1, 
+            isReset: true
+        };
+        
+        setState(newState);    
+        
+        if (isDebouncedUpdate) {
+            debounceFetchData(newState);
+        } else {
+            fetchData(newState); 
+        }
+    };
+
+    const setSorting = (column: string, order: Order) => {
+        console.log('sorting: ', column, order);
+
+        const newState = {
+            ...state,             
+            sortColumn: column,
+            sortOrder: order,
+            page: 1, 
+            isReset: true
+        };
+
+        setState(newState);
+        fetchData(newState);         
+    }
+    
+    const debounceFetchData = useRef(
+        debounce((stateValue: FetchState) => { 
+            fetchData(stateValue); 
+        }, 500)
+    ).current;
+
+    const parseUrl = () => {
+        const url = queryString.parse(location.search);
+        //console.log(url);
+        
+        const newState: FetchState = {
+            ...state,
+            search: (url.search ?? '').toString(),
+            sortColumn: url['sort-column']?.toString() ?? null,
+            sortOrder: url['sort-order']?.toString() as Order ?? null,        
+            page: 1,            
+            isReset: true
+        };
+        
+        setState(newState);
+        fetchData(newState);   
+        
+        dataGridRef.current?.updateSorting(newState.sortColumn, newState.sortOrder);
+    }
+
+    const setUrl = (stateValue: FetchState) => {
+        let url = queryString.stringify({
+            search: stateValue.search.length > 0 ? stateValue.search : null,             
+            'sort-column': stateValue.sortColumn, 
+            'sort-order': stateValue.sortOrder
+        }, {
+            skipNull: true
+        });
+        
+        if (url.length > 0) {
+            url = `/companies?${url}`;
+        }
+
+        window.history.replaceState(null, '', url);
+    }
+
+    const fetchData = useCallback((stateValue: FetchState) => {                        
+        console.log('fetchData');
+        console.log('search: ', stateValue.search, ' | ', state.search);   
+        //console.log('page: ', stateValue.page, ' | ', state.page);           
+    
+        setUrl(stateValue);        
+
+        showLoadingIcon(true);       
+    
+        fetch(`${config.API_URL}/companies?${String(new URLSearchParams({ 
+            search: stateValue.search,
+            'sort-column': stateValue.sortColumn ?? 'id',
+            'sort-order': stateValue.sortOrder ?? 'asc',
+            page: stateValue.page.toString()
+        }))}`, { 
+            signal: abortController.signal 
+        })              
+        .then((res) => {           
+          if (!res.ok) throw new Error("Nieprawidłowa odpowiedź serwera");    
+          
+          return res.json();
+        })
+        .then((res) => {  
+            const newCompanies = res as Array<ICompanyRow>;
+            if (newCompanies.length === 0 && 
+                !stateValue.isReset) {
+                return;
+            }
+
+            console.log('res', newCompanies);
+                      
+            if (stateValue.isReset) {
+                setCompanies(newCompanies);
+            }
+            else {
+                setCompanies([...companies, ...newCompanies]); 
+            }                      
+        })
+        .catch((error: unknown) => {
+            if ((error as Error).name === 'AbortError') return;
+            openMessageDialog({
+                title: 'Błąd aplikacji',
+                text: (error as Error).message
+            });
+        })
+        .finally(() => {
+            showLoadingIcon(false);                        
+        });    
+    }, [state, companies, openMessageDialog, showLoadingIcon, abortController]);
+
+    const handleDelete = (row: object) => {
+        const company = row as ICompanyRow;
+
+        openQuestionDialog({
+            title: 'Firmy',
+            text: `Czy na pewno usunąć firmę ${company.name}?`,            
+            action: deleteSingle,
+            actionParameters: company.id
+        });
+    }
+
+    const handleDeleteAll = () => {        
+        openQuestionDialog({
+            title: 'Firmy',
+            text: 'Czy na pewno usunąć wszystkie firmy?',
+            action: deleteAll,
+            //actionParameters: [1, 2, 3]
+        });
+    }
+
+    const deleteSingle = async (id: number) => {
+        const result = await deleteAsync(`${config.API_URL}/companies/${id}`, 'Nieudane usunięcie firmy');        
+        if (!result) {            
+            return;
+        }
+
+        setCompanies(companies.filter(u => u.id !== id));     
+    }
+
+    const deleteAll = async () => {
+        const result = await deleteAsync(`${config.API_URL}/companies`, 'Nieudane usunięcie wszystkich firm');        
+        if (!result) {            
+            return;
+        }
+
+        setCompanies([]);         
+    }
+
+    const deleteAsync = async (url: string, errorMessage: string) => {
+        showLoadingIcon(true);       
+        
+        const result = await fetch(url, { method: 'DELETE' })              
+            .then((res) => {           
+                if (!res.ok) throw new Error(errorMessage);    
+            
+                return true;
+            })        
+            .catch((error: unknown) => {
+                if ((error as Error).name === 'AbortError') return;
+                
+                openMessageDialog({
+                    title: 'Błąd aplikacji',
+                    text: (error as Error).message
+                });
+
+                return false;
+            })
+            .finally(() => {
+                showLoadingIcon(false);                        
+            });   
+        
+        console.log('result', result);
+        return result;
+    }
+
+    const [dataGridHeight, setDataGridHeight] = useState(0);
+
+    const handleResize = () => {
+        const appBarHeight = document.getElementById("appBar")?.clientHeight ?? 0;
+        const filterHeight = document.getElementById("filter-container")?.clientHeight ?? 0;
+        const datagridMargin = isMobileView ? 74 : 42;  
+        const mainMargin = 12;  
+
+        setDataGridHeight(window.innerHeight - appBarHeight - filterHeight - mainMargin * 3 - datagridMargin);        
+        
+        //console.log('isMobileView', isMobileView);
+        //console.log('containerHeight', document.getElementById("main-container")?.clientHeight);
+        //console.log('calculatedContainerHeight', window.innerHeight - appBarHeight);    
+    }    
 
     return (
-        <Box         
+        <Box 
+            id="main-container"                   
             sx={{                
                 width: 1,
                 height: '100%',
+                //maxHeight: '90vh',
                 display: 'flex',
                 flexDirection: 'column',
                 padding: {
@@ -128,39 +358,98 @@ const Companies = memo(() => {
                 }
             }}
         >
-            <EmployeesFilter />
+            <div id="filter-container">
+                <EmployeesFilter 
+                    search={state.search}
+                    type={1}
+                    setFilter={setFilter}
+                />
+            </div>
             <Card 
                 variant="outlined"
                 sx={{    
                     marginTop: 1.5, 
-                    height: '100%',                    
+                    height: '100%', 
+                    //maxHeight: '50vh',                   
                     [theme.breakpoints.down('sm')]: {
                         border: 'none' 
                     },                    
                 }}
             >
-                <CardContent sx={{
-                    //backgroundColor: 'red', 
-                    display: 'flex',                            
-                    maxHeight: '100%',
-                    [theme.breakpoints.down('md')]: {
-                        padding: 1,
-                        '&:last-child': { 
-                            paddingBottom: 1 
-                        }
-                    },                                                                                                                
-                }}>                    
-                    
-                    <DataGrid 
-                        columns={columns}
-                        rows={rows}
-                        isSelection={false}
-                        isDelete={true}
-                        deleteRow={() => {}}
-                        deleteAllRows={() => {}}        
-                    />
-                        
-                            
+                <CardContent 
+                    id="card-content"  
+                    sx={{
+                        //backgroundColor: 'red', 
+                        display: 'flex',                            
+                        height: '100%',
+                        [theme.breakpoints.down('md')]: {
+                            padding: 1,
+                            '&:last-child': { 
+                                paddingBottom: 1 
+                            }
+                        },                                                                                                                
+                    }}
+                >                    
+                    <Grid 
+                        container 
+                        spacing={2}
+                        sx={{
+                            //backgroundColor: 'gainsboro',                                                                                                                                           
+                        }}
+                    >
+                        <Grid 
+                            item 
+                            xs={12} 
+                            sm={12} 
+                            md={10} 
+                            // sx={{
+                            //     //backgroundColor: 'aqua',
+                            //     //flexGrow: 1,
+                            //     //alignSelf: 'flex-start'
+                            // }}
+                        >
+                            <DataGrid                             
+                                ref={dataGridRef}
+                                columns={columns}
+                                rows={companies}
+                                isSelection={false}
+                                isDelete={true}
+                                maxHeight={dataGridHeight}                              
+                                deleteRow={handleDelete}
+                                deleteAllRows={handleDeleteAll} 
+                                fetchNextData={fetchNextData}        
+                                setSorting={setSorting}
+                                onRowClick={(id: number) => navigate(`/companies/${id}`)}
+                            />
+                        </Grid>
+                        <Grid 
+                            item 
+                            xs={12} 
+                            sm={12} 
+                            md={2}
+                            sx={{
+                                //backgroundColor: 'aqua',                                
+                                alignSelf: 'flex-start',
+                                [theme.breakpoints.down('md')]: {
+                                    alignSelf: 'flex-end',
+                                },  
+                            }}
+                        >
+                            <Button                                 
+                                variant="contained"
+                                disableElevation 
+                                onClick={() => navigate('/companies/0')} 
+                                startIcon={<AddIcon />}
+                                sx={{
+                                    display: 'inline-flex',                                                                        
+                                    width: '100%', 
+                                    height: 40                                   
+                                }}
+                            >
+                                Dodaj
+                            </Button>                            
+                        </Grid>
+                    </Grid>    
                 </CardContent>
             </Card>
         </Box>

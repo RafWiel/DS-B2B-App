@@ -28,7 +28,7 @@ import { CircularProgress } from '@mui/material';
 import Customer from './pages/Customer';
 import AutoMessageDialog from './components/AutoMessageDialog';
 
-const todo = 'Firmy';
+const todo = 'Nie rob tabeli telefony, zamiast tego wyswietl telefony klientow';
 
 interface AppBarProps extends MuiAppBarProps {
     open?: boolean;

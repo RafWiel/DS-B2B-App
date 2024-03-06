@@ -14,7 +14,7 @@ import debounce from 'lodash/debounce';
 import queryString from 'query-string';
 import { useLocation } from 'wouter';
 
-interface IEmployee extends IBaseRow {
+interface IEmployeeRow extends IBaseRow {
     login: string;
     name: string;
     type: string;    
@@ -83,7 +83,7 @@ const Employees = memo(() => {
     const isMobileView = useMediaQuery(theme.breakpoints.down("md"));           
     const showLoadingIcon = useAppStore((state) => state.showLoadingIcon);
     const dataGridRef = useRef<IDataGridRef>();
-    const [employees, setEmployees] = useState<IEmployee[]>([]);
+    const [employees, setEmployees] = useState<Array<IEmployeeRow>>([]);
     const [, navigate] = useLocation();
     const abortController = useRef(new AbortController()).current;  
 
@@ -233,7 +233,7 @@ const Employees = memo(() => {
           return res.json();
         })
         .then((res) => {  
-            const newEmployees = res as IEmployee[];
+            const newEmployees = res as Array<IEmployeeRow>;
             if (newEmployees.length === 0 && 
                 !stateValue.isReset) {
                 return;
@@ -264,7 +264,7 @@ const Employees = memo(() => {
     }, [state, employees, openMessageDialog, showLoadingIcon, abortController]);
 
     const handleDelete = (row: object) => {
-        const employee = row as IEmployee;
+        const employee = row as IEmployeeRow;
 
         openQuestionDialog({
             title: 'Pracownicy',

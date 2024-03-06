@@ -93,7 +93,7 @@ const Employee = memo(() => {
     }, [employee.id]);
     
     const handleSubmit = useCallback((employee: IEmployee, { setSubmitting }: FormikHelpers<IEmployee>) => {                     
-        showLoadingIcon(true);
+        showLoadingIcon(true);        
 
         console.log('submit', employee.id);
         console.log('handleSubmit:', JSON.stringify(employee, null, 2)); 
@@ -404,7 +404,7 @@ const Employee = memo(() => {
                                         </Button>
                                     </Grid>                                    
                                 </Grid>
-                            );
+                            )
                         }}
                     </Formik>  
                 </CardContent>
