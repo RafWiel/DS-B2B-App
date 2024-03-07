@@ -1,6 +1,6 @@
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { useTheme } from '@mui/material/styles';
-import EmployeesFilter from "../components/EmployeesFilter"; tutaj
+import CompaniesFilter from "../components/CompaniesFilter"; 
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
@@ -14,8 +14,8 @@ import queryString from 'query-string';
 import { useLocation } from 'wouter';
 
 interface ICompanyRow extends IBaseRow {
-    erpId: number;
     name: string;
+    erpId: number;    
     taxNumber: string;    
     city: string;    
 }
@@ -31,6 +31,17 @@ const columns: IColumn[] = [
             mobile: '0',
             desktop: '0'
         }
+    },   
+    {
+        id: 'name',
+        label: 'Nazwa',
+        numeric: false,
+        disablePadding: false,        
+        visible: true,
+        width: {
+            mobile: '200px',
+            desktop: '200px'
+        }
     },
     {
         id: 'erpId',
@@ -39,19 +50,8 @@ const columns: IColumn[] = [
         disablePadding: true,        
         visible: true,
         width: {
-            mobile: '100px',
-            desktop: '100px'
-        }
-    },
-    {
-        id: 'name',
-        label: 'Nazwa',
-        numeric: false,
-        disablePadding: false,        
-        visible: true,
-        width: {
-            mobile: '220px',
-            desktop: '220px'
+            mobile: '150px',
+            desktop: '150px'
         }
     },
     {
@@ -61,8 +61,8 @@ const columns: IColumn[] = [
         disablePadding: false,        
         visible: true,
         width: {
-            mobile: '220px',
-            desktop: '220px'
+            mobile: '200px',
+            desktop: '200px'
         }
     },
     {
@@ -359,9 +359,8 @@ const Companies = memo(() => {
             }}
         >
             <div id="filter-container">
-                <EmployeesFilter 
-                    search={state.search}
-                    type={1}
+                <CompaniesFilter 
+                    search={state.search}                    
                     setFilter={setFilter}
                 />
             </div>

@@ -1,9 +1,9 @@
 import { ICustomer } from "./ICustomer";
 
 export interface ICompany {
-    id: number;
-    erpId: number;
+    id: number;    
     name: string;
+    erpId: number;
     taxNumber: string;
     address: string;
     postal: string;

@@ -83,7 +83,12 @@ const SideBar = memo(() => {
             <Divider />
             <List>
                 {
-                    routes.items.filter(u => u.isSidebarItem).map((route) => (
+                    routes.items
+                        .filter(u => u.isSidebarItem)
+                        .sort((a, b) => {                                                    
+                            return (a.sidebarIndex ?? 0) - (b.sidebarIndex ?? 0);
+                        })
+                        .map((route) => (
                     <ListItem key={route.id} disablePadding sx={{ display: 'block' }}>
                         <Link href={route.id}>                        
                             <ListItemButton                            

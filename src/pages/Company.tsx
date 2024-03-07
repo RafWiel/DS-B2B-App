@@ -4,54 +4,55 @@ import { useTheme } from '@mui/material/styles';
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import { Button, FormControl, FormHelperText, Grid, InputLabel, MenuItem, Select, TextField } from "@mui/material";
-import { useAppStore } from "../store";
-import { IEmployee } from '../interfaces/IEmployee.ts';
+import { Button, Grid, TextField } from "@mui/material";
+import { useAppStore } from "../store.ts";
+import { ICompany } from '../interfaces/ICompany.ts';
 import { useLocation, useRoute } from "wouter";
-import { config } from "../config/config";
-import employeeType from "../enums/employeeType.ts";
+import { config } from "../config/config.ts";
 import { Formik, FormikProps, FormikHelpers } from 'formik';
 import * as yup from 'yup';
-import boolEnum from "../enums/boolEnum.ts";
 import CheckIcon from '@mui/icons-material/Check';
 import ClearIcon from '@mui/icons-material/Clear';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import { IIdResponse } from "../interfaces/IIdResponse.ts";
+import { ICustomer } from "../interfaces/ICustomer.ts";
 
-const Employee = memo(() => {
+const Company = memo(() => {
     const theme = useTheme();  
     const setAppBarTitle = useAppStore((state) => state.setAppBarTitle);       
     const showLoadingIcon = useAppStore((state) => state.showLoadingIcon);
     const openAutoMessageDialog = useAppStore((state) => state.openAutoMessageDialog); 
     const openMessageDialog = useAppStore((state) => state.openMessageDialog); 
     const openQuestionDialog = useAppStore((state) => state.openQuestionDialog); 
-    const [, params] = useRoute("/employees/:id");
+    const [, params] = useRoute("/companies/:id");
     const [, navigate] = useLocation();    
     const abortController = useRef(new AbortController()).current;      
 
-    const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
-
-    const schema = yup.object().shape({                                        
-        type: yup.number().required().min(employeeType.administrator, 'Podaj typ').max(employeeType.employee, 'Podaj typ'),
-        login: yup.string().required('Podaj login'),
-        name: yup.string().required('Podaj imię i nazwisko'),
-        phoneNumber: yup.string().required('Podaj numer telefonu').matches(phoneRegExp, 'Nieprawidłowy numer telefonu'),
-        email: yup.string().required('Podaj e-mail').email('Nieprawidłowy e-mail'),
-        isMailing: yup.boolean().required(),                        
+    
+    const postalRegExp = /^[0-9]{2}-[0-9]{3}$/
+    
+    const schema = yup.object().shape({                                                    
+        name: yup.string().required('Podaj nazwę'),
+        erpId: yup.number().required('Podaj ERP Id'),
+        taxNumber: yup.string().required('Podaj NIP').length(10, 'Nieprawidłowy NIP'),
+        address: yup.string().required('Podaj adres'),
+        postal: yup.string().required('Podaj kod pocztowy').matches(postalRegExp, 'Nieprawidłowy kod pocztowy'),                 
+        city: yup.string().required('Podaj miasto'),
     });
 
-    const [employee, setEmployee] = useState<IEmployee>({         
-        id: Number(params?.id),        
-        type: employeeType.none,
-        login: '',
+    const [company, setCompany] = useState<ICompany>({         
+        id: Number(params?.id),                        
         name: '',
-        phoneNumber: '',
-        email: '',
-        isMailing: false
+        erpId: 0,
+        taxNumber: '',
+        address: '',
+        postal: '',
+        city: '',
+        customers: []
     }); 
 
     useEffect(() => {                        
-        setAppBarTitle('Pracownik');   
+        setAppBarTitle('Firma');   
         fetchData();                
         
         return () => {            
@@ -60,11 +61,11 @@ const Employee = memo(() => {
     }, []);
     
     const fetchData = useCallback(() => {
-        if (!employee.id) return;
+        if (!company.id) return;
                
         showLoadingIcon(true);
         
-        fetch(`${config.API_URL}/employees/${employee.id}`, { signal: abortController.signal })      
+        fetch(`${config.API_URL}/companies/${company.id}`, { signal: abortController.signal })      
         .then((res: Response) => {           
             if (!res.ok) {
                 throw new Error("Nieprawidłowa odpowiedź serwera");                       
@@ -72,12 +73,12 @@ const Employee = memo(() => {
             
             return res.json();
         })
-        .then((res: IEmployee) => {                                                                 
-            setEmployee(res);                        
+        .then((res: ICompany) => {                                                                 
+            setCompany(res);                        
 
             console.log('load:', JSON.stringify(res, null, 2));
             
-            setAppBarTitle(`Pracownik ${res.name}`);        
+            setAppBarTitle(`Firma ${res.name}`);        
         })
         .catch((error: unknown) => {
             if ((error as Error).name === 'AbortError') return;
@@ -86,31 +87,31 @@ const Employee = memo(() => {
                 text: (error as Error).message
             });
 
-            navigate('/employees');
+            navigate('/companies');
         })
         .finally(() => showLoadingIcon(false));         
-    }, [employee.id]);
+    }, [company.id]);
     
-    const handleSubmit = useCallback((employee: IEmployee, { setSubmitting }: FormikHelpers<IEmployee>) => {                     
+    const handleSubmit = useCallback((company: ICompany, { setSubmitting }: FormikHelpers<ICompany>) => {                     
         showLoadingIcon(true);        
 
-        console.log('submit', employee.id);
-        console.log('handleSubmit:', JSON.stringify(employee, null, 2)); 
+        console.log('submit', company.id);
+        console.log('handleSubmit:', JSON.stringify(company, null, 2)); 
                         
-        fetch(`${config.API_URL}/employees`, {
-            method: !employee.id ? 'POST' : 'PUT',            
+        fetch(`${config.API_URL}/companies`, {
+            method: !company.id ? 'POST' : 'PUT',            
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(employee),
+            body: JSON.stringify(company),
             signal: abortController.signal 
         })       
             .then((res) => {                
                 if (!res.ok) {
                     if (res.status === 404) {
-                        throw new Error('Nie znaleziono użytkownika w bazie danych');
+                        throw new Error('Nie znaleziono firmy w bazie danych');
                     }
 
                     if (res.status === 409) {
-                        throw new Error('Użytkownik o takich danych już istnieje');
+                        throw new Error('Firma o takich danych już istnieje');
                     }
 
                     throw new Error('Nieprawidłowa odpowiedź serwera');
@@ -119,7 +120,7 @@ const Employee = memo(() => {
                 return res.json();             
             })      
             .then((res: IIdResponse) => {                                              
-                setEmployee({...employee, id: res.id});
+                setCompany({...company, id: res.id});
 
                 openAutoMessageDialog({
                     title: 'Komunikat',
@@ -138,25 +139,25 @@ const Employee = memo(() => {
                 setSubmitting(false);  
                 showLoadingIcon(false);            
             });
-    }, [employee.id]);
+    }, [company.id]);
     
     const handleDelete = () => {        
         openQuestionDialog({
-            title: 'Pracownik',
-            text: `Czy na pewno usunąć pracownika ${employee.name}?`,            
+            title: 'Firma',
+            text: `Czy na pewno usunąć firmę ${company.name}?`,            
             action: deleteSingle,
-            actionParameters: employee.id
+            actionParameters: company.id
         });
     }
 
     const deleteSingle = (id: number) => {
         showLoadingIcon(true);       
         
-        fetch(`${config.API_URL}/employees/${id}`, { method: 'DELETE' })              
+        fetch(`${config.API_URL}/companies/${id}`, { method: 'DELETE' })              
             .then((res) => {           
-                if (!res.ok) throw new Error('Nieudane usunięcie pracownika');    
+                if (!res.ok) throw new Error('Nieudane usunięcie firmy');    
             
-                navigate('/employees');
+                navigate('/companies');
             })        
             .catch((error: unknown) => {
                 if ((error as Error).name === 'AbortError') return;
@@ -207,12 +208,12 @@ const Employee = memo(() => {
                 }}>     
                     <Formik
                         enableReinitialize={true}
-                        initialValues={employee}
+                        initialValues={company}
                         validationSchema={schema} 
                         validateOnChange={true}
                         validateOnBlur={true}           
                         onSubmit={handleSubmit}>                    
-                        {(props: FormikProps<IEmployee>) => {
+                        {(props: FormikProps<ICompany>) => {
                             const { handleSubmit, handleChange, values, errors, touched, isSubmitting } = props;                            
 
                             //console.log('render Formik');
@@ -246,11 +247,11 @@ const Employee = memo(() => {
                                         >
                                             <Grid item sm={4} xs={6}>
                                                 <TextField 
-                                                    error={touched?.login && !!errors?.login}
-                                                    helperText={touched?.login && errors?.login}
-                                                    name="login"                                                    
-                                                    value={values.login} 
-                                                    label="Login" 
+                                                    error={touched?.name && !!errors?.name}
+                                                    helperText={touched?.name && errors?.name}
+                                                    name="name"                                                    
+                                                    value={values.name} 
+                                                    label="Nazwa" 
                                                     onChange={handleChange}                                                                              
                                                     fullWidth                                 
                                                     variant="standard"                                                                                     
@@ -259,11 +260,11 @@ const Employee = memo(() => {
                                             </Grid>
                                             <Grid item sm={4} xs={6}>
                                                 <TextField 
-                                                    error={touched?.name && !!errors?.name}
-                                                    helperText={touched?.name && errors?.name}
-                                                    name="name"                                                    
-                                                    value={values.name} 
-                                                    label="Imię i nazwisko" 
+                                                    error={touched?.erpId && !!errors?.erpId}
+                                                    helperText={touched?.erpId && errors?.erpId}
+                                                    name="erpId"                                                    
+                                                    value={values.erpId} 
+                                                    label="ERP Id" 
                                                     onChange={handleChange}                                                     
                                                     fullWidth                                 
                                                     variant="standard"                                 
@@ -271,11 +272,11 @@ const Employee = memo(() => {
                                             </Grid>
                                             <Grid item sm={4} xs={6}>
                                                 <TextField 
-                                                    error={touched?.email && !!errors?.email}
-                                                    helperText={touched?.email && errors?.email}           
-                                                    name="email"                                                    
-                                                    value={values.email} 
-                                                    label="e-mail" 
+                                                    error={touched?.taxNumber && !!errors?.taxNumber}
+                                                    helperText={touched?.taxNumber && errors?.taxNumber}           
+                                                    name="taxNumber"                                                    
+                                                    value={values.taxNumber} 
+                                                    label="NIP" 
                                                     onChange={handleChange}                                                               
                                                     fullWidth                                 
                                                     variant="standard"                                 
@@ -283,59 +284,39 @@ const Employee = memo(() => {
                                             </Grid>                                            
                                             <Grid item sm={4} xs={6}>
                                                 <TextField 
-                                                    error={touched?.phoneNumber && !!errors?.phoneNumber}
-                                                    helperText={touched?.phoneNumber && errors?.phoneNumber}                        
-                                                    name="phoneNumber"                                                    
-                                                    value={values.phoneNumber} 
-                                                    label="Numer telefonu" 
+                                                    error={touched?.address && !!errors?.address}
+                                                    helperText={touched?.address && errors?.address}                        
+                                                    name="address"                                                    
+                                                    value={values.address} 
+                                                    label="Adres" 
                                                     onChange={handleChange}                                                     
                                                     fullWidth                                 
                                                     variant="standard"                                 
                                                 />  
                                             </Grid>
                                             <Grid item sm={4} xs={6}>
-                                                <FormControl 
-                                                    error={touched?.type && !!errors?.type}
-                                                    variant="standard" 
-                                                    fullWidth 
-                                                >
-                                                    <InputLabel id="type">Typ</InputLabel>
-                                                    <Select
-                                                        displayEmpty                                                        
-                                                        labelId="type"
-                                                        name="type"
-                                                        value={values.type}
-                                                        onChange={handleChange}
-                                                    >
-                                                        {
-                                                            employeeType && employeeType.items                                                                   
-                                                                .map((item) => (
-                                                                    <MenuItem key={item.id} value={item.id}>{item.text}&nbsp;</MenuItem>                                    
-                                                                ))
-                                                        }                                
-                                                    </Select>
-                                                    <FormHelperText>
-                                                        {touched?.type && errors?.type}
-                                                    </FormHelperText>
-                                                </FormControl>   
+                                                <TextField 
+                                                    error={touched?.postal && !!errors?.postal}
+                                                    helperText={touched?.postal && errors?.postal}                        
+                                                    name="postal"                                                    
+                                                    value={values.postal} 
+                                                    label="Kod pocztowy" 
+                                                    onChange={handleChange}                                                     
+                                                    fullWidth                                 
+                                                    variant="standard"                                 
+                                                />  
                                             </Grid>
                                             <Grid item sm={4} xs={6}>
-                                                <FormControl variant="standard" fullWidth>
-                                                    <InputLabel id="isMailing">Powiadomienia e-mail</InputLabel>
-                                                    <Select                                                        
-                                                        labelId="isMailing"
-                                                        name="isMailing"
-                                                        value={Number(values.isMailing)}
-                                                        onChange={handleChange}
-                                                    >
-                                                        {
-                                                            boolEnum && boolEnum.items                                      
-                                                                .map((item) => (
-                                                                    <MenuItem key={item.id} value={item.id}>{item.text}</MenuItem>                                    
-                                                                ))
-                                                        }                                
-                                                    </Select>
-                                                </FormControl>   
+                                                <TextField 
+                                                    error={touched?.city && !!errors?.city}
+                                                    helperText={touched?.city && errors?.city}                        
+                                                    name="city"                                                    
+                                                    value={values.city} 
+                                                    label="Miasto" 
+                                                    onChange={handleChange}                                                     
+                                                    fullWidth                                 
+                                                    variant="standard"                                 
+                                                />  
                                             </Grid>
                                         </Grid>                                    
                                     </Grid>
@@ -368,7 +349,7 @@ const Employee = memo(() => {
                                         <Button                                 
                                             variant="contained"
                                             disableElevation 
-                                            disabled={!employee.id}
+                                            disabled={!company.id}
                                             onClick={() => handleDelete()}                                
                                             startIcon={<ClearIcon />}
                                             sx={{
@@ -386,7 +367,7 @@ const Employee = memo(() => {
                                         <Button                                 
                                             variant="contained"
                                             disableElevation 
-                                            disabled={!employee.id}
+                                            disabled={!company.id}
                                             // onClick={() => fetchNextData()}                                
                                             startIcon={<VpnKeyIcon />}
                                             sx={{
@@ -412,4 +393,4 @@ const Employee = memo(() => {
     );
 });
 
-export default Employee;
+export default Company;

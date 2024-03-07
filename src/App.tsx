@@ -27,6 +27,7 @@ import { useEffect } from 'react';
 import { CircularProgress } from '@mui/material';
 import Customer from './pages/Customer';
 import AutoMessageDialog from './components/AutoMessageDialog';
+import Company from './pages/Company';
 
 const todo = 'Nie rob tabeli telefony, zamiast tego wyswietl telefony klientow';
 
@@ -282,9 +283,24 @@ export default function App() {
                     <Switch >   
                         <Route path={routes.home}>
                             <Redirect to={routes.serviceRequests} />
+                        </Route>                                                                
+                        <Route path={routes.companies}>
+                            <Companies />
                         </Route>
-                        <Route path={routes.serviceRequests}>
-                            <ServiceRequests />
+                        <Route path={routes.company}>
+                            <Company />
+                        </Route>
+                        <Route path={routes.customers}>
+                            <Customers />
+                        </Route>
+                        <Route path={routes.customer}>
+                            <Customer />
+                        </Route>                        
+                        <Route path={routes.employees}>
+                            <Employees />
+                        </Route>
+                        <Route path={routes.employee}>
+                            <Employee />
                         </Route>
                         <Route path={routes.phoneConsultations}>
                             <PhoneConsultations />
@@ -292,20 +308,8 @@ export default function App() {
                         <Route path={routes.registrationRequests}>
                             <RegistrationRequests />
                         </Route>
-                        <Route path={routes.customers}>
-                            <Customers />
-                        </Route>
-                        <Route path={routes.customer}>
-                            <Customer />
-                        </Route>
-                        <Route path={routes.companies}>
-                            <Companies />
-                        </Route>
-                        <Route path={routes.employees}>
-                            <Employees />
-                        </Route>
-                        <Route path={routes.employee}>
-                            <Employee />
+                        <Route path={routes.serviceRequests}>
+                            <ServiceRequests />
                         </Route>
                         <Route>
                             <NotFound />
