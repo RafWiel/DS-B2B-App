@@ -4,7 +4,7 @@ import { useTheme } from '@mui/material/styles';
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import { Button, FormControl, FormHelperText, Grid, InputLabel, MenuItem, Select, TextField } from "@mui/material";
+import { Button, FormControl, FormHelperText, Grid, InputLabel, MenuItem, Select, TextField, Typography } from "@mui/material";
 import { useAppStore } from "../store";
 import { IEmployee } from '../interfaces/IEmployee.ts';
 import { useLocation, useRoute } from "wouter";
@@ -17,6 +17,7 @@ import CheckIcon from '@mui/icons-material/Check';
 import ClearIcon from '@mui/icons-material/Clear';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import { IIdResponse } from "../interfaces/IIdResponse.ts";
+import '../assets/card.css';
 
 const Employee = memo(() => {
     const theme = useTheme();  
@@ -198,6 +199,9 @@ const Employee = memo(() => {
                 <CardContent sx={{                    
                     display: 'flex',                            
                     height: '100%',
+                    '&:last-child': { 
+                        paddingBottom: 2 
+                    },
                     [theme.breakpoints.down('md')]: {
                         padding: 1,
                         '&:last-child': { 
@@ -236,7 +240,10 @@ const Employee = memo(() => {
                                         // sx={{                                
                                         //     backgroundColor: 'aqua',                                
                                         // }}
-                                    >                                                                                                                                                             
+                                    >       
+                                        <Typography className="card-title" component="div">
+                                            Pracownik
+                                        </Typography>                                                                                                                                                       
                                         <Grid                                         
                                             container 
                                             spacing={2}
@@ -244,7 +251,12 @@ const Employee = memo(() => {
                                             //     backgroundColor: 'gainsboro',                                                                                                                                           
                                             // }}
                                         >
-                                            <Grid item sm={4} xs={6}>
+                                            <Grid 
+                                                item 
+                                                sm={4} 
+                                                xs={6} 
+                                                sx={{ mt: 1 }}
+                                            >
                                                 <TextField 
                                                     error={touched?.login && !!errors?.login}
                                                     helperText={touched?.login && errors?.login}

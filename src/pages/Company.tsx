@@ -4,7 +4,7 @@ import { useTheme } from '@mui/material/styles';
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import { Button, Grid, TextField } from "@mui/material";
+import { Button, Grid, TextField, Typography } from "@mui/material";
 import { useAppStore } from "../store.ts";
 import { ICompany } from '../interfaces/ICompany.ts';
 import { useLocation, useRoute } from "wouter";
@@ -16,6 +16,7 @@ import ClearIcon from '@mui/icons-material/Clear';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import { IIdResponse } from "../interfaces/IIdResponse.ts";
 import { ICustomer } from "../interfaces/ICustomer.ts";
+import '../assets/card.css';
 
 const Company = memo(() => {
     const theme = useTheme();  
@@ -27,7 +28,7 @@ const Company = memo(() => {
     const [, params] = useRoute("/companies/:id");
     const [, navigate] = useLocation();    
     const abortController = useRef(new AbortController()).current;      
-
+    const [mainCardHeight, setMainCardHeight] = useState(0);
     
     const postalRegExp = /^[0-9]{2}-[0-9]{3}$/
     
@@ -54,9 +55,15 @@ const Company = memo(() => {
     useEffect(() => {                        
         setAppBarTitle('Firma');   
         fetchData();                
-        
+
+        w widoku XS nie dziala, sprobuj dodac timeout
+        handleResize(); 
+                     
+        window.addEventListener('resize', handleResize);
+
         return () => {            
             abortController.abort();            
+            window.removeEventListener('resize', handleResize);       
         }
     }, []);
     
@@ -174,6 +181,10 @@ const Company = memo(() => {
             });               
     }    
 
+    const handleResize = () => {        
+        setMainCardHeight(document.getElementById('main-company-card')?.clientHeight ?? 0);                
+    }  
+
     return (
         <Box         
             sx={{                
@@ -187,10 +198,11 @@ const Company = memo(() => {
                 }
             }}
         >
-            <Card 
+            <Card
+                id="main-company-card" 
                 variant="outlined"
                 sx={{    
-                    height: '100%',                        
+                    height: 'auto',                        
                     [theme.breakpoints.down('sm')]: {
                         border: 'none' 
                     },                     
@@ -198,7 +210,228 @@ const Company = memo(() => {
             >
                 <CardContent sx={{                    
                     display: 'flex',                            
+                    height: '100%',                    
+                    '&:last-child': { 
+                        paddingBottom: 2 
+                    },
+                    [theme.breakpoints.down('md')]: {
+                        padding: 1,
+                        '&:last-child': { 
+                            paddingBottom: 2 
+                        }
+                    },                                                                                                                
+                }}>                        
+                    <Formik
+                        enableReinitialize={true}
+                        initialValues={company}
+                        validationSchema={schema} 
+                        validateOnChange={true}
+                        validateOnBlur={true}           
+                        onSubmit={handleSubmit}>                    
+                        {(props: FormikProps<ICompany>) => {
+                            const { handleSubmit, handleChange, values, errors, touched, isSubmitting } = props;                            
+
+                            //console.log('render Formik');
+                            //console.log('errors', errors);
+                            //console.log('touched', touched);
+
+                            return (                                                                                  
+                                <Grid 
+                                    container                         
+                                    spacing={2}
+                                    // sx={{
+                                    //     height: '100%',                            
+                                    // }}
+                                >
+                                    {/* Content grid */}
+                                    <Grid 
+                                        item 
+                                        xs={12} 
+                                        sm={12} 
+                                        md={10} 
+                                        // sx={{                                
+                                        //     backgroundColor: 'aqua',                                
+                                        // }}
+                                    >      
+                                        <Typography className="card-title" component="div">
+                                            Firma
+                                        </Typography>                                
+                                        <Grid                                         
+                                            container 
+                                            spacing={2}
+                                            
+                                        >                                            
+                                            <Grid 
+                                                item 
+                                                sm={4} 
+                                                xs={6} 
+                                                sx={{ mt: 1 }}
+                                            >
+                                                <TextField 
+                                                    error={touched?.name && !!errors?.name}
+                                                    helperText={touched?.name && errors?.name}
+                                                    name="name"                                                    
+                                                    value={values.name} 
+                                                    label="Nazwa" 
+                                                    onChange={handleChange}                                                                              
+                                                    fullWidth                                 
+                                                    variant="standard"                                                                                    
+                                                    // inputProps={{ style: { fontSize: '14px' } }}
+                                                />  
+                                            </Grid>
+                                            <Grid item sm={4} xs={6}>
+                                                <TextField 
+                                                    error={touched?.erpId && !!errors?.erpId}
+                                                    helperText={touched?.erpId && errors?.erpId}
+                                                    name="erpId"                                                    
+                                                    value={values.erpId} 
+                                                    label="ERP Id" 
+                                                    onChange={handleChange}                                                     
+                                                    fullWidth                                 
+                                                    variant="standard"                                 
+                                                />  
+                                            </Grid>
+                                            <Grid item sm={4} xs={6}>
+                                                <TextField 
+                                                    error={touched?.taxNumber && !!errors?.taxNumber}
+                                                    helperText={touched?.taxNumber && errors?.taxNumber}           
+                                                    name="taxNumber"                                                    
+                                                    value={values.taxNumber} 
+                                                    label="NIP" 
+                                                    onChange={handleChange}                                                               
+                                                    fullWidth                                 
+                                                    variant="standard"                                 
+                                                />  
+                                            </Grid>                                            
+                                            <Grid item sm={4} xs={6}>
+                                                <TextField 
+                                                    error={touched?.address && !!errors?.address}
+                                                    helperText={touched?.address && errors?.address}                        
+                                                    name="address"                                                    
+                                                    value={values.address} 
+                                                    label="Adres" 
+                                                    onChange={handleChange}                                                     
+                                                    fullWidth                                 
+                                                    variant="standard"                                 
+                                                />  
+                                            </Grid>
+                                            <Grid item sm={4} xs={6}>
+                                                <TextField 
+                                                    error={touched?.postal && !!errors?.postal}
+                                                    helperText={touched?.postal && errors?.postal}                        
+                                                    name="postal"                                                    
+                                                    value={values.postal} 
+                                                    label="Kod pocztowy" 
+                                                    onChange={handleChange}                                                     
+                                                    fullWidth                                 
+                                                    variant="standard"                                 
+                                                />  
+                                            </Grid>
+                                            <Grid item sm={4} xs={6}>
+                                                <TextField 
+                                                    error={touched?.city && !!errors?.city}
+                                                    helperText={touched?.city && errors?.city}                        
+                                                    name="city"                                                    
+                                                    value={values.city} 
+                                                    label="Miasto" 
+                                                    onChange={handleChange}                                                     
+                                                    fullWidth                                 
+                                                    variant="standard"                                 
+                                                />  
+                                            </Grid>
+                                        </Grid>                                    
+                                    </Grid>
+                                    {/* Buttons grid */}
+                                    <Grid                             
+                                        item 
+                                        xs={12} 
+                                        sm={12} 
+                                        md={2}
+                                        sx={{                                
+                                            alignSelf: 'flex-start',
+                                            [theme.breakpoints.down('md')]: {
+                                                alignSelf: 'flex-end'
+                                            },  
+                                        }}
+                                    >
+                                        <Button                                 
+                                            variant="contained"
+                                            disableElevation 
+                                            onClick={() => handleSubmit()}                                
+                                            startIcon={<CheckIcon />}
+                                            sx={{
+                                                display: 'inline-flex',                                                                        
+                                                width: '100%', 
+                                                height: 40                                   
+                                            }}
+                                        >
+                                            Zapisz
+                                        </Button>
+                                        <Button                                 
+                                            variant="contained"
+                                            disableElevation 
+                                            disabled={!company.id}
+                                            onClick={() => handleDelete()}                                
+                                            startIcon={<ClearIcon />}
+                                            sx={{
+                                                display: 'inline-flex',                                                                        
+                                                width: '100%', 
+                                                height: 40,
+                                                marginTop: '16px',
+                                                [theme.breakpoints.down('sm')]: {
+                                                    marginTop: '1px',
+                                                },
+                                            }}
+                                        >
+                                            Usuń
+                                        </Button>
+                                        <Button                                 
+                                            variant="contained"
+                                            disableElevation 
+                                            disabled={!company.id}
+                                            // onClick={() => fetchNextData()}                                
+                                            startIcon={<VpnKeyIcon />}
+                                            sx={{
+                                                display: 'inline-flex',                                                                        
+                                                width: '100%', 
+                                                height: 40,
+                                                marginTop: '4px',
+                                                [theme.breakpoints.down('sm')]: {
+                                                    marginTop: '1px',
+                                                },                                   
+                                            }}
+                                        >
+                                            Zresetuj hasło
+                                        </Button>                                        
+                                    </Grid>                                    
+                                </Grid>
+                            )
+                        }}
+                    </Formik>  
+                </CardContent>
+            </Card>
+
+
+
+
+            <Card                 
+                variant="outlined"
+                sx={{  
+                    mt: 1.5,  
+                    height: `calc(100% - ${mainCardHeight}px)`,
+                    //height: '50%',
+                    [theme.breakpoints.down('sm')]: {
+                        border: 'none' 
+                    },                     
+                }}
+            >
+                
+                <CardContent sx={{                    
+                    display: 'flex',                            
                     height: '100%',
+                    '&:last-child': { 
+                        paddingBottom: 2 
+                    },
                     [theme.breakpoints.down('md')]: {
                         padding: 1,
                         '&:last-child': { 
@@ -237,7 +470,10 @@ const Company = memo(() => {
                                         // sx={{                                
                                         //     backgroundColor: 'aqua',                                
                                         // }}
-                                    >                                                                                                                                                             
+                                    >       
+                                        <Typography className="card-title" component="div">
+                                            Pracownicy
+                                        </Typography>                                                                                                                                                        
                                         <Grid                                         
                                             container 
                                             spacing={2}
@@ -245,7 +481,12 @@ const Company = memo(() => {
                                             //     backgroundColor: 'gainsboro',                                                                                                                                           
                                             // }}
                                         >
-                                            <Grid item sm={4} xs={6}>
+                                            <Grid 
+                                                item 
+                                                sm={4} 
+                                                xs={6}
+                                                sx={{ mt: 1 }}
+                                            >
                                                 <TextField 
                                                     error={touched?.name && !!errors?.name}
                                                     helperText={touched?.name && errors?.name}
@@ -388,7 +629,7 @@ const Company = memo(() => {
                         }}
                     </Formik>  
                 </CardContent>
-            </Card>
+            </Card>            
         </Box>
     );
 });

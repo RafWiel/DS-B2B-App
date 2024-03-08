@@ -4,7 +4,7 @@ import { useTheme } from '@mui/material/styles';
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import { Button, FormControl, FormHelperText, Grid, InputLabel, MenuItem, Select, TextField } from "@mui/material";
+import { Button, FormControl, FormHelperText, Grid, InputLabel, MenuItem, Select, TextField, Typography } from "@mui/material";
 import { useAppStore } from "../store.ts";
 import { ICustomer } from '../interfaces/ICustomer.ts';
 import { useLocation, useRoute } from "wouter";
@@ -20,6 +20,7 @@ import ArticleIcon from '@mui/icons-material/Article';
 import PhoneIcon from '@mui/icons-material/Phone';
 import AddIcon from '@mui/icons-material/Add';
 import { IIdResponse } from "../interfaces/IIdResponse.ts";
+import '../assets/card.css';
 
 const Customer = memo(() => {
     const theme = useTheme();  
@@ -202,6 +203,9 @@ const Customer = memo(() => {
                 <CardContent sx={{                    
                     display: 'flex',                            
                     height: '100%',
+                    '&:last-child': { 
+                        paddingBottom: 2 
+                    },
                     [theme.breakpoints.down('md')]: {
                         padding: 1,
                         '&:last-child': { 
@@ -237,12 +241,20 @@ const Customer = memo(() => {
                                         xs={12} 
                                         sm={12} 
                                         md={9}                                         
-                                    >                                                                                                                                                             
+                                    >     
+                                        <Typography className="card-title" component="div">
+                                            Klient
+                                        </Typography>                                                                                                                                                         
                                         <Grid                                         
                                             container 
                                             spacing={2}                                            
                                         >
-                                            <Grid item sm={4} xs={6}>
+                                            <Grid 
+                                                item 
+                                                sm={4} 
+                                                xs={6} 
+                                                sx={{ mt: 1 }}
+                                            >
                                                 <TextField 
                                                     error={touched?.login && !!errors?.login}
                                                     helperText={touched?.login && errors?.login}

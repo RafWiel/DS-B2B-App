@@ -96,7 +96,8 @@ const Companies = memo(() => {
     const [companies, setCompanies] = useState<ICompanyRow[]>([]);
     const [, navigate] = useLocation();
     const abortController = useRef(new AbortController()).current;  
-
+    const [dataGridHeight, setDataGridHeight] = useState(0);
+    
     const [state, setState] = useState<FetchState>({
         search: '',
         page: 1,
@@ -326,9 +327,7 @@ const Companies = memo(() => {
         
         console.log('result', result);
         return result;
-    }
-
-    const [dataGridHeight, setDataGridHeight] = useState(0);
+    }    
 
     const handleResize = () => {
         const appBarHeight = document.getElementById("appBar")?.clientHeight ?? 0;
@@ -381,6 +380,9 @@ const Companies = memo(() => {
                         //backgroundColor: 'red', 
                         display: 'flex',                            
                         height: '100%',
+                        '&:last-child': { 
+                            paddingBottom: 2 
+                        },
                         [theme.breakpoints.down('md')]: {
                             padding: 1,
                             '&:last-child': { 

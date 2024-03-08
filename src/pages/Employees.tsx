@@ -86,7 +86,8 @@ const Employees = memo(() => {
     const [employees, setEmployees] = useState<Array<IEmployeeRow>>([]);
     const [, navigate] = useLocation();
     const abortController = useRef(new AbortController()).current;  
-
+    const [dataGridHeight, setDataGridHeight] = useState(0);
+    
     const [state, setState] = useState<FetchState>({
         search: '',
         type: employeeType.none.toString(),
@@ -326,9 +327,7 @@ const Employees = memo(() => {
         
         console.log('result', result);
         return result;
-    }
-
-    const [dataGridHeight, setDataGridHeight] = useState(0);
+    }    
 
     const handleResize = () => {
         const appBarHeight = document.getElementById("appBar")?.clientHeight ?? 0;
@@ -382,6 +381,9 @@ const Employees = memo(() => {
                         //backgroundColor: 'red', 
                         display: 'flex',                            
                         height: '100%',
+                        '&:last-child': { 
+                            paddingBottom: 2 
+                        },
                         [theme.breakpoints.down('md')]: {
                             padding: 1,
                             '&:last-child': { 
