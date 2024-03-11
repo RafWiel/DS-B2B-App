@@ -50,8 +50,19 @@ const columns: IColumn[] = [
         disablePadding: false,        
         visible: true,
         width: {
-            mobile: '220px',
-            desktop: '220px'
+            mobile: '190px',
+            desktop: '190px'
+        }
+    },
+    {
+        id: 'phoneNumber',
+        label: 'Numer telefonu',
+        numeric: false,
+        disablePadding: false,        
+        visible: true,
+        width: {
+            mobile: '170px',
+            desktop: '170px'
         }
     },
     {
@@ -239,6 +250,8 @@ const Employees = memo(() => {
                 !stateValue.isReset) {
                 return;
             }
+
+            console.log('employees', newEmployees);
 
             //update type text
             newEmployees.forEach(u => {

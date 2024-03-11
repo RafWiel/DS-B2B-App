@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as React from 'react';
 //import { alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
@@ -544,8 +545,8 @@ const DataGrid = React.forwardRef((props: IDataGridProps, ref) => {
                                                     padding: 0,
                                                     paddingLeft: column.disablePadding ? (isSelection ? 0 : 1) : 0
                                                 }}                                               
-                                            >
-                                                {Object.values(row)[columnIndex]}                                                 
+                                            >                                                
+                                                {row[column.id]}  
                                                 {
                                                     //instersection object - trigger event to fetch another data chunk
                                                     columnIndex === 1 && 

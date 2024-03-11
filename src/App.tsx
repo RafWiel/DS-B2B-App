@@ -29,7 +29,7 @@ import Customer from './pages/Customer';
 import AutoMessageDialog from './components/AutoMessageDialog';
 import Company from './pages/Company';
 
-const todo = 'Nie rob tabeli telefony, zamiast tego wyswietl telefony klientow';
+const todo = 'Dodaj wielu pracownikow do jednej firmy, sprawdz wysokosc DataGrid';
 
 interface AppBarProps extends MuiAppBarProps {
     open?: boolean;

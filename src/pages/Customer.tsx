@@ -385,7 +385,7 @@ const Customer = memo(() => {
                                                 display: 'inline-flex',                                                                        
                                                 width: '100%', 
                                                 height: 40,
-                                                marginTop: '16px',
+                                                marginTop: '4px',
                                                 [theme.breakpoints.down('sm')]: {
                                                     marginTop: '1px',
                                                 },
@@ -421,7 +421,7 @@ const Customer = memo(() => {
                                                 display: 'inline-flex',                                                                        
                                                 width: '100%', 
                                                 height: 40,
-                                                marginTop: '16px',
+                                                marginTop: '4px',
                                                 [theme.breakpoints.down('sm')]: {
                                                     marginTop: '1px',
                                                 },                                   
@@ -457,7 +457,7 @@ const Customer = memo(() => {
                                                 display: 'inline-flex',                                                                        
                                                 width: '100%', 
                                                 height: 40,
-                                                marginTop: '16px',
+                                                marginTop: '4px',
                                                 [theme.breakpoints.down('sm')]: {
                                                     marginTop: '1px',
                                                 },                                   

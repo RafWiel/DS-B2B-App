@@ -59,6 +59,7 @@ const SideBar = memo(() => {
     const isOpenMobile = useAppStore((state) => state.isOpenMobile);      
     const isOpenDesktop = useAppStore((state) => state.isOpenDesktop);      
     const close = useAppStore((state) => state.close);  
+    const closeMobile = useAppStore((state) => state.closeMobile);  
     
     const DrawerHeader = styled('div')(({ theme }) => ({
         display: 'flex',
@@ -90,7 +91,10 @@ const SideBar = memo(() => {
                         })
                         .map((route) => (
                     <ListItem key={route.id} disablePadding sx={{ display: 'block' }}>
-                        <Link href={route.id}>                        
+                        <Link 
+                            href={route.id} 
+                            onClick={closeMobile}
+                        >
                             <ListItemButton                            
                                 selected={isSelected(route.id)}                            
                                 sx={{                                
