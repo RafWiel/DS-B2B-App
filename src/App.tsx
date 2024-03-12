@@ -29,7 +29,7 @@ import Customer from './pages/Customer';
 import AutoMessageDialog from './components/AutoMessageDialog';
 import Company from './pages/Company';
 
-const todo = 'Dodaj wielu pracownikow do jednej firmy, sprawdz wysokosc DataGrid';
+const todo = 'Firmy na karcie pracownika, potem dodaj pracownika z poziomu firmy';
 
 interface AppBarProps extends MuiAppBarProps {
     open?: boolean;

@@ -17,6 +17,8 @@ import { useLocation } from 'wouter';
 interface ICustomerRow extends IBaseRow {
     login: string;
     name: string;
+    phoneNumber: string,
+    company: string,
     type: string;    
 }
 
@@ -63,6 +65,17 @@ const columns: IColumn[] = [
         width: {
             mobile: '170px',
             desktop: '170px'
+        }
+    },
+    {
+        id: 'company',
+        label: 'Firma',
+        numeric: false,
+        disablePadding: false,        
+        visible: true,
+        width: {
+            mobile: '190px',
+            desktop: '190px'
         }
     },
     {
@@ -281,7 +294,7 @@ const Customers = memo(() => {
         openQuestionDialog({
             title: 'Klienci',
             text: `Czy na pewno usunąć klienta ${customer.name}?`,            
-            action: deleteOne,
+            action: deleteSingle,
             actionParameters: customer.id
         });
     }
@@ -295,7 +308,7 @@ const Customers = memo(() => {
         });
     }
 
-    const deleteOne = async (id?: number) => {
+    const deleteSingle = async (id?: number) => {
         const result = await deleteAsync(`${config.API_URL}/customers/${id}`, 'Nieudane usunięcie klienta');        
         if (!result) {            
             return;

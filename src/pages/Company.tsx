@@ -15,13 +15,15 @@ import CheckIcon from '@mui/icons-material/Check';
 import ClearIcon from '@mui/icons-material/Clear';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import { IIdResponse } from "../interfaces/IIdResponse.ts";
-import { ICustomer } from "../interfaces/ICustomer.ts";
 import '../assets/card.css';
 import DataGrid, { IBaseRow, IColumn, IDataGridRef } from "../components/DataGrid.tsx";
+import { ICustomer } from "../interfaces/ICustomer.ts";
 
 interface ICustomerRow extends IBaseRow {
+    login: string,
     name: string;
     phoneNumber: string;    
+    type: string
 }
 
 const columns: IColumn[] = [
@@ -96,8 +98,7 @@ const Company = memo(() => {
     const dataGridRef = useRef<IDataGridRef>();
     const [dataGridHeight, setDataGridHeight] = useState(0);
     const isMobileView = useMediaQuery(theme.breakpoints.down("md"));           
-    const postalRegExp = /^[0-9]{2}-[0-9]{3}$/
-    const [customers, setCustomers] = useState<Array<ICustomerRow>>([]);
+    const postalRegExp = /^[0-9]{2}-[0-9]{3}$/    
 
     const schema = yup.object().shape({                                                    
         name: yup.string().required('Podaj nazwę'),
@@ -227,14 +228,60 @@ const Company = memo(() => {
         });
     }
 
-    const deleteSingle = (id: number) => {
+    const deleteSingle = async (id: number) => {
+        const result = await deleteAsync(`${config.API_URL}/companies/${id}`, 'Nieudane usunięcie firmy');        
+        if (!result) {            
+            return;
+        }
+
+        navigate('/companies');
+    }   
+
+    const handleDeleteCustomer = (row: object) => {    
+        const customer = row as ICustomerRow;
+        
+        openQuestionDialog({
+            title: 'Firma',
+            text: `Czy na pewno usunąć pracownika ${customer.name}?`,            
+            action: deleteSingleCustomer,
+            actionParameters: customer.id
+        });
+    }
+
+    const handleDeleteAllCustomers = () => {        
+        openQuestionDialog({
+            title: 'Firma',
+            text: 'Czy na pewno usunąć wszystkich pracowników?',
+            action: deleteAllCustomers,
+        });
+    }
+
+    const deleteSingleCustomer = async (id: number) => {
+        const result = await deleteAsync(`${config.API_URL}/customers/${id}`, 'Nieudane usunięcie pracownika');        
+        if (!result) {            
+            return;
+        }
+
+        setCompany({...company, customers: company.customers.filter(u => u.id !== id)} );   
+    }    
+
+    const deleteAllCustomers = async () => {
+        const result = await deleteAsync(`${config.API_URL}/companies/${company.id}/customers`, 'Nieudane usunięcie wszystkich pracowników');        
+        if (!result) {            
+            return;
+        }
+
+        setCompany({...company, customers: new Array<ICustomer>() });           
+    }
+
+    const deleteAsync = async (url: string, errorMessage: string) => {
         showLoadingIcon(true);       
         
-        fetch(`${config.API_URL}/companies/${id}`, { method: 'DELETE' })              
+        const result = await fetch(url, { method: 'DELETE' })              
             .then((res) => {           
-                if (!res.ok) throw new Error('Nieudane usunięcie firmy');    
+                if (!res.ok) throw new Error(errorMessage);    
             
-                navigate('/companies');
+                return true;
             })        
             .catch((error: unknown) => {
                 if ((error as Error).name === 'AbortError') return;
@@ -248,20 +295,21 @@ const Company = memo(() => {
             })
             .finally(() => {
                 showLoadingIcon(false);                        
-            });               
-    }    
-
-    const handleResize = () => {  
-        //console.log('height', document.getElementById('main-company-card')?.clientHeight);          
-
-        setMainCardHeight(document.getElementById('main-company-card')?.clientHeight ?? 0);    
+            });   
         
-        const appBarHeight = document.getElementById("appBar")?.clientHeight ?? 0;
-        const filterHeight = document.getElementById("filter-container")?.clientHeight ?? 0;
+        console.log('result', result);
+        return result;
+    }   
+
+    const handleResize = () => {                  
+        const appBarHeight = document.getElementById("appBar")?.clientHeight ?? 0;     
+        const mainCardHeight = document.getElementById('company-main-card')?.clientHeight ?? 0;
+        const titleHeight = document.getElementById('company-datagrid-card-title')?.clientHeight ?? 0;        
         const datagridMargin = isMobileView ? 74 : 42;  
         const mainMargin = 12;  
 
-        setDataGridHeight(window.innerHeight - appBarHeight - filterHeight - mainMargin * 3 - datagridMargin);                    
+        setMainCardHeight(mainCardHeight);    
+        setDataGridHeight(window.innerHeight - appBarHeight - mainCardHeight - titleHeight - mainMargin * 3 - datagridMargin);                    
     }  
 
     return (
@@ -277,8 +325,9 @@ const Company = memo(() => {
                 }
             }}
         >
+            {/* Szczegoly */}
             <Card
-                id="main-company-card" 
+                id="company-main-card" 
                 variant="outlined"
                 sx={{    
                     minHeight: 162,  
@@ -290,7 +339,7 @@ const Company = memo(() => {
                         border: 'none' 
                     },                     
                 }}
-            >
+            >                
                 <CardContent sx={{                    
                     display: 'flex',                            
                     height: '100%',                    
@@ -493,7 +542,7 @@ const Company = memo(() => {
                     </Formik>  
                 </CardContent>
             </Card>
-            {/* Pracownicy */}
+            {/* Klienci */}
             <Card                 
                 variant="outlined"
                 sx={{  
@@ -517,7 +566,7 @@ const Company = memo(() => {
                             paddingBottom: 1 
                         }
                     },                                                                                                                
-                }}>     
+                }}>                     
                     <Grid 
                         container 
                         spacing={2}
@@ -536,17 +585,23 @@ const Company = memo(() => {
                             //     //alignSelf: 'flex-start'
                             // }}
                         >
+                            <Typography 
+                                id="company-datagrid-card-title" 
+                                className="card-title" 
+                                component="div">
+                                Klienci
+                            </Typography>    
                             <DataGrid                             
                                 ref={dataGridRef}
                                 columns={columns}
-                                rows={customers}
+                                rows={company.customers}
                                 isSelection={false}
                                 isDelete={true}
                                 maxHeight={dataGridHeight}                              
-                                deleteRow={handleDelete}
-                                //deleteAllRows={handleDeleteAll} 
-                                //fetchNextData={fetchNextData}        
-                                //setSorting={setSorting}
+                                deleteRow={handleDeleteCustomer}
+                                deleteAllRows={handleDeleteAllCustomers} 
+                                fetchNextData={() => void 0}        
+                                setSorting={() => void 0}
                                 onRowClick={(id: number) => navigate(`/customers/${id}`)}
                             />
                         </Grid>
@@ -566,7 +621,7 @@ const Company = memo(() => {
                             <Button                                 
                                 variant="contained"
                                 disableElevation 
-                                onClick={() => navigate('/employees/0')} 
+                                onClick={() => navigate('/customers/0')} 
                                 //startIcon={<AddIcon />}
                                 sx={{
                                     display: 'inline-flex',                                                                        
