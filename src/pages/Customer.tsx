@@ -21,6 +21,8 @@ import PhoneIcon from '@mui/icons-material/Phone';
 import AddIcon from '@mui/icons-material/Add';
 import { IIdResponse } from "../interfaces/IIdResponse.ts";
 import '../assets/card.css';
+import { IList } from "../interfaces/IList.ts";
+import useFetch from "../hooks/useFetch.ts";
 
 const Customer = memo(() => {
     const theme = useTheme();  
@@ -31,8 +33,8 @@ const Customer = memo(() => {
     const openQuestionDialog = useAppStore((state) => state.openQuestionDialog); 
     const [, params] = useRoute("/customers/:id");
     const [, navigate] = useLocation();    
-    const abortController = useRef(new AbortController()).current;      
-
+    const abortController = useRef(new AbortController()).current;     
+    const companies = useFetch<Array<IList>>(`${config.API_URL}/companies/list`, 'Nieudane pobranie listy firm'); 
     const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
     
     const schema = yup.object().shape({                                        
@@ -41,11 +43,13 @@ const Customer = memo(() => {
         name: yup.string().required('Podaj imię i nazwisko'),
         phoneNumber: yup.string().required('Podaj numer telefonu').matches(phoneRegExp, 'Nieprawidłowy numer telefonu'),
         email: yup.string().required('Podaj e-mail').email('Nieprawidłowy e-mail'),
-        isMailing: yup.boolean().required(),                        
+        isMailing: yup.boolean().required(),
+        companyId: yup.number().required('Wybierz firmę').min(1, 'Wybierz firmę'),
     });
 
     const [customer, setCustomer] = useState<ICustomer>({
-        id: Number(params?.id),        
+        id: Number(params?.id),     
+        companyId: 0,   
         type: customerType.none,
         login: '',
         name: '',
@@ -241,20 +245,12 @@ const Customer = memo(() => {
                                         xs={12} 
                                         sm={12} 
                                         md={9}                                         
-                                    >     
-                                        <Typography className="card-title" component="div">
-                                            Klient
-                                        </Typography>                                                                                                                                                         
+                                    >                                                                                                                                                                                                   
                                         <Grid                                         
                                             container 
                                             spacing={2}                                            
                                         >
-                                            <Grid 
-                                                item 
-                                                sm={4} 
-                                                xs={6} 
-                                                sx={{ mt: 1 }}
-                                            >
+                                            <Grid item md={3} sm={4} xs={6}>
                                                 <TextField 
                                                     error={touched?.login && !!errors?.login}
                                                     helperText={touched?.login && errors?.login}
@@ -267,7 +263,7 @@ const Customer = memo(() => {
                                                     // inputProps={{ style: { fontSize: '14px' } }}
                                                 />  
                                             </Grid>
-                                            <Grid item sm={4} xs={6}>
+                                            <Grid item md={3} sm={4} xs={6}>
                                                 <TextField 
                                                     error={touched?.name && !!errors?.name}
                                                     helperText={touched?.name && errors?.name}
@@ -279,7 +275,7 @@ const Customer = memo(() => {
                                                     variant="standard"                                 
                                                 />  
                                             </Grid>
-                                            <Grid item sm={4} xs={6}>
+                                            <Grid item md={6} sm={4} xs={6}>
                                                 <TextField 
                                                     error={touched?.email && !!errors?.email}
                                                     helperText={touched?.email && errors?.email}           
@@ -291,7 +287,7 @@ const Customer = memo(() => {
                                                     variant="standard"                                 
                                                 />  
                                             </Grid>                                            
-                                            <Grid item sm={4} xs={6}>
+                                            <Grid item md={3} sm={4} xs={6}>
                                                 <TextField 
                                                     error={touched?.phoneNumber && !!errors?.phoneNumber}
                                                     helperText={touched?.phoneNumber && errors?.phoneNumber}                        
@@ -303,7 +299,32 @@ const Customer = memo(() => {
                                                     variant="standard"                                 
                                                 />  
                                             </Grid>
-                                            <Grid item sm={4} xs={6}>
+                                            <Grid item md={3} sm={4} xs={6}>
+                                                <FormControl 
+                                                    error={touched?.companyId && !!errors?.companyId}
+                                                    variant="standard" 
+                                                    fullWidth 
+                                                >
+                                                    <InputLabel id="companyId">Firma</InputLabel>
+                                                    <Select
+                                                        displayEmpty                                                        
+                                                        labelId="companyId"
+                                                        name="companyId"
+                                                        value={values.companyId}
+                                                        onChange={handleChange}
+                                                    >
+                                                        {
+                                                            companies && companies.map((item) => (
+                                                                    <MenuItem key={item.id} value={item.id}>{item.name}&nbsp;</MenuItem>                                    
+                                                                ))
+                                                        }                                
+                                                    </Select>
+                                                    <FormHelperText>
+                                                        {touched?.companyId && errors?.companyId}
+                                                    </FormHelperText>
+                                                </FormControl>   
+                                            </Grid>
+                                            <Grid item md={3} sm={4} xs={6}>
                                                 <FormControl 
                                                     error={touched?.type && !!errors?.type}
                                                     variant="standard" 
@@ -329,7 +350,7 @@ const Customer = memo(() => {
                                                     </FormHelperText>
                                                 </FormControl>   
                                             </Grid>
-                                            <Grid item sm={4} xs={6}>
+                                            <Grid item md={3} sm={4} xs={6}>
                                                 <FormControl variant="standard" fullWidth>
                                                     <InputLabel id="isMailing">Powiadomienia e-mail</InputLabel>
                                                     <Select                                                        
@@ -364,6 +385,7 @@ const Customer = memo(() => {
                                     >
                                         <Button                                 
                                             variant="contained"
+                                            disabled={isSubmitting}
                                             disableElevation 
                                             onClick={() => handleSubmit()}                                
                                             startIcon={<CheckIcon />}
@@ -378,7 +400,7 @@ const Customer = memo(() => {
                                         <Button                                 
                                             variant="contained"
                                             disableElevation 
-                                            disabled={!customer.id}
+                                            disabled={!customer.id || isSubmitting}
                                             onClick={() => handleDelete()}                                
                                             startIcon={<ClearIcon />}
                                             sx={{
@@ -396,7 +418,7 @@ const Customer = memo(() => {
                                         <Button                                 
                                             variant="contained"
                                             disableElevation 
-                                            disabled={!customer.id}
+                                            disabled={!customer.id || isSubmitting}
                                             // onClick={() => fetchNextData()}                                
                                             startIcon={<VpnKeyIcon />}
                                             sx={{
@@ -414,7 +436,7 @@ const Customer = memo(() => {
                                         <Button                                 
                                             variant="contained"
                                             disableElevation 
-                                            disabled={!customer.id}
+                                            disabled={!customer.id || isSubmitting}
                                             // onClick={() => fetchNextData()}                                
                                             startIcon={<ArticleIcon />}
                                             sx={{
@@ -432,7 +454,7 @@ const Customer = memo(() => {
                                         <Button                                 
                                             variant="contained"
                                             disableElevation 
-                                            disabled={!customer.id}
+                                            disabled={!customer.id || isSubmitting}
                                             // onClick={() => fetchNextData()}                                
                                             startIcon={<PhoneIcon />}
                                             sx={{
@@ -450,7 +472,7 @@ const Customer = memo(() => {
                                         <Button                                 
                                             variant="contained"
                                             disableElevation 
-                                            disabled={!customer.id}
+                                            disabled={!customer.id || isSubmitting}
                                             // onClick={() => fetchNextData()}                                
                                             startIcon={<AddIcon />}
                                             sx={{

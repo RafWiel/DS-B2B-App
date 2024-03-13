@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAppStore } from '../store';
 
-const useFetchGet = <T,>(url: string, errorMessage: string): T | null => {
+const useFetch = <T,>(url: string, errorMessage: string): T | null => {
     const [data, setData] = useState(null);
     const showLoadingIcon = useAppStore((state) => state.showLoadingIcon);
     const openMessageDialog = useAppStore((state) => state.openMessageDialog);   
@@ -10,10 +10,12 @@ const useFetchGet = <T,>(url: string, errorMessage: string): T | null => {
     useEffect(() => {
         const abortController = new AbortController();
 
-        console.log('useFetchGet', url);
+        console.log('useFetch', url);
         showLoadingIcon(true);
 
-        fetch(url, { signal: abortController.signal })
+        fetch(url, { 
+            signal: abortController.signal 
+        })
         .then((res: Response) => {
             if (!res.ok) {
                 throw new Error(errorMessage);
@@ -21,7 +23,8 @@ const useFetchGet = <T,>(url: string, errorMessage: string): T | null => {
 
             return res.json();    
         })
-        .then((data: React.SetStateAction<null>) => {      
+        .then((data: React.SetStateAction<null>) => {   
+            console.log('fetch data', data);   
             setData(data);
         })
         .catch((error: unknown) => {
@@ -33,18 +36,21 @@ const useFetchGet = <T,>(url: string, errorMessage: string): T | null => {
                 title: 'Błąd aplikacji',
                 text: (error as Error).message
             });
-        });
-
-        showLoadingIcon(false);
+        })
+        .finally(() => {
+            showLoadingIcon(false);                        
+        });               
     
         //cleanup, przerwij wywolanie fetch jesli unmount
         return () => {
             abortController.abort();
-            showLoadingIcon(false);    
+            showLoadingIcon(false);   
+            
+            console.log('abort useFetch');
         }
     }, [url]); 
 
     return data;
 }
 
-export default useFetchGet;
+export default useFetch;

@@ -29,7 +29,7 @@ import Customer from './pages/Customer';
 import AutoMessageDialog from './components/AutoMessageDialog';
 import Company from './pages/Company';
 
-const todo = 'Firmy na karcie pracownika, potem dodaj pracownika z poziomu firmy';
+const todo = '1: Dodaj klienta z poziomu firmy. 2: Company: za duzy margines dolny listy uzytkownikow';
 
 interface AppBarProps extends MuiAppBarProps {
     open?: boolean;

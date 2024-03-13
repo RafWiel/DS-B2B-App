@@ -125,7 +125,7 @@ const Employees = memo(() => {
     }, []);
     
     const fetchNextData = () => {
-        console.log('fetchNextData');
+        //console.log('fetchNextData');
         //console.log('search', state.search);
         //console.log('page', state.page);
         
@@ -140,7 +140,7 @@ const Employees = memo(() => {
     };
 
     const setFilter = (search: string, type: string, isDebouncedUpdate: boolean) => {
-        console.log('setFilter');        
+        //console.log('setFilter');        
         //console.log('search', value);        
         //console.log('page', state.page);
 
@@ -162,7 +162,7 @@ const Employees = memo(() => {
     };
 
     const setSorting = (column: string, order: Order) => {
-        console.log('sorting: ', column, order);
+        //console.log('sorting: ', column, order);
 
         const newState = {
             ...state,             
@@ -220,9 +220,9 @@ const Employees = memo(() => {
     }
 
     const fetchData = useCallback((stateValue: FetchState) => {                        
-        console.log('fetchData');
-        console.log('search: ', stateValue.search, ' | ', state.search);   
-        console.log('type: ', stateValue.type, ' | ', state.type);   
+        //console.log('fetchData');
+        //console.log('search: ', stateValue.search, ' | ', state.search);   
+        //console.log('type: ', stateValue.type, ' | ', state.type);   
         //console.log('page: ', stateValue.page, ' | ', state.page);           
     
         setUrl(stateValue);        
@@ -251,7 +251,7 @@ const Employees = memo(() => {
                 return;
             }
 
-            console.log('employees', newEmployees);
+            //console.log('employees', newEmployees);
 
             //update type text
             newEmployees.forEach(u => {
@@ -338,7 +338,7 @@ const Employees = memo(() => {
                 showLoadingIcon(false);                        
             });   
         
-        console.log('result', result);
+        //console.log('result', result);
         return result;
     }    
 

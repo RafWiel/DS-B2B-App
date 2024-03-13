@@ -18,7 +18,7 @@ interface ICustomerRow extends IBaseRow {
     login: string;
     name: string;
     phoneNumber: string,
-    company: string,
+    companyName: string,
     type: string;    
 }
 
@@ -68,7 +68,7 @@ const columns: IColumn[] = [
         }
     },
     {
-        id: 'company',
+        id: 'companyName',
         label: 'Firma',
         numeric: false,
         disablePadding: false,        
@@ -138,7 +138,7 @@ const Customers = memo(() => {
     }, []);
     
     const fetchNextData = () => {
-        console.log('fetchNextData');
+        //console.log('fetchNextData');
         //console.log('search', state.search);
         //console.log('page', state.page);
         
@@ -153,7 +153,7 @@ const Customers = memo(() => {
     };
 
     const setFilter = (search: string, type: string, isDebouncedUpdate: boolean) => {
-        console.log('setFilter');        
+        //console.log('setFilter');        
         //console.log('search', value);        
         //console.log('page', state.page);
 
@@ -175,7 +175,7 @@ const Customers = memo(() => {
     };
 
     const setSorting = (column: string, order: Order) => {
-        console.log('sorting: ', column, order);
+        //console.log('sorting: ', column, order);
 
         const newState = {
             ...state,             
@@ -233,9 +233,9 @@ const Customers = memo(() => {
     }
 
     const fetchData = useCallback((stateValue: FetchState) => {                        
-        console.log('fetchData');
-        console.log('search: ', stateValue.search, ' | ', state.search);   
-        console.log('type: ', stateValue.type, ' | ', state.type);   
+        //console.log('fetchData');
+        //console.log('search: ', stateValue.search, ' | ', state.search);   
+        //console.log('type: ', stateValue.type, ' | ', state.type);   
         //console.log('page: ', stateValue.page, ' | ', state.page);           
     
         setUrl(stateValue);        
@@ -349,7 +349,7 @@ const Customers = memo(() => {
                 showLoadingIcon(false);                        
             });   
         
-        console.log('result', result);
+        //console.log('result', result);
         return result;
     }    
 
@@ -464,7 +464,7 @@ const Customers = memo(() => {
                             <Button                                 
                                 variant="contained"
                                 disableElevation 
-                                onClick={() => fetchNextData()}                                
+                                onClick={() => navigate('/customers/0')}                                
                                 startIcon={<AddIcon />}
                                 sx={{
                                     display: 'inline-flex',                                                                        

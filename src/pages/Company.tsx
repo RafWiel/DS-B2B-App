@@ -297,7 +297,7 @@ const Company = memo(() => {
                 showLoadingIcon(false);                        
             });   
         
-        console.log('result', result);
+        //console.log('result', result);
         return result;
     }   
 
@@ -411,7 +411,12 @@ const Company = memo(() => {
                                                     // inputProps={{ style: { fontSize: '14px' } }}
                                                 />  
                                             </Grid>
-                                            <Grid item sm={4} xs={6}>
+                                            <Grid 
+                                                item 
+                                                sm={4} 
+                                                xs={6}
+                                                sx={{ mt: 1 }}
+                                            >
                                                 <TextField 
                                                     error={touched?.erpId && !!errors?.erpId}
                                                     helperText={touched?.erpId && errors?.erpId}
@@ -423,7 +428,12 @@ const Company = memo(() => {
                                                     variant="standard"                                 
                                                 />  
                                             </Grid>
-                                            <Grid item sm={4} xs={6}>
+                                            <Grid 
+                                                item 
+                                                sm={4} 
+                                                xs={6}
+                                                sx={{ mt: 1 }}
+                                            >
                                                 <TextField 
                                                     error={touched?.taxNumber && !!errors?.taxNumber}
                                                     helperText={touched?.taxNumber && errors?.taxNumber}           
@@ -489,6 +499,7 @@ const Company = memo(() => {
                                         <Button                                 
                                             variant="contained"
                                             disableElevation 
+                                            disabled={isSubmitting}
                                             onClick={() => handleSubmit()}                                
                                             startIcon={<CheckIcon />}
                                             sx={{
@@ -502,7 +513,7 @@ const Company = memo(() => {
                                         <Button                                 
                                             variant="contained"
                                             disableElevation 
-                                            disabled={!company.id}
+                                            disabled={!company.id || isSubmitting}
                                             onClick={() => handleDelete()}                                
                                             startIcon={<ClearIcon />}
                                             sx={{
@@ -520,7 +531,7 @@ const Company = memo(() => {
                                         <Button                                 
                                             variant="contained"
                                             disableElevation 
-                                            disabled={!company.id}
+                                            disabled={!company.id || isSubmitting}
                                             // onClick={() => fetchNextData()}                                
                                             startIcon={<VpnKeyIcon />}
                                             sx={{
@@ -619,9 +630,9 @@ const Company = memo(() => {
                             }}
                         >
                             <Button                                 
-                                variant="contained"
+                                variant="contained"                                
                                 disableElevation 
-                                onClick={() => navigate('/customers/0')} 
+                                onClick={() => navigate(`/companies/${company.id}/customers/0`)} 
                                 //startIcon={<AddIcon />}
                                 sx={{
                                     display: 'inline-flex',                                                                        

@@ -123,7 +123,7 @@ const Companies = memo(() => {
     }, []);
     
     const fetchNextData = () => {
-        console.log('fetchNextData');
+        //console.log('fetchNextData');
         //console.log('search', state.search);
         //console.log('page', state.page);
         
@@ -138,7 +138,7 @@ const Companies = memo(() => {
     };
 
     const setFilter = (search: string, isDebouncedUpdate: boolean) => {
-        console.log('setFilter');        
+        //console.log('setFilter');        
         //console.log('search', value);        
         //console.log('page', state.page);
 
@@ -159,7 +159,7 @@ const Companies = memo(() => {
     };
 
     const setSorting = (column: string, order: Order) => {
-        console.log('sorting: ', column, order);
+        //console.log('sorting: ', column, order);
 
         const newState = {
             ...state,             
@@ -215,8 +215,8 @@ const Companies = memo(() => {
     }
 
     const fetchData = useCallback((stateValue: FetchState) => {                        
-        console.log('fetchData');
-        console.log('search: ', stateValue.search, ' | ', state.search);   
+        //console.log('fetchData');
+        //console.log('search: ', stateValue.search, ' | ', state.search);   
         //console.log('page: ', stateValue.page, ' | ', state.page);           
     
         setUrl(stateValue);        
@@ -243,7 +243,7 @@ const Companies = memo(() => {
                 return;
             }
 
-            console.log('res', newCompanies);
+            //console.log('res', newCompanies);
                       
             if (stateValue.isReset) {
                 setCompanies(newCompanies);
@@ -325,7 +325,7 @@ const Companies = memo(() => {
                 showLoadingIcon(false);                        
             });   
         
-        console.log('result', result);
+        //console.log('result', result);
         return result;
     }    
 

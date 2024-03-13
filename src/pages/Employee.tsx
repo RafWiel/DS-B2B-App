@@ -76,7 +76,7 @@ const Employee = memo(() => {
         .then((res: IEmployee) => {                                                                 
             setEmployee(res);                        
 
-            console.log('load:', JSON.stringify(res, null, 2));
+            //console.log('load:', JSON.stringify(res, null, 2));
             
             setAppBarTitle(`Pracownik ${res.name}`);        
         })
@@ -95,8 +95,8 @@ const Employee = memo(() => {
     const handleSubmit = useCallback((employee: IEmployee, { setSubmitting }: FormikHelpers<IEmployee>) => {                     
         showLoadingIcon(true);        
 
-        console.log('submit', employee.id);
-        console.log('handleSubmit:', JSON.stringify(employee, null, 2)); 
+        //console.log('submit', employee.id);
+        //console.log('handleSubmit:', JSON.stringify(employee, null, 2)); 
                         
         fetch(`${config.API_URL}/employees`, {
             method: !employee.id ? 'POST' : 'PUT',            
@@ -241,9 +241,9 @@ const Employee = memo(() => {
                                         //     backgroundColor: 'aqua',                                
                                         // }}
                                     >       
-                                        <Typography className="card-title" component="div">
+                                        {/* <Typography className="card-title" component="div">
                                             Pracownik
-                                        </Typography>                                                                                                                                                       
+                                        </Typography>                                                                                                                                                        */}
                                         <Grid                                         
                                             container 
                                             spacing={2}
@@ -255,7 +255,7 @@ const Employee = memo(() => {
                                                 item 
                                                 sm={4} 
                                                 xs={6} 
-                                                sx={{ mt: 1 }}
+                                                // sx={{ mt: 1 }}
                                             >
                                                 <TextField 
                                                     error={touched?.login && !!errors?.login}
@@ -367,6 +367,7 @@ const Employee = memo(() => {
                                         <Button                                 
                                             variant="contained"
                                             disableElevation 
+                                            disabled={isSubmitting}
                                             onClick={() => handleSubmit()}                                
                                             startIcon={<CheckIcon />}
                                             sx={{
@@ -380,7 +381,7 @@ const Employee = memo(() => {
                                         <Button                                 
                                             variant="contained"
                                             disableElevation 
-                                            disabled={!employee.id}
+                                            disabled={!employee.id || isSubmitting}
                                             onClick={() => handleDelete()}                                
                                             startIcon={<ClearIcon />}
                                             sx={{
@@ -398,7 +399,7 @@ const Employee = memo(() => {
                                         <Button                                 
                                             variant="contained"
                                             disableElevation 
-                                            disabled={!employee.id}
+                                            disabled={!employee.id || isSubmitting}
                                             // onClick={() => fetchNextData()}                                
                                             startIcon={<VpnKeyIcon />}
                                             sx={{
