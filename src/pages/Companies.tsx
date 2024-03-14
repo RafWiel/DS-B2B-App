@@ -12,6 +12,7 @@ import { config } from "../config/config";
 import debounce from 'lodash/debounce';
 import queryString from 'query-string';
 import { useLocation } from 'wouter';
+import api from "../helpers/api";
 
 interface ICompanyRow extends IBaseRow {
     name: string;
@@ -223,21 +224,18 @@ const Companies = memo(() => {
 
         showLoadingIcon(true);       
     
-        fetch(`${config.API_URL}/companies?${String(new URLSearchParams({ 
-            search: stateValue.search,
-            'sort-column': stateValue.sortColumn ?? 'id',
-            'sort-order': stateValue.sortOrder ?? 'asc',
-            page: stateValue.page.toString()
-        }))}`, { 
+        api.get(`${config.API_URL}/companies?${String(new URLSearchParams({ 
+                search: stateValue.search,
+                'sort-column': stateValue.sortColumn ?? 'id',
+                'sort-order': stateValue.sortOrder ?? 'asc',
+                page: stateValue.page.toString()
+            }))}`, { 
             signal: abortController.signal 
         })              
-        .then((res) => {           
-          if (!res.ok) throw new Error("Nieprawidłowa odpowiedź serwera");    
-          
-          return res.json();
-        })
         .then((res) => {  
-            const newCompanies = res as Array<ICompanyRow>;
+            if (res.status !== 200) throw new Error('Nieprawidłowa odpowiedź serwera'); 
+
+            const newCompanies = res.data as Array<ICompanyRow>;
             if (newCompanies.length === 0 && 
                 !stateValue.isReset) {
                 return;
@@ -252,17 +250,19 @@ const Companies = memo(() => {
                 setCompanies([...companies, ...newCompanies]); 
             }                      
         })
-        .catch((error: unknown) => {
-            if ((error as Error).name === 'AbortError') return;
+        .catch((error) => {
+            if (error.name === 'AbortError' || 
+                error.name === 'CanceledError') return;
+
             openMessageDialog({
                 title: 'Błąd aplikacji',
-                text: (error as Error).message
-            });
+                text: error.message
+            }
         })
         .finally(() => {
             showLoadingIcon(false);                        
         });    
-    }, [state, companies, openMessageDialog, showLoadingIcon, abortController]);
+    }, [companies, openMessageDialog, showLoadingIcon, abortController]);
 
     const handleDelete = (row: object) => {
         const company = row as ICompanyRow;
@@ -305,29 +305,32 @@ const Companies = memo(() => {
     const deleteAsync = async (url: string, errorMessage: string) => {
         showLoadingIcon(true);       
         
-        const result = await fetch(url, { method: 'DELETE' })              
-            .then((res) => {           
-                if (!res.ok) throw new Error(errorMessage);    
+        const result = await api.delete(url, {
+            signal: abortController.signal 
+        })              
+        .then((res) => {           
+            if (res.status !== 200) throw new Error(errorMessage);    
+        
+            return true;
+        })        
+        .catch((error) => {
+            if (error.name === 'AbortError' || 
+                error.name === 'CanceledError') return;
             
-                return true;
-            })        
-            .catch((error: unknown) => {
-                if ((error as Error).name === 'AbortError') return;
-                
-                openMessageDialog({
-                    title: 'Błąd aplikacji',
-                    text: (error as Error).message
-                });
+            openMessageDialog({
+                title: 'Błąd aplikacji',
+                text: error.message
+            });
 
-                return false;
-            })
-            .finally(() => {
-                showLoadingIcon(false);                        
-            });   
+            return false;
+        })
+        .finally(() => {
+            showLoadingIcon(false);                        
+        });   
         
         //console.log('result', result);
         return result;
-    }    
+    }   
 
     const handleResize = () => {
         const appBarHeight = document.getElementById("appBar")?.clientHeight ?? 0;

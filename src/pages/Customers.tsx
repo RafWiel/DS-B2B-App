@@ -13,6 +13,7 @@ import customerType from "../enums/customerType";
 import debounce from 'lodash/debounce';
 import queryString from 'query-string';
 import { useLocation } from 'wouter';
+import api from "../helpers/api";
 
 interface ICustomerRow extends IBaseRow {
     login: string;
@@ -242,23 +243,19 @@ const Customers = memo(() => {
 
         showLoadingIcon(true);       
     
-        fetch(`${config.API_URL}/customers?${String(new URLSearchParams({ 
-            search: stateValue.search,
-            type: stateValue.type,
-            'sort-column': stateValue.sortColumn ?? 'id',
-            'sort-order': stateValue.sortOrder ?? 'asc',
-            page: stateValue.page.toString()
-        }))}`, { 
+        api.get(`${config.API_URL}/customers?${String(new URLSearchParams({ 
+                search: stateValue.search,
+                type: stateValue.type,
+                'sort-column': stateValue.sortColumn ?? 'id',
+                'sort-order': stateValue.sortOrder ?? 'asc',
+                page: stateValue.page.toString()
+            }))}`, { 
             signal: abortController.signal 
-        })              
-        .then((res) => {           
-          if (!res.ok) throw new Error("Nieprawidłowa odpowiedź serwera");    
-          
-          //console.log('res', res);
-          return res.json();
-        })
+        })                      
         .then((res) => {  
-            const newCustomers = res as Array<ICustomerRow>;
+            if (res.status !== 200) throw new Error('Nieprawidłowa odpowiedź serwera'); 
+
+            const newCustomers = res.data as Array<ICustomerRow>;
             if (newCustomers.length === 0 && 
                 !stateValue.isReset) {
                 return;
@@ -276,17 +273,19 @@ const Customers = memo(() => {
                 setCustomers([...customers, ...newCustomers]); 
             }                      
         })
-        .catch((error: unknown) => {
-            if ((error as Error).name === 'AbortError') return;
+        .catch((error) => {
+            if (error.name === 'AbortError' || 
+                error.name === 'CanceledError') return;
+            
             openMessageDialog({
                 title: 'Błąd aplikacji',
-                text: (error as Error).message
+                text: error.message
             });
         })
         .finally(() => {
             showLoadingIcon(false);                        
         });    
-    }, [state, customers, openMessageDialog, showLoadingIcon, abortController]);
+    }, [customers, openMessageDialog, showLoadingIcon, abortController]);
 
     const handleDelete = (row: object) => {
         const customer = row as ICustomerRow;
@@ -329,26 +328,29 @@ const Customers = memo(() => {
     const deleteAsync = async (url: string, errorMessage: string) => {
         showLoadingIcon(true);       
         
-        const result = await fetch(url, { method: 'DELETE' })              
-            .then((res) => {           
-                if (!res.ok) throw new Error(errorMessage);    
-            
-                return true;
-            })        
-            .catch((error: unknown) => {
-                if ((error as Error).name === 'AbortError') return;
-                
-                openMessageDialog({
-                    title: 'Błąd aplikacji',
-                    text: (error as Error).message
-                });
-
-                return false;
-            })
-            .finally(() => {
-                showLoadingIcon(false);                        
-            });   
+        const result = await api.delete(url, {
+            signal: abortController.signal 
+        })              
+        .then((res) => {           
+            if (res.status !== 200) throw new Error(errorMessage);    
         
+            return true;
+        })        
+        .catch((error) => {
+            if (error.name === 'AbortError' || 
+                error.name === 'CanceledError') return;
+            
+            openMessageDialog({
+                title: 'Błąd aplikacji',
+                text: error.message
+            });
+
+            return false;
+        })
+        .finally(() => {
+            showLoadingIcon(false);                        
+        });   
+    
         //console.log('result', result);
         return result;
     }    

@@ -13,6 +13,7 @@ import employeeType from "../enums/employeeType";
 import debounce from 'lodash/debounce';
 import queryString from 'query-string';
 import { useLocation } from 'wouter';
+import api from "../helpers/api";
 
 interface IEmployeeRow extends IBaseRow {
     login: string;
@@ -229,23 +230,19 @@ const Employees = memo(() => {
 
         showLoadingIcon(true);       
     
-        fetch(`${config.API_URL}/employees?${String(new URLSearchParams({ 
-            search: stateValue.search,
-            type: stateValue.type,
-            'sort-column': stateValue.sortColumn ?? 'id',
-            'sort-order': stateValue.sortOrder ?? 'asc',
-            page: stateValue.page.toString()
-        }))}`, { 
+        api.get(`${config.API_URL}/employees?${String(new URLSearchParams({ 
+                search: stateValue.search,
+                type: stateValue.type,
+                'sort-column': stateValue.sortColumn ?? 'id',
+                'sort-order': stateValue.sortOrder ?? 'asc',
+                page: stateValue.page.toString()
+            }))}`, { 
             signal: abortController.signal 
-        })              
-        .then((res) => {           
-          if (!res.ok) throw new Error("Nieprawidłowa odpowiedź serwera");    
-          
-          //console.log('res', res);
-          return res.json();
-        })
-        .then((res) => {  
-            const newEmployees = res as Array<IEmployeeRow>;
+        })                      
+        .then((res) => {
+            if (res.status !== 200) throw new Error("Nieprawidłowa odpowiedź serwera"); 
+
+            const newEmployees = res.data as Array<IEmployeeRow>;
             if (newEmployees.length === 0 && 
                 !stateValue.isReset) {
                 return;
@@ -265,17 +262,19 @@ const Employees = memo(() => {
                 setEmployees([...employees, ...newEmployees]); 
             }                      
         })
-        .catch((error: unknown) => {
-            if ((error as Error).name === 'AbortError') return;
+        .catch((error) => {
+            if (error.name === 'AbortError' || 
+                error.name === 'CanceledError') return;
+            
             openMessageDialog({
                 title: 'Błąd aplikacji',
-                text: (error as Error).message
+                text: error.message
             });
         })
         .finally(() => {
             showLoadingIcon(false);                        
         });    
-    }, [state, employees, openMessageDialog, showLoadingIcon, abortController]);
+    }, [employees, openMessageDialog, showLoadingIcon, abortController]);
 
     const handleDelete = (row: object) => {
         const employee = row as IEmployeeRow;
@@ -318,25 +317,28 @@ const Employees = memo(() => {
     const deleteAsync = async (url: string, errorMessage: string) => {
         showLoadingIcon(true);       
         
-        const result = await fetch(url, { method: 'DELETE' })              
-            .then((res) => {           
-                if (!res.ok) throw new Error(errorMessage);    
+        const result = await api.delete(url, {
+            signal: abortController.signal 
+        })              
+        .then((res) => {           
+            if (res.status !== 200) throw new Error(errorMessage);    
+        
+            return true;
+        })        
+        .catch((error) => {            
+            if (error.name === 'AbortError' || 
+                error.name === 'CanceledError') return;
             
-                return true;
-            })        
-            .catch((error: unknown) => {
-                if ((error as Error).name === 'AbortError') return;
-                
-                openMessageDialog({
-                    title: 'Błąd aplikacji',
-                    text: (error as Error).message
-                });
+            openMessageDialog({
+                title: 'Błąd aplikacji',
+                text: error.message
+            });
 
-                return false;
-            })
-            .finally(() => {
-                showLoadingIcon(false);                        
-            });   
+            return false;
+        })
+        .finally(() => {
+            showLoadingIcon(false);                        
+        });   
         
         //console.log('result', result);
         return result;

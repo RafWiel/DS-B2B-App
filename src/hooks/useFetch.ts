@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useAppStore } from '../store';
+import api from '../helpers/api';
 
 const useFetch = <T,>(url: string, errorMessage: string): T | null => {
     const [data, setData] = useState(null);
@@ -13,28 +14,22 @@ const useFetch = <T,>(url: string, errorMessage: string): T | null => {
         console.log('useFetch', url);
         showLoadingIcon(true);
 
-        fetch(url, { 
+        api.get(url, { 
             signal: abortController.signal 
         })
-        .then((res: Response) => {
-            if (!res.ok) {
-                throw new Error(errorMessage);
-            }
-
-            return res.json();    
+        .then((res) => {
+            if (res.status !== 200) throw new Error(errorMessage);  
+            
+            console.log('fetch data', res.data);   
+            setData(res.data);
         })
-        .then((data: React.SetStateAction<null>) => {   
-            console.log('fetch data', data);   
-            setData(data);
-        })
-        .catch((error: unknown) => {
-            if ((error as Error).name === 'AbortError') {
-                return;
-            }
-        
+        .catch((error) => {
+            if (error.name === 'AbortError' || 
+                error.name === 'CanceledError') return;
+            
             openMessageDialog({
                 title: 'Błąd aplikacji',
-                text: (error as Error).message
+                text: error.message
             });
         })
         .finally(() => {

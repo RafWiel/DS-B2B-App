@@ -18,6 +18,7 @@ import ClearIcon from '@mui/icons-material/Clear';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import { IIdResponse } from "../interfaces/IIdResponse.ts";
 import '../assets/card.css';
+import api from "../helpers/api.ts";
 
 const Employee = memo(() => {
     const theme = useTheme();  
@@ -65,26 +66,25 @@ const Employee = memo(() => {
                
         showLoadingIcon(true);
         
-        fetch(`${config.API_URL}/employees/${employee.id}`, { signal: abortController.signal })      
-        .then((res: Response) => {           
-            if (!res.ok) {
-                throw new Error("Nieprawidłowa odpowiedź serwera");                       
-            }
-            
-            return res.json();
-        })
-        .then((res: IEmployee) => {                                                                 
-            setEmployee(res);                        
+        api.get(`${config.API_URL}/employees/${employee.id}`, { 
+            signal: abortController.signal 
+        })              
+        .then((res) => {                                                                 
+            if (res.status !== 200) throw new Error('Nieprawidłowa odpowiedź serwera');         
+
+            setEmployee(res.data);                        
 
             //console.log('load:', JSON.stringify(res, null, 2));
             
-            setAppBarTitle(`Pracownik ${res.name}`);        
+            setAppBarTitle(`Pracownik ${res.data.name}`);        
         })
-        .catch((error: unknown) => {
-            if ((error as Error).name === 'AbortError') return;
+        .catch((error) => {
+            if (error.name === 'AbortError' || 
+                error.name === 'CanceledError') return;
+            
             openMessageDialog({
                 title: 'Błąd aplikacji',
-                text: (error as Error).message
+                text: error.message
             });
 
             navigate('/employees');
@@ -98,47 +98,46 @@ const Employee = memo(() => {
         //console.log('submit', employee.id);
         //console.log('handleSubmit:', JSON.stringify(employee, null, 2)); 
                         
-        fetch(`${config.API_URL}/employees`, {
+        api(`${config.API_URL}/employees`, {
             method: !employee.id ? 'POST' : 'PUT',            
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(employee),
+            data: employee,
             signal: abortController.signal 
         })       
-            .then((res) => {                
-                if (!res.ok) {
-                    if (res.status === 404) {
-                        throw new Error('Nie znaleziono użytkownika w bazie danych');
-                    }
-
-                    if (res.status === 409) {
-                        throw new Error('Użytkownik o takich danych już istnieje');
-                    }
-
-                    throw new Error('Nieprawidłowa odpowiedź serwera');
+        .then((res) => {                
+            if (res.status !== 200) {
+                if (res.status === 404) {
+                    throw new Error('Nie znaleziono użytkownika w bazie danych');
                 }
 
-                return res.json();             
-            })      
-            .then((res: IIdResponse) => {                                              
-                setEmployee({...employee, id: res.id});
+                if (res.status === 409) {
+                    throw new Error('Użytkownik o takich danych już istnieje');
+                }
 
-                openAutoMessageDialog({
-                    title: 'Komunikat',
-                    text: 'Zapisano',
-                    delay: 1000
-                });
-            })
-            .catch((error: unknown) => {
-                if ((error as Error).name === 'AbortError') return;
-                openMessageDialog({
-                    title: 'Błąd aplikacji',
-                    text: (error as Error).message
-                });
-            })        
-            .finally(() => {           
-                setSubmitting(false);  
-                showLoadingIcon(false);            
+                throw new Error('Nieprawidłowa odpowiedź serwera');
+            }
+
+            setEmployee({...employee, id: res.data.id});
+
+            openAutoMessageDialog({
+                title: 'Komunikat',
+                text: 'Zapisano',
+                delay: 1000
             });
+        })              
+        .catch((error) => {
+            if (error.name === 'AbortError' || 
+                error.name === 'CanceledError') return;
+            
+            openMessageDialog({
+                title: 'Błąd aplikacji',
+                text: error.message
+            });
+        })        
+        .finally(() => {           
+            setSubmitting(false);  
+            showLoadingIcon(false);            
+        });
     }, [employee.id]);
     
     const handleDelete = () => {        
@@ -153,25 +152,28 @@ const Employee = memo(() => {
     const deleteSingle = (id: number) => {
         showLoadingIcon(true);       
         
-        fetch(`${config.API_URL}/employees/${id}`, { method: 'DELETE' })              
-            .then((res) => {           
-                if (!res.ok) throw new Error('Nieudane usunięcie pracownika');    
+        api.delete(`${config.API_URL}/employees/${id}`, { 
+            signal: abortController.signal 
+        })              
+        .then((res) => {           
+            if (res.status !== 200) throw new Error('Nieudane usunięcie pracownika');    
+        
+            navigate('/employees');
+        })        
+        .catch((error) => {
+            if (error.name === 'AbortError' || 
+                error.name === 'CanceledError') return;
             
-                navigate('/employees');
-            })        
-            .catch((error: unknown) => {
-                if ((error as Error).name === 'AbortError') return;
-                
-                openMessageDialog({
-                    title: 'Błąd aplikacji',
-                    text: (error as Error).message
-                });
+            openMessageDialog({
+                title: 'Błąd aplikacji',
+                text: error.message
+            });
 
-                return false;
-            })
-            .finally(() => {
-                showLoadingIcon(false);                        
-            });               
+            return false;
+        })
+        .finally(() => {
+            showLoadingIcon(false);                        
+        });               
     }    
 
     return (

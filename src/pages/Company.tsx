@@ -18,6 +18,7 @@ import { IIdResponse } from "../interfaces/IIdResponse.ts";
 import '../assets/card.css';
 import DataGrid, { IBaseRow, IColumn, IDataGridRef } from "../components/DataGrid.tsx";
 import { ICustomer } from "../interfaces/ICustomer.ts";
+import api from "../helpers/api.ts";
 
 interface ICustomerRow extends IBaseRow {
     login: string,
@@ -143,26 +144,25 @@ const Company = memo(() => {
                
         showLoadingIcon(true);
         
-        fetch(`${config.API_URL}/companies/${company.id}`, { signal: abortController.signal })      
-        .then((res: Response) => {           
-            if (!res.ok) {
-                throw new Error("Nieprawidłowa odpowiedź serwera");                       
-            }
-            
-            return res.json();
-        })
-        .then((res: ICompany) => {                                                                 
-            setCompany(res);                        
+        api.get(`${config.API_URL}/companies/${company.id}`, { 
+            signal: abortController.signal 
+        })              
+        .then((res) => {
+            if (res.status !== 200) throw new Error('Nieprawidłowa odpowiedź serwera');  
+
+            setCompany(res.data);  
 
             //console.log('load:', JSON.stringify(res, null, 2));
             
-            setAppBarTitle(`Firma ${res.name}`);        
+            setAppBarTitle(`Firma ${res.data.name}`);        
         })
-        .catch((error: unknown) => {
-            if ((error as Error).name === 'AbortError') return;
+        .catch((error) => {
+            if (error.name === 'AbortError' || 
+                error.name === 'CanceledError') return;
+            
             openMessageDialog({
                 title: 'Błąd aplikacji',
-                text: (error as Error).message
+                text: error.message
             });
 
             navigate('/companies');
@@ -176,47 +176,46 @@ const Company = memo(() => {
         //console.log('submit', company.id);
         //console.log('handleSubmit:', JSON.stringify(company, null, 2)); 
                         
-        fetch(`${config.API_URL}/companies`, {
+        api(`${config.API_URL}/companies`, {
             method: !company.id ? 'POST' : 'PUT',            
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(company),
+            data: company,
             signal: abortController.signal 
         })       
-            .then((res) => {                
-                if (!res.ok) {
-                    if (res.status === 404) {
-                        throw new Error('Nie znaleziono firmy w bazie danych');
-                    }
-
-                    if (res.status === 409) {
-                        throw new Error('Firma o takich danych już istnieje');
-                    }
-
-                    throw new Error('Nieprawidłowa odpowiedź serwera');
+        .then((res) => {                
+            if (res.status !== 200) {
+                if (res.status === 404) {
+                    throw new Error('Nie znaleziono firmy w bazie danych');
                 }
 
-                return res.json();             
-            })      
-            .then((res: IIdResponse) => {                                              
-                setCompany({...company, id: res.id});
+                if (res.status === 409) {
+                    throw new Error('Firma o takich danych już istnieje');
+                }
 
-                openAutoMessageDialog({
-                    title: 'Komunikat',
-                    text: 'Zapisano',
-                    delay: 1000
-                });
-            })
-            .catch((error: unknown) => {
-                if ((error as Error).name === 'AbortError') return;
-                openMessageDialog({
-                    title: 'Błąd aplikacji',
-                    text: (error as Error).message
-                });
-            })        
-            .finally(() => {           
-                setSubmitting(false);  
-                showLoadingIcon(false);            
+                throw new Error('Nieprawidłowa odpowiedź serwera');
+            }
+
+            setCompany({...company, id: res.data.id});
+
+            openAutoMessageDialog({
+                title: 'Komunikat',
+                text: 'Zapisano',
+                delay: 1000
+            });           
+        })      
+        .catch((error) => {
+            if (error.name === 'AbortError' || 
+                error.name === 'CanceledError') return;
+            
+            openMessageDialog({
+                title: 'Błąd aplikacji',
+                text: error.message
             });
+        })        
+        .finally(() => {           
+            setSubmitting(false);  
+            showLoadingIcon(false);            
+        });
     }, [company.id]);
     
     const handleDelete = () => {        
@@ -277,29 +276,32 @@ const Company = memo(() => {
     const deleteAsync = async (url: string, errorMessage: string) => {
         showLoadingIcon(true);       
         
-        const result = await fetch(url, { method: 'DELETE' })              
-            .then((res) => {           
-                if (!res.ok) throw new Error(errorMessage);    
-            
-                return true;
-            })        
-            .catch((error: unknown) => {
-                if ((error as Error).name === 'AbortError') return;
-                
-                openMessageDialog({
-                    title: 'Błąd aplikacji',
-                    text: (error as Error).message
-                });
-
-                return false;
-            })
-            .finally(() => {
-                showLoadingIcon(false);                        
-            });   
+        const result = await api.delete(url, {
+            signal: abortController.signal 
+        })              
+        .then((res) => {           
+            if (res.status !== 200) throw new Error(errorMessage);    
         
+            return true;
+        })        
+        .catch((error) => {
+            if (error.name === 'AbortError' || 
+                error.name === 'CanceledError') return;
+            
+            openMessageDialog({
+                title: 'Błąd aplikacji',
+                text: error.message
+            });
+
+            return false;
+        })
+        .finally(() => {
+            showLoadingIcon(false);                        
+        });   
+    
         //console.log('result', result);
         return result;
-    }   
+    } 
 
     const handleResize = () => {                  
         const appBarHeight = document.getElementById("appBar")?.clientHeight ?? 0;     

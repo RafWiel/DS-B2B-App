@@ -28,6 +28,7 @@ import { CircularProgress } from '@mui/material';
 import Customer from './pages/Customer';
 import AutoMessageDialog from './components/AutoMessageDialog';
 import Company from './pages/Company';
+import { TokenSharp } from '@mui/icons-material';
 
 const todo = '1: Dodaj klienta z poziomu firmy. 2: Company: za duzy margines dolny listy uzytkownikow';
 

@@ -23,6 +23,7 @@ import { IIdResponse } from "../interfaces/IIdResponse.ts";
 import '../assets/card.css';
 import { IList } from "../interfaces/IList.ts";
 import useFetch from "../hooks/useFetch.ts";
+import api from "../helpers/api.ts";
 
 const Customer = memo(() => {
     const theme = useTheme();  
@@ -72,27 +73,25 @@ const Customer = memo(() => {
                
         showLoadingIcon(true);
         
-        fetch(`${config.API_URL}/customers/${customer.id}`, { signal: abortController.signal })      
-        .then((res: Response) => {           
-            if (!res.ok) {
-                throw new Error("Nieprawidłowa odpowiedź serwera");                       
-            }
-            //res = JSON.parse(JSON.stringify(res).replace(/\:null/gi, "\:\"\""));
+        api.get(`${config.API_URL}/customers/${customer.id}`, { 
+            signal: abortController.signal 
+        })      
+        .then((res) => { 
+            if (res.status !== 200) throw new Error('Nieprawidłowa odpowiedź serwera'); 
 
-            return res.json();
-        })
-        .then((res: ICustomer) => {                                                                 
-            setCustomer(res);                        
+            setCustomer(res.data);                        
 
             console.log('load:', JSON.stringify(res, null, 2));
             
-            setAppBarTitle(`Klient ${res.name}`);        
+            setAppBarTitle(`Klient ${res.data.name}`);        
         })
-        .catch((error: unknown) => {
-            if ((error as Error).name === 'AbortError') return;
+        .catch((error) => {
+            if (error.name === 'AbortError' || 
+                error.name === 'CanceledError') return;
+            
             openMessageDialog({
                 title: 'Błąd aplikacji',
-                text: (error as Error).message
+                text: error.message
             });
 
             navigate('/customers');
@@ -106,47 +105,46 @@ const Customer = memo(() => {
         console.log('submit', customer.id);
         console.log('handleSubmit:', JSON.stringify(customer, null, 2)); 
                         
-        fetch(`${config.API_URL}/customers`, {
+        api(`${config.API_URL}/customers`, {
             method: !customer.id ? 'POST' : 'PUT',            
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(customer),
+            data: customer,
             signal: abortController.signal 
         })       
-            .then((res) => {                
-                if (!res.ok) {
-                    if (res.status === 404) {
-                        throw new Error('Nie znaleziono użytkownika w bazie danych');
-                    }
-
-                    if (res.status === 409) {
-                        throw new Error('Użytkownik o takich danych już istnieje');
-                    }
-
-                    throw new Error('Nieprawidłowa odpowiedź serwera');
+        .then((res) => {                
+            if (res.status !== 200) {
+                if (res.status === 404) {
+                    throw new Error('Nie znaleziono użytkownika w bazie danych');
                 }
 
-                return res.json();             
-            })      
-            .then((res: IIdResponse) => {                                              
-                setCustomer({...customer, id: res.id});
+                if (res.status === 409) {
+                    throw new Error('Użytkownik o takich danych już istnieje');
+                }
 
-                openAutoMessageDialog({
-                    title: 'Komunikat',
-                    text: 'Zapisano',
-                    delay: 1000
-                });
-            })
-            .catch((error: unknown) => {
-                if ((error as Error).name === 'AbortError') return;
-                openMessageDialog({
-                    title: 'Błąd aplikacji',
-                    text: (error as Error).message
-                });
-            })        
-            .finally(() => {           
-                setSubmitting(false);  
-                showLoadingIcon(false);            
+                throw new Error('Nieprawidłowa odpowiedź serwera');
+            }
+
+            setCustomer({...customer, id: res.data.id});
+
+            openAutoMessageDialog({
+                title: 'Komunikat',
+                text: 'Zapisano',
+                delay: 1000
+            });             
+        })              
+        .catch((error) => {
+            if (error.name === 'AbortError' || 
+                error.name === 'CanceledError') return;
+            
+            openMessageDialog({
+                title: 'Błąd aplikacji',
+                text: error.message
             });
+        })        
+        .finally(() => {           
+            setSubmitting(false);  
+            showLoadingIcon(false);            
+        });
     }, [customer.id]);
     
     const handleDelete = () => {        
@@ -161,25 +159,28 @@ const Customer = memo(() => {
     const deleteSingle = (id: number) => {
         showLoadingIcon(true);       
         
-        fetch(`${config.API_URL}/customers/${id}`, { method: 'DELETE' })              
-            .then((res) => {           
-                if (!res.ok) throw new Error('Nieudane usunięcie klienta');    
+        api.delete(`${config.API_URL}/customers/${id}`, { 
+            signal: abortController.signal  
+        })              
+        .then((res) => {           
+            if (res.status !== 200) throw new Error('Nieudane usunięcie pracownika');      
+        
+            navigate('/customers');
+        })        
+        .catch((error) => {
+            if (error.name === 'AbortError' || 
+                error.name === 'CanceledError') return;
             
-                navigate('/customers');
-            })        
-            .catch((error: unknown) => {
-                if ((error as Error).name === 'AbortError') return;
-                
-                openMessageDialog({
-                    title: 'Błąd aplikacji',
-                    text: (error as Error).message
-                });
+            openMessageDialog({
+                title: 'Błąd aplikacji',
+                text: error.message
+            });
 
-                return false;
-            })
-            .finally(() => {
-                showLoadingIcon(false);                        
-            });               
+            return false;
+        })
+        .finally(() => {
+            showLoadingIcon(false);                        
+        });               
     }    
 
     return (
