@@ -634,6 +634,7 @@ const Company = memo(() => {
                             <Button                                 
                                 variant="contained"                                
                                 disableElevation 
+                                disabled={!company.id}
                                 onClick={() => navigate(`/companies/${company.id}/customers/0`)} 
                                 //startIcon={<AddIcon />}
                                 sx={{

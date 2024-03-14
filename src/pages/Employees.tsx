@@ -233,7 +233,7 @@ const Employees = memo(() => {
         api.get(`${config.API_URL}/employees?${String(new URLSearchParams({ 
                 search: stateValue.search,
                 type: stateValue.type,
-                'sort-column': stateValue.sortColumn ?? 'id',
+                'sort-column': stateValue.sortColumn ?? 'login',
                 'sort-order': stateValue.sortOrder ?? 'asc',
                 page: stateValue.page.toString()
             }))}`, { 

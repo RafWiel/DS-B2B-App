@@ -226,7 +226,7 @@ const Companies = memo(() => {
     
         api.get(`${config.API_URL}/companies?${String(new URLSearchParams({ 
                 search: stateValue.search,
-                'sort-column': stateValue.sortColumn ?? 'id',
+                'sort-column': stateValue.sortColumn ?? 'name',
                 'sort-order': stateValue.sortOrder ?? 'asc',
                 page: stateValue.page.toString()
             }))}`, { 
@@ -253,11 +253,11 @@ const Companies = memo(() => {
         .catch((error) => {
             if (error.name === 'AbortError' || 
                 error.name === 'CanceledError') return;
-
+            
             openMessageDialog({
                 title: 'Błąd aplikacji',
                 text: error.message
-            }
+            });
         })
         .finally(() => {
             showLoadingIcon(false);                        
@@ -313,7 +313,7 @@ const Companies = memo(() => {
         
             return true;
         })        
-        .catch((error) => {
+        .catch((error) => {            
             if (error.name === 'AbortError' || 
                 error.name === 'CanceledError') return;
             
@@ -330,7 +330,7 @@ const Companies = memo(() => {
         
         //console.log('result', result);
         return result;
-    }   
+    }     
 
     const handleResize = () => {
         const appBarHeight = document.getElementById("appBar")?.clientHeight ?? 0;

@@ -8,6 +8,7 @@ import BadgeIcon from '@mui/icons-material/Badge';
 const home = '/';
 const companies = '/companies';
 const company = '/companies/:id';
+const companyCustomer = '/companies/:companyId/customers/:id';
 const customers = '/customers';
 const customer = '/customers/:id';
 const employees = '/employees';
@@ -21,6 +22,7 @@ const routes = {
     home,
     companies,
     company,    
+    companyCustomer,
     customers,
     customer,
     employees,
@@ -45,6 +47,10 @@ const routes = {
         id: company,
         text: 'Firma',
         isSidebarItem: false,        
+    }, {
+        id: companyCustomer,
+        text: 'Klient',
+        isSidebarItem: false        
     }, {
         id: customers,
         text: 'Klienci',

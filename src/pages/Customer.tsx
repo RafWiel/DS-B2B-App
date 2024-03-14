@@ -32,12 +32,17 @@ const Customer = memo(() => {
     const openAutoMessageDialog = useAppStore((state) => state.openAutoMessageDialog); 
     const openMessageDialog = useAppStore((state) => state.openMessageDialog); 
     const openQuestionDialog = useAppStore((state) => state.openQuestionDialog); 
-    const [, params] = useRoute("/customers/:id");
+    const [, params] = useRoute("/customers/:id");    
+    const [, companyParams] = useRoute("/companies/:companyId/customers/:id");    
     const [, navigate] = useLocation();    
     const abortController = useRef(new AbortController()).current;     
     const companies = useFetch<Array<IList>>(`${config.API_URL}/companies/list`, 'Nieudane pobranie listy firm'); 
     const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
     
+    console.log('company id', companyParams?.companyId);
+    console.log('customer id', companyParams?.id);
+    console.log('id', params?.id);
+
     const schema = yup.object().shape({                                        
         type: yup.number().required().min(customerType.supervisor, 'Podaj typ').max(customerType.employee, 'Podaj typ'),
         login: yup.string().required('Podaj login'),
@@ -49,8 +54,8 @@ const Customer = memo(() => {
     });
 
     const [customer, setCustomer] = useState<ICustomer>({
-        id: Number(params?.id),     
-        companyId: 0,   
+        id: Number(params?.id ?? companyParams?.id),     
+        companyId: Number(companyParams?.companyId ?? 0),   
         type: customerType.none,
         login: '',
         name: '',

@@ -30,7 +30,7 @@ import AutoMessageDialog from './components/AutoMessageDialog';
 import Company from './pages/Company';
 import { TokenSharp } from '@mui/icons-material';
 
-const todo = '1: Dodaj klienta z poziomu firmy. 2: Company: za duzy margines dolny listy uzytkownikow';
+const todo = '1: Sortowanie Firma Klienci 2: Company: za duzy margines dolny listy uzytkownikow';
 
 interface AppBarProps extends MuiAppBarProps {
     open?: boolean;
@@ -163,7 +163,6 @@ export default function App() {
         }
     });
     
-
     useEffect(() => {          
         if (routes.isText(location[0])) {
             setAppBarTitle(routes.getText(location[0]));
@@ -296,7 +295,10 @@ export default function App() {
                         </Route>
                         <Route path={routes.customer}>
                             <Customer />
-                        </Route>                        
+                        </Route>
+                        <Route path={routes.companyCustomer}>
+                            <Customer />
+                        </Route>
                         <Route path={routes.employees}>
                             <Employees />
                         </Route>
