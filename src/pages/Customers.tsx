@@ -252,9 +252,7 @@ const Customers = memo(() => {
             }))}`, { 
             signal: abortController.signal 
         })                      
-        .then((res) => {  
-            if (res.status !== 200) throw new Error('Nieprawidłowa odpowiedź serwera'); 
-
+        .then((res) => {              
             const newCustomers = res.data as Array<ICustomerRow>;
             if (newCustomers.length === 0 && 
                 !stateValue.isReset) {
@@ -279,7 +277,7 @@ const Customers = memo(() => {
             
             openMessageDialog({
                 title: 'Błąd aplikacji',
-                text: error.message
+                text: `${error.response.status} - Nieprawidłowa odpowiedź serwera`
             });
         })
         .finally(() => {
@@ -331,9 +329,7 @@ const Customers = memo(() => {
         const result = await api.delete(url, {
             signal: abortController.signal 
         })              
-        .then((res) => {           
-            if (res.status !== 200) throw new Error(errorMessage);    
-        
+        .then(() => {           
             return true;
         })        
         .catch((error) => {
@@ -342,7 +338,7 @@ const Customers = memo(() => {
             
             openMessageDialog({
                 title: 'Błąd aplikacji',
-                text: error.message
+                text: `${error.response.status} - ${errorMessage}`
             });
 
             return false;

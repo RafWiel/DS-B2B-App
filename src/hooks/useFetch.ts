@@ -17,10 +17,8 @@ const useFetch = <T,>(url: string, errorMessage: string): T | null => {
         api.get(url, { 
             signal: abortController.signal 
         })
-        .then((res) => {
-            if (res.status !== 200) throw new Error(errorMessage);  
-            
-            console.log('fetch data', res.data);   
+        .then((res) => {            
+            //console.log('fetch data', res.data);   
             setData(res.data);
         })
         .catch((error) => {
@@ -29,7 +27,7 @@ const useFetch = <T,>(url: string, errorMessage: string): T | null => {
             
             openMessageDialog({
                 title: 'Błąd aplikacji',
-                text: error.message
+                text: `${error.response.status} - ${errorMessage}`
             });
         })
         .finally(() => {

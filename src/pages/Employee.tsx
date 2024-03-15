@@ -70,8 +70,6 @@ const Employee = memo(() => {
             signal: abortController.signal 
         })              
         .then((res) => {                                                                 
-            if (res.status !== 200) throw new Error('Nieprawidłowa odpowiedź serwera');         
-
             setEmployee(res.data);                        
 
             //console.log('load:', JSON.stringify(res, null, 2));
@@ -84,7 +82,7 @@ const Employee = memo(() => {
             
             openMessageDialog({
                 title: 'Błąd aplikacji',
-                text: error.message
+                text: `${error.response.status} - Nieprawidłowa odpowiedź serwera`
             });
 
             navigate('/employees');
@@ -104,23 +102,14 @@ const Employee = memo(() => {
             data: employee,
             signal: abortController.signal 
         })       
-        .then((res) => {                
-            if (res.status !== 200) {
-                if (res.status === 404) {
-                    throw new Error('Nie znaleziono użytkownika w bazie danych');
-                }
+        .then((res) => {                            
+            const response = res.data as IIdResponse;
 
-                if (res.status === 409) {
-                    throw new Error('Użytkownik o takich danych już istnieje');
-                }
-
-                throw new Error('Nieprawidłowa odpowiedź serwera');
-            }
-
-            setEmployee({...employee, id: res.data.id});
+            setEmployee({...employee, id: response.id});
+            setUrl(response.id);
 
             openAutoMessageDialog({
-                title: 'Komunikat',
+                title: 'Pracownik',
                 text: 'Zapisano',
                 delay: 1000
             });
@@ -128,10 +117,20 @@ const Employee = memo(() => {
         .catch((error) => {
             if (error.name === 'AbortError' || 
                 error.name === 'CanceledError') return;
+
+            let errorMessage = 'Nieprawidłowa odpowiedź serwera';
             
+            if (error.response.status === 404) {
+                errorMessage = 'Nie znaleziono użytkownika w bazie danych';
+            }
+
+            if (error.response.status === 409) {
+                errorMessage = 'Użytkownik o takich danych już istnieje';
+            }
+
             openMessageDialog({
                 title: 'Błąd aplikacji',
-                text: error.message
+                text: `${error.response.status} - ${errorMessage}`
             });
         })        
         .finally(() => {           
@@ -139,6 +138,12 @@ const Employee = memo(() => {
             showLoadingIcon(false);            
         });
     }, [employee.id]);
+    
+    const setUrl = (id: number) => {
+        const url = `/employees/${id}`;
+        
+        window.history.replaceState(null, '', url);
+    }
     
     const handleDelete = () => {        
         openQuestionDialog({
@@ -155,9 +160,7 @@ const Employee = memo(() => {
         api.delete(`${config.API_URL}/employees/${id}`, { 
             signal: abortController.signal 
         })              
-        .then((res) => {           
-            if (res.status !== 200) throw new Error('Nieudane usunięcie pracownika');    
-        
+        .then(() => {                       
             navigate('/employees');
         })        
         .catch((error) => {
@@ -166,7 +169,7 @@ const Employee = memo(() => {
             
             openMessageDialog({
                 title: 'Błąd aplikacji',
-                text: error.message
+                text: `${error.response.status} - Nieudane usunięcie pracownika`
             });
 
             return false;
@@ -174,7 +177,7 @@ const Employee = memo(() => {
         .finally(() => {
             showLoadingIcon(false);                        
         });               
-    }    
+    }       
 
     return (
         <Box         

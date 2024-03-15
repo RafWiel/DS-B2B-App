@@ -87,7 +87,7 @@ type FetchState = {
     isReset: boolean
 }
   
-const Companies = memo(() => {
+const Companies = memo(() => {    
     const theme = useTheme();     
     const openQuestionDialog = useAppStore((state) => state.openQuestionDialog); 
     const openMessageDialog = useAppStore((state) => state.openMessageDialog); 
@@ -97,7 +97,7 @@ const Companies = memo(() => {
     const [companies, setCompanies] = useState<ICompanyRow[]>([]);
     const [, navigate] = useLocation();
     const abortController = useRef(new AbortController()).current;  
-    const [dataGridHeight, setDataGridHeight] = useState(0);
+    const [dataGridHeight, setDataGridHeight] = useState(0);    
     
     const [state, setState] = useState<FetchState>({
         search: '',
@@ -232,9 +232,7 @@ const Companies = memo(() => {
             }))}`, { 
             signal: abortController.signal 
         })              
-        .then((res) => {  
-            if (res.status !== 200) throw new Error('Nieprawidłowa odpowiedź serwera'); 
-
+        .then((res) => {              
             const newCompanies = res.data as Array<ICompanyRow>;
             if (newCompanies.length === 0 && 
                 !stateValue.isReset) {
@@ -256,7 +254,7 @@ const Companies = memo(() => {
             
             openMessageDialog({
                 title: 'Błąd aplikacji',
-                text: error.message
+                text: `${error.response.status} - Nieprawidłowa odpowiedź serwera`
             });
         })
         .finally(() => {
@@ -308,9 +306,7 @@ const Companies = memo(() => {
         const result = await api.delete(url, {
             signal: abortController.signal 
         })              
-        .then((res) => {           
-            if (res.status !== 200) throw new Error(errorMessage);    
-        
+        .then(() => {                       
             return true;
         })        
         .catch((error) => {            
@@ -319,7 +315,7 @@ const Companies = memo(() => {
             
             openMessageDialog({
                 title: 'Błąd aplikacji',
-                text: error.message
+                text: `${error.response.status} - ${errorMessage}`
             });
 
             return false;

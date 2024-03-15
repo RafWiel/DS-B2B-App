@@ -8,8 +8,8 @@ import { Button, FormControl, FormHelperText, Grid, InputLabel, MenuItem, Select
 import { useAppStore } from "../store.ts";
 import { ICustomer } from '../interfaces/ICustomer.ts';
 import { useLocation, useRoute } from "wouter";
-import { config } from "../config/config.ts";
-import customerType from "../enums/customerType.ts";
+import { config } from '../config/config.ts';
+import customerType from '../enums/customerType.ts';
 import { Formik, FormikProps, FormikHelpers } from 'formik';
 import * as yup from 'yup';
 import boolEnum from "../enums/boolEnum.ts";
@@ -81,9 +81,7 @@ const Customer = memo(() => {
         api.get(`${config.API_URL}/customers/${customer.id}`, { 
             signal: abortController.signal 
         })      
-        .then((res) => { 
-            if (res.status !== 200) throw new Error('Nieprawidłowa odpowiedź serwera'); 
-
+        .then((res) => {             
             setCustomer(res.data);                        
 
             console.log('load:', JSON.stringify(res, null, 2));
@@ -96,7 +94,7 @@ const Customer = memo(() => {
             
             openMessageDialog({
                 title: 'Błąd aplikacji',
-                text: error.message
+                text: `${error.response.status} - Nieprawidłowa odpowiedź serwera`
             });
 
             navigate('/customers');
@@ -116,23 +114,14 @@ const Customer = memo(() => {
             data: customer,
             signal: abortController.signal 
         })       
-        .then((res) => {                
-            if (res.status !== 200) {
-                if (res.status === 404) {
-                    throw new Error('Nie znaleziono użytkownika w bazie danych');
-                }
+        .then((res) => {                            
+            const response = res.data as IIdResponse;
 
-                if (res.status === 409) {
-                    throw new Error('Użytkownik o takich danych już istnieje');
-                }
-
-                throw new Error('Nieprawidłowa odpowiedź serwera');
-            }
-
-            setCustomer({...customer, id: res.data.id});
+            setCustomer({...customer, id: response.id});
+            setUrl(response.id);
 
             openAutoMessageDialog({
-                title: 'Komunikat',
+                title: 'Klient',
                 text: 'Zapisano',
                 delay: 1000
             });             
@@ -140,10 +129,20 @@ const Customer = memo(() => {
         .catch((error) => {
             if (error.name === 'AbortError' || 
                 error.name === 'CanceledError') return;
+
+            let errorMessage = 'Nieprawidłowa odpowiedź serwera';
             
+            if (error.response.status === 404) {
+                errorMessage = 'Nie znaleziono użytkownika w bazie danych';
+            }
+
+            if (error.response.status === 409) {
+                errorMessage = 'Użytkownik o takich danych już istnieje';
+            }
+
             openMessageDialog({
                 title: 'Błąd aplikacji',
-                text: error.message
+                text: `${error.response.status} - ${errorMessage}`
             });
         })        
         .finally(() => {           
@@ -151,6 +150,12 @@ const Customer = memo(() => {
             showLoadingIcon(false);            
         });
     }, [customer.id]);
+
+    const setUrl = (id: number) => {
+        const url = `/customers/${id}`;
+        
+        window.history.replaceState(null, '', url);
+    }
     
     const handleDelete = () => {        
         openQuestionDialog({
@@ -167,9 +172,7 @@ const Customer = memo(() => {
         api.delete(`${config.API_URL}/customers/${id}`, { 
             signal: abortController.signal  
         })              
-        .then((res) => {           
-            if (res.status !== 200) throw new Error('Nieudane usunięcie pracownika');      
-        
+        .then(() => {                       
             navigate('/customers');
         })        
         .catch((error) => {
@@ -178,7 +181,7 @@ const Customer = memo(() => {
             
             openMessageDialog({
                 title: 'Błąd aplikacji',
-                text: error.message
+                text: `${error.response.status} - Nieudane usunięcie pracownika`
             });
 
             return false;
@@ -186,7 +189,7 @@ const Customer = memo(() => {
         .finally(() => {
             showLoadingIcon(false);                        
         });               
-    }    
+    }        
 
     return (
         <Box         

@@ -239,9 +239,7 @@ const Employees = memo(() => {
             }))}`, { 
             signal: abortController.signal 
         })                      
-        .then((res) => {
-            if (res.status !== 200) throw new Error("Nieprawidłowa odpowiedź serwera"); 
-
+        .then((res) => {            
             const newEmployees = res.data as Array<IEmployeeRow>;
             if (newEmployees.length === 0 && 
                 !stateValue.isReset) {
@@ -268,7 +266,7 @@ const Employees = memo(() => {
             
             openMessageDialog({
                 title: 'Błąd aplikacji',
-                text: error.message
+                text: `${error.response.status} - Nieprawidłowa odpowiedź serwera`
             });
         })
         .finally(() => {
@@ -320,9 +318,7 @@ const Employees = memo(() => {
         const result = await api.delete(url, {
             signal: abortController.signal 
         })              
-        .then((res) => {           
-            if (res.status !== 200) throw new Error(errorMessage);    
-        
+        .then(() => {                       
             return true;
         })        
         .catch((error) => {            
@@ -331,7 +327,7 @@ const Employees = memo(() => {
             
             openMessageDialog({
                 title: 'Błąd aplikacji',
-                text: error.message
+                text: `${error.response.status} - ${errorMessage}`
             });
 
             return false;

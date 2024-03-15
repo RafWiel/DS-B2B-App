@@ -19,6 +19,7 @@ import '../assets/card.css';
 import DataGrid, { IBaseRow, IColumn, IDataGridRef } from "../components/DataGrid.tsx";
 import { ICustomer } from "../interfaces/ICustomer.ts";
 import api from "../helpers/api.ts";
+import customerType from "../enums/customerType.ts";
 
 interface ICustomerRow extends IBaseRow {
     login: string,
@@ -99,11 +100,12 @@ const Company = memo(() => {
     const dataGridRef = useRef<IDataGridRef>();
     const [dataGridHeight, setDataGridHeight] = useState(0);
     const isMobileView = useMediaQuery(theme.breakpoints.down("md"));           
+    const isXsMobileView = useMediaQuery(theme.breakpoints.only("xs"));           
     const postalRegExp = /^[0-9]{2}-[0-9]{3}$/    
 
     const schema = yup.object().shape({                                                    
         name: yup.string().required('Podaj nazwę'),
-        erpId: yup.number().required('Podaj ERP Id'),
+        erpId: yup.number().typeError('Nieprawidłowy ERP Id').required('Podaj ERP Id'),
         taxNumber: yup.string().required('Podaj NIP').length(10, 'Nieprawidłowy NIP'),
         address: yup.string().required('Podaj adres'),
         postal: yup.string().required('Podaj kod pocztowy').matches(postalRegExp, 'Nieprawidłowy kod pocztowy'),                 
@@ -118,7 +120,7 @@ const Company = memo(() => {
         address: '',
         postal: '',
         city: '',
-        customers: []
+        customers: new Array<ICustomer>()
     }); 
 
     useEffect(() => {                        
@@ -147,8 +149,13 @@ const Company = memo(() => {
         api.get(`${config.API_URL}/companies/${company.id}`, { 
             signal: abortController.signal 
         })              
-        .then((res) => {
-            if (res.status !== 200) throw new Error('Nieprawidłowa odpowiedź serwera');  
+        .then((res) => {            
+            const newCompany = res.data as ICompany;
+
+            //update type text
+            newCompany.customers.forEach(u => {
+                u.type = customerType.getText(Number(u.type));                
+            });
 
             setCompany(res.data);  
 
@@ -162,7 +169,7 @@ const Company = memo(() => {
             
             openMessageDialog({
                 title: 'Błąd aplikacji',
-                text: error.message
+                text: `${error.response.status} - Nieprawidłowa odpowiedź serwera`
             });
 
             navigate('/companies');
@@ -174,31 +181,26 @@ const Company = memo(() => {
         showLoadingIcon(true);        
 
         //console.log('submit', company.id);
-        //console.log('handleSubmit:', JSON.stringify(company, null, 2)); 
-                        
+        console.log('handleSubmit:', JSON.stringify(company, null, 2)); 
+                 
+        //nie wysylaj klientow, bo dane sa niepelne i nie przechodza walidacji
+        const clone = {...company};
+        clone.customers = new Array<ICustomer>();
+
         api(`${config.API_URL}/companies`, {
             method: !company.id ? 'POST' : 'PUT',            
             headers: { "Content-Type": "application/json" },
-            data: company,
+            data: clone,
             signal: abortController.signal 
         })       
-        .then((res) => {                
-            if (res.status !== 200) {
-                if (res.status === 404) {
-                    throw new Error('Nie znaleziono firmy w bazie danych');
-                }
+        .then((res) => {                           
+            const response = res.data as IIdResponse;
 
-                if (res.status === 409) {
-                    throw new Error('Firma o takich danych już istnieje');
-                }
-
-                throw new Error('Nieprawidłowa odpowiedź serwera');
-            }
-
-            setCompany({...company, id: res.data.id});
+            setCompany({...company, id: response.id});
+            setUrl(response.id);
 
             openAutoMessageDialog({
-                title: 'Komunikat',
+                title: 'Firma',
                 text: 'Zapisano',
                 delay: 1000
             });           
@@ -206,10 +208,20 @@ const Company = memo(() => {
         .catch((error) => {
             if (error.name === 'AbortError' || 
                 error.name === 'CanceledError') return;
+
+            let errorMessage = 'Nieprawidłowa odpowiedź serwera';
             
+            if (error.response.status === 404) {
+                errorMessage = 'Nie znaleziono firmy w bazie danych';
+            }
+
+            if (error.response.status === 409) {
+                errorMessage = 'Firma o takich danych już istnieje';
+            }
+
             openMessageDialog({
                 title: 'Błąd aplikacji',
-                text: error.message
+                text: `${error.response.status} - ${errorMessage}`
             });
         })        
         .finally(() => {           
@@ -218,6 +230,12 @@ const Company = memo(() => {
         });
     }, [company.id]);
     
+    const setUrl = (id: number) => {
+        const url = `/companies/${id}`;
+        
+        window.history.replaceState(null, '', url);
+    }
+
     const handleDelete = () => {        
         openQuestionDialog({
             title: 'Firma',
@@ -279,9 +297,7 @@ const Company = memo(() => {
         const result = await api.delete(url, {
             signal: abortController.signal 
         })              
-        .then((res) => {           
-            if (res.status !== 200) throw new Error(errorMessage);    
-        
+        .then(() => {                       
             return true;
         })        
         .catch((error) => {
@@ -290,7 +306,7 @@ const Company = memo(() => {
             
             openMessageDialog({
                 title: 'Błąd aplikacji',
-                text: error.message
+                text: `${error.response.status} - ${errorMessage}`                
             });
 
             return false;
@@ -307,9 +323,9 @@ const Company = memo(() => {
         const appBarHeight = document.getElementById("appBar")?.clientHeight ?? 0;     
         const mainCardHeight = document.getElementById('company-main-card')?.clientHeight ?? 0;
         const titleHeight = document.getElementById('company-datagrid-card-title')?.clientHeight ?? 0;        
-        const datagridMargin = isMobileView ? 74 : 42;  
+        const datagridMargin = isMobileView ? (isXsMobileView ? 45 : 74) : 42; //uwaga, tutaj rzezba
         const mainMargin = 12;  
-
+        
         setMainCardHeight(mainCardHeight);    
         setDataGridHeight(window.innerHeight - appBarHeight - mainCardHeight - titleHeight - mainMargin * 3 - datagridMargin);                    
     }  
@@ -571,7 +587,7 @@ const Company = memo(() => {
                     display: 'flex',                            
                     height: '100%',
                     '&:last-child': { 
-                        paddingBottom: 2 
+                        paddingBottom: 1 
                     },
                     [theme.breakpoints.down('md')]: {
                         padding: 1,
@@ -582,10 +598,10 @@ const Company = memo(() => {
                 }}>                     
                     <Grid 
                         container 
-                        spacing={2}
-                        sx={{
-                            //backgroundColor: 'gainsboro',                                                                                                                                           
-                        }}
+                        spacing={{ xs: 0, md: 2 }}   
+                        // sx={{
+                        //     backgroundColor: 'yellow',
+                        // }}                     
                     >
                         <Grid 
                             item 
@@ -593,9 +609,7 @@ const Company = memo(() => {
                             sm={12} 
                             md={10} 
                             // sx={{
-                            //     //backgroundColor: 'aqua',
-                            //     //flexGrow: 1,
-                            //     //alignSelf: 'flex-start'
+                            //     backgroundColor: 'aqua',                                                            
                             // }}
                         >
                             <Typography 
@@ -624,7 +638,6 @@ const Company = memo(() => {
                             sm={12} 
                             md={2}
                             sx={{
-                                //backgroundColor: 'aqua',                                
                                 alignSelf: 'flex-start',
                                 [theme.breakpoints.down('md')]: {
                                     alignSelf: 'flex-end',
