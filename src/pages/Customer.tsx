@@ -23,7 +23,7 @@ import { IIdResponse } from "../interfaces/IIdResponse.ts";
 import '../assets/card.css';
 import { IList } from "../interfaces/IList.ts";
 import useFetch from "../hooks/useFetch.ts";
-import api from "../helpers/api.ts";
+import useApi from '../hooks/useApi.ts';
 
 const Customer = memo(() => {
     const theme = useTheme();  
@@ -38,7 +38,8 @@ const Customer = memo(() => {
     const abortController = useRef(new AbortController()).current;     
     const companies = useFetch<Array<IList>>(`${config.API_URL}/companies/list`, 'Nieudane pobranie listy firm'); 
     const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
-    
+    const api = useApi();
+
     console.log('company id', companyParams?.companyId);
     console.log('customer id', companyParams?.id);
     console.log('id', params?.id);

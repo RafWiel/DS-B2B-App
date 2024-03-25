@@ -13,7 +13,7 @@ import employeeType from "../enums/employeeType";
 import debounce from 'lodash/debounce';
 import queryString from 'query-string';
 import { useLocation } from 'wouter';
-import api from "../helpers/api";
+import useApi from '../hooks/useApi.ts';
 
 interface IServiceRequestRow extends IBaseRow {
     login: string;
@@ -95,11 +95,12 @@ const ServiceRequests = memo(() => {
     const isMobileView = useMediaQuery(theme.breakpoints.down("md"));           
     const showLoadingIcon = useAppStore((state) => state.showLoadingIcon);
     const dataGridRef = useRef<IDataGridRef>();
-    const [employees, setEmployees] = useState<Array<IEmployeeRow>>([]);
+    const [employees, setEmployees] = useState<Array<IServiceRequestRow>>([]);
     const [, navigate] = useLocation();
     const abortController = useRef(new AbortController()).current;  
     const [dataGridHeight, setDataGridHeight] = useState(0);
-    
+    const api = useApi();
+
     const [state, setState] = useState<FetchState>({
         search: '',
         type: employeeType.none.toString(),
@@ -109,7 +110,6 @@ const ServiceRequests = memo(() => {
         isReset: true
     });
     
-   
     //console.log('render', state.page);
 
     useEffect(() => {                    

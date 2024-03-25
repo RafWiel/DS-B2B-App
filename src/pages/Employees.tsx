@@ -13,7 +13,7 @@ import employeeType from "../enums/employeeType";
 import debounce from 'lodash/debounce';
 import queryString from 'query-string';
 import { useLocation } from 'wouter';
-import api from "../helpers/api";
+import useApi from '../hooks/useApi.ts';
 
 interface IEmployeeRow extends IBaseRow {
     login: string;
@@ -99,6 +99,7 @@ const Employees = memo(() => {
     const [, navigate] = useLocation();
     const abortController = useRef(new AbortController()).current;  
     const [dataGridHeight, setDataGridHeight] = useState(0);
+    const api = useApi();
     
     const [state, setState] = useState<FetchState>({
         search: '',

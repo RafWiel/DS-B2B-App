@@ -18,7 +18,7 @@ import { IIdResponse } from "../interfaces/IIdResponse.ts";
 import '../assets/card.css';
 import DataGrid, { IBaseRow, IColumn, IDataGridRef } from "../components/DataGrid.tsx";
 import { ICustomer } from "../interfaces/ICustomer.ts";
-import api from "../helpers/api.ts";
+import useApi from '../hooks/useApi.ts';
 import customerType from "../enums/customerType.ts";
 
 interface ICustomerRow extends IBaseRow {
@@ -102,6 +102,7 @@ const Company = memo(() => {
     const isMobileView = useMediaQuery(theme.breakpoints.down("md"));           
     const isXsMobileView = useMediaQuery(theme.breakpoints.only("xs"));           
     const postalRegExp = /^[0-9]{2}-[0-9]{3}$/    
+    const api = useApi();
 
     const schema = yup.object().shape({                                                    
         name: yup.string().required('Podaj nazwę'),
@@ -183,7 +184,7 @@ const Company = memo(() => {
         //console.log('submit', company.id);
         console.log('handleSubmit:', JSON.stringify(company, null, 2)); 
                  
-        //nie wysylaj klientow, bo dane sa niepelne i nie przechodza walidacji
+        //nie wysylaj klientow, dane sa niepelne i nie przechodza walidacji
         const clone = {...company};
         clone.customers = new Array<ICustomer>();
 

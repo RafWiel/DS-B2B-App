@@ -4,7 +4,7 @@ import { useTheme } from '@mui/material/styles';
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import { Button, FormControl, FormHelperText, Grid, InputLabel, MenuItem, Select, TextField, Typography } from "@mui/material";
+import { Button, FormControl, FormHelperText, Grid, InputLabel, MenuItem, Select, TextField } from "@mui/material";
 import { useAppStore } from "../store";
 import { IEmployee } from '../interfaces/IEmployee.ts';
 import { useLocation, useRoute } from "wouter";
@@ -18,7 +18,7 @@ import ClearIcon from '@mui/icons-material/Clear';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import { IIdResponse } from "../interfaces/IIdResponse.ts";
 import '../assets/card.css';
-import api from "../helpers/api.ts";
+import useApi from '../hooks/useApi.ts';
 
 const Employee = memo(() => {
     const theme = useTheme();  
@@ -30,6 +30,7 @@ const Employee = memo(() => {
     const [, params] = useRoute("/employees/:id");
     const [, navigate] = useLocation();    
     const abortController = useRef(new AbortController()).current;      
+    const api = useApi();
 
     const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
 

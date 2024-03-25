@@ -12,7 +12,7 @@ import { config } from "../config/config";
 import debounce from 'lodash/debounce';
 import queryString from 'query-string';
 import { useLocation } from 'wouter';
-import api from "../helpers/api";
+import useApi from '../hooks/useApi.ts';
 
 interface ICompanyRow extends IBaseRow {
     name: string;
@@ -98,6 +98,7 @@ const Companies = memo(() => {
     const [, navigate] = useLocation();
     const abortController = useRef(new AbortController()).current;  
     const [dataGridHeight, setDataGridHeight] = useState(0);    
+    const api = useApi();
     
     const [state, setState] = useState<FetchState>({
         search: '',

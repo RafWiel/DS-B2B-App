@@ -1,29 +1,31 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from 'react';
 import { useAppStore } from '../store';
-import api from '../helpers/api';
+import useApi from './useApi';
 
 const useFetch = <T,>(url: string, errorMessage: string): T | null => {
     const [data, setData] = useState(null);
     const showLoadingIcon = useAppStore((state) => state.showLoadingIcon);
     const openMessageDialog = useAppStore((state) => state.openMessageDialog);   
+    const api = useApi();
 
     useEffect(() => {
         const abortController = new AbortController();
 
-        console.log('useFetch', url);
+        //console.log('useFetch', url);
         showLoadingIcon(true);
 
         api.get(url, { 
             signal: abortController.signal 
         })
         .then((res) => {            
-            //console.log('fetch data', res.data);   
-            setData(res.data);
+            setData(res.data as React.SetStateAction<null>);
         })
         .catch((error) => {
             if (error.name === 'AbortError' || 
-                error.name === 'CanceledError') return;
+                error.name === 'CanceledError' ||
+                error.response?.status === 401) return;
             
             openMessageDialog({
                 title: 'Błąd aplikacji',
