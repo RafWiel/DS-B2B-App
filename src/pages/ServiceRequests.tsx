@@ -230,18 +230,18 @@ const ServiceRequests = memo(() => {
 
         showLoadingIcon(true);       
     
-        api.get(`${config.API_URL}/employees?${String(new URLSearchParams({ 
+        api.get(`${config.API_URL}/service-requests?${String(new URLSearchParams({ 
                 search: stateValue.search,
                 type: stateValue.type,
-                'sort-column': stateValue.sortColumn ?? 'login',
+                'sort-column': stateValue.sortColumn ?? 'date',
                 'sort-order': stateValue.sortOrder ?? 'asc',
                 page: stateValue.page.toString()
             }))}`, { 
             signal: abortController.signal 
         })                      
         .then((res) => {            
-            const newEmployees = res.data as Array<IServiceRequestRow>;
-            if (newEmployees.length === 0 && 
+            const newRequests = res.data as Array<IServiceRequestRow>;
+            if (newRequests.length === 0 && 
                 !stateValue.isReset) {
                 return;
             }
@@ -249,15 +249,15 @@ const ServiceRequests = memo(() => {
             //console.log('employees', newEmployees);
 
             //update type text
-            newEmployees.forEach(u => {
+            newRequests.forEach(u => {
                 u.type = employeeType.getText(Number(u.type));                
             });
             
             if (stateValue.isReset) {
-                setEmployees(newEmployees);
+                setEmployees(newRequests);
             }
             else {
-                setEmployees([...employees, ...newEmployees]); 
+                setEmployees([...employees, ...newRequests]); 
             }                      
         })
         .catch((error) => {

@@ -259,11 +259,6 @@ const Customers = memo(() => {
                 !stateValue.isReset) {
                 return;
             }
-
-            //update type text
-            newCustomers.forEach(u => {
-                u.type = customerType.getText(Number(u.type));                
-            });
             
             if (stateValue.isReset) {
                 setCustomers(newCustomers);

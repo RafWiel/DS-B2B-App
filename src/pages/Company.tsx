@@ -150,18 +150,8 @@ const Company = memo(() => {
         api.get(`${config.API_URL}/companies/${company.id}`, { 
             signal: abortController.signal 
         })              
-        .then((res) => {            
-            const newCompany = res.data as ICompany;
-
-            //update type text
-            newCompany.customers.forEach(u => {
-                u.type = customerType.getText(Number(u.type));                
-            });
-
+        .then((res) => {                        
             setCompany(res.data);  
-
-            //console.log('load:', JSON.stringify(res, null, 2));
-            
             setAppBarTitle(`Firma ${res.data.name}`);        
         })
         .catch((error) => {

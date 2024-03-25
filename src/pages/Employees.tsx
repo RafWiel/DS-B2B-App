@@ -246,13 +246,6 @@ const Employees = memo(() => {
                 !stateValue.isReset) {
                 return;
             }
-
-            //console.log('employees', newEmployees);
-
-            //update type text
-            newEmployees.forEach(u => {
-                u.type = employeeType.getText(Number(u.type));                
-            });
             
             if (stateValue.isReset) {
                 setEmployees(newEmployees);
