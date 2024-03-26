@@ -34,8 +34,8 @@ const columns: IColumn[] = [
         }
     },
     {
-        id: 'login',
-        label: 'Login',
+        id: 'date',
+        label: 'Data',
         numeric: false,
         disablePadding: true,        
         visible: true,
@@ -46,7 +46,7 @@ const columns: IColumn[] = [
     },
     {
         id: 'name',
-        label: 'Imię i nazwisko',
+        label: 'Numer',
         numeric: false,
         disablePadding: false,        
         visible: true,
@@ -56,8 +56,41 @@ const columns: IColumn[] = [
         }
     },
     {
-        id: 'phoneNumber',
-        label: 'Numer telefonu',
+        id: 'topic',
+        label: 'Temat',
+        numeric: false,
+        disablePadding: false,        
+        visible: true,
+        width: {
+            mobile: '170px',
+            desktop: '170px'
+        }
+    },
+    {
+        id: 'customer',
+        label: 'Zgłaszający',
+        numeric: false,
+        disablePadding: false,        
+        visible: true,
+        width: {
+            mobile: '170px',
+            desktop: '170px'
+        }
+    },
+    {
+        id: 'company',
+        label: 'Firma',
+        numeric: false,
+        disablePadding: false,        
+        visible: true,
+        width: {
+            mobile: '170px',
+            desktop: '170px'
+        }
+    },
+    {
+        id: 'employee',
+        label: 'Odpowiedzialny',
         numeric: false,
         disablePadding: false,        
         visible: true,
@@ -69,6 +102,28 @@ const columns: IColumn[] = [
     {
         id: 'type',
         label: 'Typ',
+        numeric: false,
+        disablePadding: false,        
+        visible: true,
+        width: {
+            mobile: '170px',
+            desktop: '170px'
+        }
+    },
+    {
+        id: 'submitType',
+        label: 'Źródło',
+        numeric: false,
+        disablePadding: false,        
+        visible: true,
+        width: {
+            mobile: '170px',
+            desktop: '170px'
+        }
+    },
+    {
+        id: 'status',
+        label: 'Status',
         numeric: false,
         disablePadding: false,        
         visible: true,
@@ -244,14 +299,7 @@ const ServiceRequests = memo(() => {
             if (newRequests.length === 0 && 
                 !stateValue.isReset) {
                 return;
-            }
-
-            //console.log('employees', newEmployees);
-
-            //update type text
-            newRequests.forEach(u => {
-                u.type = employeeType.getText(Number(u.type));                
-            });
+            }            
             
             if (stateValue.isReset) {
                 setEmployees(newRequests);
