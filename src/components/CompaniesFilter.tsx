@@ -9,7 +9,7 @@ type ComponentProps = {
     setFilter(search: string, isDebouncedUpdate: boolean): void;           
 };  
 
-const CompaniesFilter = memo(({search, setFilter}: ComponentProps) => {
+export const CompaniesFilter = memo(({search, setFilter}: ComponentProps) => {
     const theme = useTheme();
     
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {           
@@ -48,5 +48,3 @@ const CompaniesFilter = memo(({search, setFilter}: ComponentProps) => {
         </Card>
     );
 });
-
-export default CompaniesFilter;

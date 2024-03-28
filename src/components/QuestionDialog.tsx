@@ -2,7 +2,7 @@ import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Dialog
 import { memo } from "react";
 import { useAppStore } from "../store";
 
-const QuestionDialog = memo(() => {
+export const QuestionDialog = memo(() => {
     const questionDialog = useAppStore((state) => state.questionDialog);
     const applyQuestionDialog = useAppStore((state) => state.applyQuestionDialog);    
     const cancelQuestionDialog = useAppStore((state) => state.cancelQuestionDialog);
@@ -35,5 +35,3 @@ const QuestionDialog = memo(() => {
         </Dialog>
     );
 });
-
-export default QuestionDialog;

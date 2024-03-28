@@ -1,7 +1,7 @@
 import { Box, Typography } from '@mui/material';
 import { memo } from "react";
 
-const NotFound = memo(() => {
+export const NotFound = memo(() => {
     return (
         <Box             
             sx={{ 
@@ -33,5 +33,3 @@ const NotFound = memo(() => {
         </Box>
     );
 });
-
-export default NotFound;

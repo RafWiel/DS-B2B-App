@@ -20,7 +20,7 @@ import { IIdResponse } from "../interfaces/IIdResponse.ts";
 import '../assets/card.css';
 import useApi from '../hooks/useApi.ts';
 
-const Employee = memo(() => {
+export const Employee = () => {
     const theme = useTheme();  
     const setAppBarTitle = useAppStore((state) => state.setAppBarTitle);       
     const showLoadingIcon = useAppStore((state) => state.showLoadingIcon);
@@ -429,6 +429,4 @@ const Employee = memo(() => {
             </Card>
         </Box>
     );
-});
-
-export default Employee;
+}

@@ -1,10 +1,10 @@
-import { memo, useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTheme } from '@mui/material/styles';
-import CompaniesFilter from "../components/CompaniesFilter"; 
+import { CompaniesFilter } from "../components/CompaniesFilter"; 
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import DataGrid, { IBaseRow, IColumn, IDataGridRef, Order } from "../components/DataGrid";
+import { DataGrid, IBaseRow, IColumn, IDataGridRef, Order } from "../components/DataGrid";
 import { useAppStore } from "../store";
 import { Button, Grid, useMediaQuery } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
@@ -26,19 +26,12 @@ const columns: IColumn[] = [
         id: 'id',
         label: 'Id',
         numeric: true,
-        disablePadding: false,        
-        visible: false,
-        width: {
-            mobile: '0',
-            desktop: '0'
-        }
+        hidden: true,        
     },   
     {
         id: 'name',
         label: 'Nazwa',
-        numeric: false,
-        disablePadding: false,        
-        visible: true,
+        disablePadding: true,  
         width: {
             mobile: '200px',
             desktop: '200px'
@@ -46,10 +39,7 @@ const columns: IColumn[] = [
     },
     {
         id: 'erpId',
-        label: 'ERP Id',
-        numeric: false,
-        disablePadding: true,        
-        visible: true,
+        label: 'ERP Id',                
         width: {
             mobile: '150px',
             desktop: '150px'
@@ -58,9 +48,6 @@ const columns: IColumn[] = [
     {
         id: 'taxNumber',
         label: 'NIP',
-        numeric: false,
-        disablePadding: false,        
-        visible: true,
         width: {
             mobile: '200px',
             desktop: '200px'
@@ -69,9 +56,6 @@ const columns: IColumn[] = [
     {
         id: 'city',
         label: 'Miasto',
-        numeric: false,
-        disablePadding: false,        
-        visible: true,
         width: {
             mobile: 'auto',
             desktop: 'auto'
@@ -87,7 +71,7 @@ type FetchState = {
     isReset: boolean
 }
   
-const Companies = memo(() => {    
+export const Companies = () => {    
     const theme = useTheme();     
     const openQuestionDialog = useAppStore((state) => state.openQuestionDialog); 
     const openMessageDialog = useAppStore((state) => state.openMessageDialog); 
@@ -109,9 +93,9 @@ const Companies = memo(() => {
     });
     
    
-    //console.log('render', state.page);
+    console.log('render', state.page);
 
-    useEffect(() => {                    
+    useEffect(() => {                 
         parseUrl();        
         handleResize();              
         window.addEventListener('resize', handleResize);
@@ -122,22 +106,7 @@ const Companies = memo(() => {
           debounceFetchData.cancel();   
           window.removeEventListener('resize', handleResize);       
         }
-    }, []);
-    
-    const fetchNextData = () => {
-        //console.log('fetchNextData');
-        //console.log('search', state.search);
-        //console.log('page', state.page);
-        
-        const newState = {
-            ...state,             
-            page: state.page + 1,
-            isReset: false
-        };        
-
-        setState(newState);    
-        fetchData(newState);
-    };
+    }, []);    
 
     const setFilter = (search: string, isDebouncedUpdate: boolean) => {
         //console.log('setFilter');        
@@ -158,22 +127,7 @@ const Companies = memo(() => {
         } else {
             fetchData(newState); 
         }
-    };
-
-    const setSorting = (column: string, order: Order) => {
-        //console.log('sorting: ', column, order);
-
-        const newState = {
-            ...state,             
-            sortColumn: column,
-            sortOrder: order,
-            page: 1, 
-            isReset: true
-        };
-
-        setState(newState);
-        fetchData(newState);         
-    }
+    }    
     
     const debounceFetchData = useRef(
         debounce((stateValue: FetchState) => { 
@@ -261,47 +215,39 @@ const Companies = memo(() => {
         .finally(() => {
             showLoadingIcon(false);                        
         });    
-    }, [companies, openMessageDialog, showLoadingIcon, abortController]);
+    }, [abortController.signal, api, companies, showLoadingIcon, openMessageDialog]);
 
-    const handleDelete = (row: object) => {
-        const company = row as ICompanyRow;
+    const fetchNextData = useCallback(() => {
+        //console.log('fetchNextData');
+        //console.log('search', state.search);
+        //console.log('page', state.page);
+        
+        const newState = {
+            ...state,             
+            page: state.page + 1,
+            isReset: false
+        };        
 
-        openQuestionDialog({
-            title: 'Firmy',
-            text: `Czy na pewno usunąć firmę ${company.name}?`,            
-            action: deleteSingle,
-            actionParameters: company.id
-        });
-    }
+        setState(newState);    
+        fetchData(newState);
+    }, [fetchData, state]);
 
-    const handleDeleteAll = () => {        
-        openQuestionDialog({
-            title: 'Firmy',
-            text: 'Czy na pewno usunąć wszystkie firmy?',
-            action: deleteAll,
-            //actionParameters: [1, 2, 3]
-        });
-    }
+    const setSorting = useCallback((column: string, order: Order) => {
+        //console.log('sorting: ', column, order);
 
-    const deleteSingle = async (id: number) => {
-        const result = await deleteAsync(`${config.API_URL}/companies/${id}`, 'Nieudane usunięcie firmy');        
-        if (!result) {            
-            return;
-        }
+        const newState = {
+            ...state,             
+            sortColumn: column,
+            sortOrder: order,
+            page: 1, 
+            isReset: true
+        };
 
-        setCompanies(companies.filter(u => u.id !== id));     
-    }
+        setState(newState);
+        fetchData(newState);         
+    }, [fetchData, state]);
 
-    const deleteAll = async () => {
-        const result = await deleteAsync(`${config.API_URL}/companies`, 'Nieudane usunięcie wszystkich firm');        
-        if (!result) {            
-            return;
-        }
-
-        setCompanies([]);         
-    }
-
-    const deleteAsync = async (url: string, errorMessage: string) => {
+    const deleteAsync = useCallback(async (url: string, errorMessage: string) => {
         showLoadingIcon(true);       
         
         const result = await api.delete(url, {
@@ -327,8 +273,46 @@ const Companies = memo(() => {
         
         //console.log('result', result);
         return result;
-    }     
+    }, [abortController.signal, api, openMessageDialog, showLoadingIcon]);  
 
+    const deleteSingle = useCallback(async (id: number) => {
+        const result = await deleteAsync(`${config.API_URL}/companies/${id}`, 'Nieudane usunięcie firmy');        
+        if (!result) {            
+            return;
+        }
+
+        setCompanies(companies.filter(u => u.id !== id));     
+    }, [companies, deleteAsync]);
+
+    const handleDelete = useCallback((row: object) => {
+        const company = row as ICompanyRow;
+
+        openQuestionDialog({
+            title: 'Firmy',
+            text: `Czy na pewno usunąć firmę ${company.name}?`,            
+            action: deleteSingle,
+            actionParameters: company.id
+        });
+    }, [deleteSingle, openQuestionDialog]);
+
+    const deleteAll = useCallback(async () => {
+        const result = await deleteAsync(`${config.API_URL}/companies`, 'Nieudane usunięcie wszystkich firm');        
+        if (!result) {            
+            return;
+        }
+
+        setCompanies([]);         
+    }, [deleteAsync]);
+
+    const handleDeleteAll = useCallback(() => {        
+        openQuestionDialog({
+            title: 'Firmy',
+            text: 'Czy na pewno usunąć wszystkie firmy?',
+            action: deleteAll,
+            //actionParameters: [1, 2, 3]
+        });
+    }, [deleteAll, openQuestionDialog]);    
+          
     const handleResize = () => {
         const appBarHeight = document.getElementById("appBar")?.clientHeight ?? 0;
         const filterHeight = document.getElementById("filter-container")?.clientHeight ?? 0;
@@ -455,6 +439,4 @@ const Companies = memo(() => {
             </Card>
         </Box>
     );
-});
-
-export default Companies;
+}

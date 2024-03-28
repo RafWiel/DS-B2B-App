@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { memo, useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTheme } from '@mui/material/styles';
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
@@ -16,10 +16,9 @@ import ClearIcon from '@mui/icons-material/Clear';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import { IIdResponse } from "../interfaces/IIdResponse.ts";
 import '../assets/card.css';
-import DataGrid, { IBaseRow, IColumn, IDataGridRef } from "../components/DataGrid.tsx";
+import { DataGrid, IBaseRow, IColumn, IDataGridRef } from "../components/DataGrid.tsx";
 import { ICustomer } from "../interfaces/ICustomer.ts";
 import useApi from '../hooks/useApi.ts';
-import customerType from "../enums/customerType.ts";
 
 interface ICustomerRow extends IBaseRow {
     login: string,
@@ -27,6 +26,9 @@ interface ICustomerRow extends IBaseRow {
     phoneNumber: string;    
     type: string
 }
+
+popraw kolumny
+popraw useCallback
 
 const columns: IColumn[] = [
     {
@@ -86,7 +88,7 @@ const columns: IColumn[] = [
     },
 ];
 
-const Company = memo(() => {
+export const Company = () => {
     const theme = useTheme();  
     const setAppBarTitle = useAppStore((state) => state.setAppBarTitle);       
     const showLoadingIcon = useAppStore((state) => state.showLoadingIcon);
@@ -142,7 +144,7 @@ const Company = memo(() => {
         }
     }, []);
     
-    const fetchData = useCallback(() => {
+    const fetchData = () => {
         if (!company.id) return;
                
         showLoadingIcon(true);
@@ -166,9 +168,9 @@ const Company = memo(() => {
             navigate('/companies');
         })
         .finally(() => showLoadingIcon(false));         
-    }, [company.id]);
+    }
     
-    const handleSubmit = useCallback((company: ICompany, { setSubmitting }: FormikHelpers<ICompany>) => {                     
+    const handleSubmit = (company: ICompany, { setSubmitting }: FormikHelpers<ICompany>) => {                     
         showLoadingIcon(true);        
 
         //console.log('submit', company.id);
@@ -219,7 +221,7 @@ const Company = memo(() => {
             setSubmitting(false);  
             showLoadingIcon(false);            
         });
-    }, [company.id]);
+    }
     
     const setUrl = (id: number) => {
         const url = `/companies/${id}`;
@@ -655,6 +657,5 @@ const Company = memo(() => {
             </Card>            
         </Box>
     );
-});
+}
 
-export default Company;

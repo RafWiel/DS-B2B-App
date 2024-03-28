@@ -4,14 +4,13 @@ import { useTheme } from '@mui/material/styles';
 import SearchIcon from '@mui/icons-material/Search';
 import employeeType from '../enums/employeeType.ts';
 
-
 type ComponentProps = { 
     search: string,  
     type: string,
     setFilter(search: string, type: string, isDebouncedUpdate: boolean): void;           
 };  
 
-const EmployeesFilter = memo(({search, type, setFilter}: ComponentProps) => {
+export const EmployeesFilter = memo(({search, type, setFilter}: ComponentProps) => {
     const theme = useTheme();
     
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {           
@@ -72,5 +71,3 @@ const EmployeesFilter = memo(({search, type, setFilter}: ComponentProps) => {
         </Card>
     );
 });
-
-export default EmployeesFilter;

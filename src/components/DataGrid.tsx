@@ -21,8 +21,9 @@ import { visuallyHidden } from '@mui/utils';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import ClearIcon from '@mui/icons-material/Clear';
 import { useTheme } from '@mui/material/styles';
-import { styled } from '@mui/material';
+import { Typography, styled, useMediaQuery } from '@mui/material';
 import { InView } from 'react-intersection-observer';
+import moment from "moment";
 
 export interface IBaseRow {
     id: number;    
@@ -31,11 +32,12 @@ export interface IBaseRow {
 export interface IColumn {    
     id: string;
     label: string;
-    numeric: boolean;
-    disablePadding: boolean;
-    visible: boolean;
-    width: {
-        mobile: string;
+    numeric?: boolean;
+    disablePadding?: boolean;
+    hidden?: boolean;
+    mobileHidden?: boolean;
+    width?: {
+        mobile?: string;
         desktop: string;
     }
 }
@@ -119,6 +121,7 @@ function stableSort<T>(array: T[], comparator: (a: T, b: T) => number) {
 
 function EnhancedTableHead(props: IHeadProps) {
     const theme = useTheme();
+    const isMobileView = useMediaQuery(theme.breakpoints.down("md"));           
 
     const { 
         onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort, 
@@ -175,7 +178,7 @@ function EnhancedTableHead(props: IHeadProps) {
                 }
                 {
                     columns && columns.map((column) => (
-                        column.visible && 
+                        !column.hidden && ((isMobileView && !column.mobileHidden) || !isMobileView) && 
                         <TableCell
                             key={column.id}                            
                             align={column.numeric ? 'right' : 'left'}
@@ -197,10 +200,12 @@ function EnhancedTableHead(props: IHeadProps) {
                                 backgroundColor: 'white',
                                 padding: 0,  
                                 paddingLeft: column.disablePadding ? (isSelection ? 0 : 1) : 0,
-                                width: column.width.desktop,
+                                width: column.width?.desktop,
+                                maxWidth: column.width?.desktop,
                                 [theme.breakpoints.down('sm')]: {
-                                    width: column.width.mobile,
-                                },                                  
+                                    width: column.width?.mobile,
+                                    maxWidth: column.width?.mobile,
+                                },                                 
                             }} 
                         >
                             <TableSortLabel
@@ -318,7 +323,7 @@ function EnhancedTableHead(props: IHeadProps) {
 //     );
 // }
 
-const DataGrid = React.forwardRef((props: IDataGridProps, ref) => {
+export const DataGrid = React.memo(React.forwardRef((props: IDataGridProps, ref) => {        
     const { 
         maxHeight, 
         columns, 
@@ -332,6 +337,8 @@ const DataGrid = React.forwardRef((props: IDataGridProps, ref) => {
         onRowClick 
     } = props;
 
+    const theme = useTheme();
+    const isMobileView = useMediaQuery(theme.breakpoints.down("md"));           
     const [order, setOrder] = React.useState<Order>('asc');    
     const [orderBy, setOrderBy] = React.useState<string>('');
     const [selected, setSelected] = React.useState<readonly number[]>([]);
@@ -534,8 +541,8 @@ const DataGrid = React.forwardRef((props: IDataGridProps, ref) => {
                                     }                                    
                                     {
                                         columns && columns.map((column, columnIndex) => (
-                                            column.visible && 
-                                            <TableCell
+                                            !column.hidden && ((isMobileView && !column.mobileHidden) || !isMobileView) && 
+                                            <TableCell                                                
                                                 id={columnIndex === 1 ? labelId : undefined}
                                                 scope="row"                                                 
                                                 key={column.id}
@@ -543,10 +550,22 @@ const DataGrid = React.forwardRef((props: IDataGridProps, ref) => {
                                                 padding={column.disablePadding ? 'none' : 'normal'}                                                        
                                                 sx = {{
                                                     padding: 0,
-                                                    paddingLeft: column.disablePadding ? (isSelection ? 0 : 1) : 0
+                                                    paddingLeft: column.disablePadding ? (isSelection ? 0 : 1) : 0,
+                                                    width: column.width?.desktop,
+                                                    maxWidth: column.width?.desktop,
+                                                    [theme.breakpoints.down('sm')]: {
+                                                        width: column.width?.mobile,
+                                                        maxWidth: column.width?.mobile,
+                                                    },
                                                 }}                                               
-                                            >                                                
-                                                {row[column.id]}  
+                                            >      
+                                                <Typography className="text-ellipsis">
+                                                {
+                                                    column.id == 'date' ? 
+                                                        moment(row['date']).format('DD/MM/YYYY') : 
+                                                        row[column.id]
+                                                }
+                                                </Typography>                                                                                                                                
                                                 {
                                                     //instersection object - trigger event to fetch another data chunk
                                                     columnIndex === 1 && 
@@ -621,6 +640,4 @@ const DataGrid = React.forwardRef((props: IDataGridProps, ref) => {
             /> */}
         </Box>
     );
-});
-
-export default DataGrid;
+}));

@@ -3,10 +3,9 @@ import { useTheme } from '@mui/material/styles';
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import { Typography } from "@mui/material";
-import ParentComponent from "../components/ParentComponent";
 
-const RegistrationRequests = memo(() => {
+
+export const RegistrationRequests = () => {
     const theme = useTheme();    
 
     return (
@@ -32,11 +31,9 @@ const RegistrationRequests = memo(() => {
                 }}
             >
                 <CardContent>
-                    <ParentComponent />
+                    
                 </CardContent>
             </Card>
         </Box>
     );
-});
-
-export default RegistrationRequests;
+}

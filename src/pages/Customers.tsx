@@ -1,10 +1,10 @@
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { useTheme } from '@mui/material/styles';
-import CustomersFilter from "../components/CustomersFilter";
+import { CustomersFilter } from "../components/CustomersFilter";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import DataGrid, { IBaseRow, IColumn, IDataGridRef, Order } from "../components/DataGrid";
+import { DataGrid, IBaseRow, IColumn, IDataGridRef, Order } from "../components/DataGrid";
 import { useAppStore } from "../store";
 import { Button, Grid, useMediaQuery } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
@@ -101,7 +101,7 @@ type FetchState = {
     isReset: boolean
 }
   
-const Customers = memo(() => {
+export const Customers = () => {
     const theme = useTheme();     
     const openQuestionDialog = useAppStore((state) => state.openQuestionDialog); 
     const openMessageDialog = useAppStore((state) => state.openMessageDialog); 
@@ -474,6 +474,4 @@ const Customers = memo(() => {
             </Card>
         </Box>
     );
-});
-
-export default Customers;
+}

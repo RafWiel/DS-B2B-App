@@ -25,7 +25,7 @@ import { IList } from "../interfaces/IList.ts";
 import useFetch from "../hooks/useFetch.ts";
 import useApi from '../hooks/useApi.ts';
 
-const Customer = memo(() => {
+export const Customer = () => {
     const theme = useTheme();  
     const setAppBarTitle = useAppStore((state) => state.setAppBarTitle);       
     const showLoadingIcon = useAppStore((state) => state.showLoadingIcon);
@@ -506,6 +506,4 @@ const Customer = memo(() => {
             </Card>
         </Box>
     );
-});
-
-export default Customer;
+}

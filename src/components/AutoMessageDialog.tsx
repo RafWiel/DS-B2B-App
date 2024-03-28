@@ -2,7 +2,7 @@ import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Dialog
 import { memo, useEffect } from "react";
 import { useAppStore } from "../store";
 
-const AutoMessageDialog = memo(() => {
+export const AutoMessageDialog = memo(() => {
     const autoMessageDialog = useAppStore((state) => state.autoMessageDialog);
     const closeAutoMessageDialog = useAppStore((state) => state.closeAutoMessageDialog);
     
@@ -46,5 +46,3 @@ const AutoMessageDialog = memo(() => {
         </Dialog>
     );
 });
-
-export default AutoMessageDialog;

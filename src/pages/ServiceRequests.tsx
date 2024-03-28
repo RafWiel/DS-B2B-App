@@ -1,10 +1,10 @@
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { useTheme } from '@mui/material/styles';
-import EmployeesFilter from "../components/EmployeesFilter";
+import { EmployeesFilter } from "../components/EmployeesFilter";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import DataGrid, { IBaseRow, IColumn, IDataGridRef, Order } from "../components/DataGrid";
+import { DataGrid, IBaseRow, IColumn, IDataGridRef, Order } from "../components/DataGrid";
 import { useAppStore } from "../store";
 import { Button, Grid, useMediaQuery } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
@@ -14,6 +14,7 @@ import debounce from 'lodash/debounce';
 import queryString from 'query-string';
 import { useLocation } from 'wouter';
 import useApi from '../hooks/useApi.ts';
+import requestType from "../enums/requestType.ts";
 
 interface IServiceRequestRow extends IBaseRow {
     login: string;
@@ -26,8 +27,7 @@ const columns: IColumn[] = [
         id: 'id',
         label: 'Id',
         numeric: true,
-        disablePadding: false,        
-        visible: false,
+        hidden: true,
         width: {
             mobile: '0',
             desktop: '0'
@@ -36,99 +36,73 @@ const columns: IColumn[] = [
     {
         id: 'date',
         label: 'Data',
-        numeric: false,
-        disablePadding: true,        
-        visible: true,
+        disablePadding: true,                
         width: {
-            mobile: '170px',
-            desktop: '170px'
+            mobile: '100px',
+            desktop: '120px'
         }
     },
     {
         id: 'name',
         label: 'Numer',
-        numeric: false,
-        disablePadding: false,        
-        visible: true,
         width: {
-            mobile: '190px',
-            desktop: '190px'
+            mobile: '120px',
+            desktop: '150px'
         }
     },
     {
         id: 'topic',
         label: 'Temat',
-        numeric: false,
-        disablePadding: false,        
-        visible: true,
         width: {
-            mobile: '170px',
-            desktop: '170px'
+            mobile: '150px',
+            desktop: '200px'
         }
     },
     {
         id: 'customer',
         label: 'Zgłaszający',
-        numeric: false,
-        disablePadding: false,        
-        visible: true,
-        width: {
-            mobile: '170px',
-            desktop: '170px'
+        mobileHidden: true,
+        width: {            
+            desktop: '150px'
         }
     },
     {
         id: 'company',
         label: 'Firma',
-        numeric: false,
-        disablePadding: false,        
-        visible: true,
+        mobileHidden: true,
         width: {
-            mobile: '170px',
-            desktop: '170px'
+            desktop: '150px'
         }
     },
     {
         id: 'employee',
         label: 'Odpowiedzialny',
-        numeric: false,
-        disablePadding: false,        
-        visible: true,
+        mobileHidden: true,
         width: {
-            mobile: '170px',
-            desktop: '170px'
+            desktop: '150px'
         }
     },
     {
         id: 'type',
         label: 'Typ',
-        numeric: false,
-        disablePadding: false,        
-        visible: true,
+        mobileHidden: true,
         width: {
-            mobile: '170px',
-            desktop: '170px'
+            desktop: '100px'
         }
     },
     {
         id: 'submitType',
         label: 'Źródło',
-        numeric: false,
-        disablePadding: false,        
-        visible: true,
+        mobileHidden: true,
         width: {
-            mobile: '170px',
-            desktop: '170px'
+            desktop: 'auto'
         }
     },
     {
         id: 'status',
         label: 'Status',
-        numeric: false,
-        disablePadding: false,        
-        visible: true,
+        mobileHidden: true,
         width: {
-            mobile: 'auto',
             desktop: 'auto'
         }
     },
@@ -143,14 +117,14 @@ type FetchState = {
     isReset: boolean
 }
   
-const ServiceRequests = memo(() => {
+export const ServiceRequests = () => {
     const theme = useTheme();     
     const openQuestionDialog = useAppStore((state) => state.openQuestionDialog); 
     const openMessageDialog = useAppStore((state) => state.openMessageDialog); 
     const isMobileView = useMediaQuery(theme.breakpoints.down("md"));           
     const showLoadingIcon = useAppStore((state) => state.showLoadingIcon);
     const dataGridRef = useRef<IDataGridRef>();
-    const [employees, setEmployees] = useState<Array<IServiceRequestRow>>([]);
+    const [requests, setRequests] = useState<Array<IServiceRequestRow>>([]);
     const [, navigate] = useLocation();
     const abortController = useRef(new AbortController()).current;  
     const [dataGridHeight, setDataGridHeight] = useState(0);
@@ -158,7 +132,7 @@ const ServiceRequests = memo(() => {
 
     const [state, setState] = useState<FetchState>({
         search: '',
-        type: employeeType.none.toString(),
+        type: requestType.none.toString(),
         page: 1,
         sortColumn: null,
         sortOrder: null,        
@@ -269,7 +243,7 @@ const ServiceRequests = memo(() => {
         });
         
         if (url.length > 0) {
-            url = `/employees?${url}`;
+            url = `/service-requests?${url}`;
         }
 
         window.history.replaceState(null, '', url);
@@ -302,10 +276,10 @@ const ServiceRequests = memo(() => {
             }            
             
             if (stateValue.isReset) {
-                setEmployees(newRequests);
+                setRequests(newRequests);
             }
             else {
-                setEmployees([...employees, ...newRequests]); 
+                setRequests([...requests, ...newRequests]); 
             }                      
         })
         .catch((error) => {
@@ -320,7 +294,7 @@ const ServiceRequests = memo(() => {
         .finally(() => {
             showLoadingIcon(false);                        
         });    
-    }, [employees, openMessageDialog, showLoadingIcon, abortController]);
+    }, [requests, openMessageDialog, showLoadingIcon, abortController]);
 
     const handleDelete = (row: object) => {
         const employee = row as IServiceRequestRow;
@@ -348,7 +322,7 @@ const ServiceRequests = memo(() => {
             return;
         }
 
-        setEmployees(employees.filter(u => u.id !== id));     
+        setRequests(requests.filter(u => u.id !== id));     
     }
 
     const deleteAll = async () => {
@@ -357,7 +331,7 @@ const ServiceRequests = memo(() => {
             return;
         }
 
-        setEmployees([]);         
+        setRequests([]);         
     }
 
     const deleteAsync = async (url: string, errorMessage: string) => {
@@ -472,7 +446,7 @@ const ServiceRequests = memo(() => {
                             <DataGrid                             
                                 ref={dataGridRef}
                                 columns={columns}
-                                rows={employees}
+                                rows={requests}
                                 isSelection={false}
                                 isDelete={true}
                                 maxHeight={dataGridHeight}                              
@@ -515,6 +489,4 @@ const ServiceRequests = memo(() => {
             </Card>
         </Box>
     );
-});
-
-export default ServiceRequests;
+}
