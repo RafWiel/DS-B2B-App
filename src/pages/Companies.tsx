@@ -108,68 +108,12 @@ export const Companies = () => {
         }
     }, []);    
 
-    const setFilter = (search: string, isDebouncedUpdate: boolean) => {
-        //console.log('setFilter');        
-        //console.log('search', value);        
-        //console.log('page', state.page);
-
-        const newState = {
-            ...state,             
-            search: search,
-            page: 1, 
-            isReset: true
-        };
-        
-        setState(newState);    
-        
-        if (isDebouncedUpdate) {
-            debounceFetchData(newState);
-        } else {
-            fetchData(newState); 
-        }
-    }    
-    
     const debounceFetchData = useRef(
         debounce((stateValue: FetchState) => { 
             fetchData(stateValue); 
         }, 500)
     ).current;
-
-    const parseUrl = () => {
-        const url = queryString.parse(location.search);
-        //console.log(url);
-        
-        const newState: FetchState = {
-            ...state,
-            search: (url.search ?? '').toString(),
-            sortColumn: url['sort-column']?.toString() ?? null,
-            sortOrder: url['sort-order']?.toString() as Order ?? null,        
-            page: 1,            
-            isReset: true
-        };
-        
-        setState(newState);
-        fetchData(newState);   
-        
-        dataGridRef.current?.updateSorting(newState.sortColumn, newState.sortOrder);
-    }
-
-    const setUrl = (stateValue: FetchState) => {
-        let url = queryString.stringify({
-            search: stateValue.search.length > 0 ? stateValue.search : null,             
-            'sort-column': stateValue.sortColumn, 
-            'sort-order': stateValue.sortOrder
-        }, {
-            skipNull: true
-        });
-        
-        if (url.length > 0) {
-            url = `/companies?${url}`;
-        }
-
-        window.history.replaceState(null, '', url);
-    }
-
+    
     const fetchData = useCallback((stateValue: FetchState) => {                        
         //console.log('fetchData');
         //console.log('search: ', stateValue.search, ' | ', state.search);   
@@ -216,6 +160,62 @@ export const Companies = () => {
             showLoadingIcon(false);                        
         });    
     }, [abortController.signal, api, companies, showLoadingIcon, openMessageDialog]);
+
+    const setFilter = useCallback((search: string, isDebouncedUpdate: boolean) => {
+        //console.log('setFilter');        
+        //console.log('search', value);        
+        //console.log('page', state.page);
+
+        const newState = {
+            ...state,             
+            search: search,
+            page: 1, 
+            isReset: true
+        };
+        
+        setState(newState);    
+        
+        if (isDebouncedUpdate) {
+            debounceFetchData(newState);
+        } else {
+            fetchData(newState); 
+        }
+    }, [debounceFetchData, fetchData, state]);        
+
+    const parseUrl = () => {
+        const url = queryString.parse(location.search);
+        //console.log(url);
+        
+        const newState: FetchState = {
+            ...state,
+            search: (url.search ?? '').toString(),
+            sortColumn: url['sort-column']?.toString() ?? null,
+            sortOrder: url['sort-order']?.toString() as Order ?? null,        
+            page: 1,            
+            isReset: true
+        };
+        
+        setState(newState);
+        fetchData(newState);   
+        
+        dataGridRef.current?.updateSorting(newState.sortColumn, newState.sortOrder);
+    }
+
+    const setUrl = (stateValue: FetchState) => {
+        let url = queryString.stringify({
+            search: stateValue.search.length > 0 ? stateValue.search : null,             
+            'sort-column': stateValue.sortColumn, 
+            'sort-order': stateValue.sortOrder
+        }, {
+            skipNull: true
+        });
+        
+        if (url.length > 0) {
+            url = `/companies?${url}`;
+        }
+
+        window.history.replaceState(null, '', url);
+    }    
 
     const fetchNextData = useCallback(() => {
         //console.log('fetchNextData');

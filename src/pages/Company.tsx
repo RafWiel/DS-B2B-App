@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTheme } from '@mui/material/styles';
 import Box from "@mui/material/Box";
@@ -27,27 +26,17 @@ interface ICustomerRow extends IBaseRow {
     type: string
 }
 
-popraw kolumny
-popraw useCallback
-
 const columns: IColumn[] = [
     {
         id: 'id',
         label: 'Id',
         numeric: true,
-        disablePadding: false,        
-        visible: false,
-        width: {
-            mobile: '0',
-            desktop: '0'
-        }
+        hidden: true,        
     },
     {
         id: 'login',
         label: 'Login',
-        numeric: false,
         disablePadding: true,        
-        visible: true,
         width: {
             mobile: '170px',
             desktop: '170px'
@@ -56,9 +45,6 @@ const columns: IColumn[] = [
     {
         id: 'name',
         label: 'Imię i nazwisko',
-        numeric: false,
-        disablePadding: false,        
-        visible: true,
         width: {
             mobile: '190px',
             desktop: '190px'
@@ -67,9 +53,6 @@ const columns: IColumn[] = [
     {
         id: 'phoneNumber',
         label: 'Numer telefonu',
-        numeric: false,
-        disablePadding: false,        
-        visible: true,
         width: {
             mobile: '170px',
             desktop: '170px'
@@ -78,9 +61,6 @@ const columns: IColumn[] = [
     {
         id: 'type',
         label: 'Typ',
-        numeric: false,
-        disablePadding: false,        
-        visible: true,
         width: {
             mobile: 'auto',
             desktop: 'auto'
@@ -247,44 +227,7 @@ export const Company = () => {
         navigate('/companies');
     }   
 
-    const handleDeleteCustomer = (row: object) => {    
-        const customer = row as ICustomerRow;
-        
-        openQuestionDialog({
-            title: 'Firma',
-            text: `Czy na pewno usunąć pracownika ${customer.name}?`,            
-            action: deleteSingleCustomer,
-            actionParameters: customer.id
-        });
-    }
-
-    const handleDeleteAllCustomers = () => {        
-        openQuestionDialog({
-            title: 'Firma',
-            text: 'Czy na pewno usunąć wszystkich pracowników?',
-            action: deleteAllCustomers,
-        });
-    }
-
-    const deleteSingleCustomer = async (id: number) => {
-        const result = await deleteAsync(`${config.API_URL}/customers/${id}`, 'Nieudane usunięcie pracownika');        
-        if (!result) {            
-            return;
-        }
-
-        setCompany({...company, customers: company.customers.filter(u => u.id !== id)} );   
-    }    
-
-    const deleteAllCustomers = async () => {
-        const result = await deleteAsync(`${config.API_URL}/companies/${company.id}/customers`, 'Nieudane usunięcie wszystkich pracowników');        
-        if (!result) {            
-            return;
-        }
-
-        setCompany({...company, customers: new Array<ICustomer>() });           
-    }
-
-    const deleteAsync = async (url: string, errorMessage: string) => {
+    const deleteAsync = useCallback(async (url: string, errorMessage: string) => {
         showLoadingIcon(true);       
         
         const result = await api.delete(url, {
@@ -310,7 +253,44 @@ export const Company = () => {
     
         //console.log('result', result);
         return result;
-    } 
+    }, [abortController.signal, api, openMessageDialog, showLoadingIcon]); 
+
+    const deleteSingleCustomer = useCallback(async (id: number) => {
+        const result = await deleteAsync(`${config.API_URL}/customers/${id}`, 'Nieudane usunięcie pracownika');        
+        if (!result) {            
+            return;
+        }
+
+        setCompany({...company, customers: company.customers.filter(u => u.id !== id)} );   
+    }, [company, deleteAsync]);
+
+    const handleDeleteCustomer = useCallback((row: object) => {    
+        const customer = row as ICustomerRow;
+        
+        openQuestionDialog({
+            title: 'Firma',
+            text: `Czy na pewno usunąć pracownika ${customer.name}?`,            
+            action: deleteSingleCustomer,
+            actionParameters: customer.id
+        });
+    }, [deleteSingleCustomer, openQuestionDialog]);
+
+    const deleteAllCustomers = useCallback(async () => {
+        const result = await deleteAsync(`${config.API_URL}/companies/${company.id}/customers`, 'Nieudane usunięcie wszystkich pracowników');        
+        if (!result) {            
+            return;
+        }
+
+        setCompany({...company, customers: new Array<ICustomer>() });           
+    }, [company, deleteAsync]);
+
+    const handleDeleteAllCustomers = useCallback(() => {        
+        openQuestionDialog({
+            title: 'Firma',
+            text: 'Czy na pewno usunąć wszystkich pracowników?',
+            action: deleteAllCustomers,
+        });
+    }, [deleteAllCustomers, openQuestionDialog]);            
 
     const handleResize = () => {                  
         const appBarHeight = document.getElementById("appBar")?.clientHeight ?? 0;     

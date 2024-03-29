@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { memo, useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTheme } from '@mui/material/styles';
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
@@ -40,9 +40,9 @@ export const Customer = () => {
     const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
     const api = useApi();
 
-    console.log('company id', companyParams?.companyId);
-    console.log('customer id', companyParams?.id);
-    console.log('id', params?.id);
+    //console.log('company id', companyParams?.companyId);
+    //console.log('customer id', companyParams?.id);
+    //console.log('id', params?.id);
 
     const schema = yup.object().shape({                                        
         type: yup.number().required().min(customerType.supervisor, 'Podaj typ').max(customerType.employee, 'Podaj typ'),
@@ -74,7 +74,7 @@ export const Customer = () => {
         }
     }, []);
     
-    const fetchData = useCallback(() => {
+    const fetchData = () => {
         if (!customer.id) return;
                
         showLoadingIcon(true);
@@ -101,13 +101,13 @@ export const Customer = () => {
             navigate('/customers');
         })
         .finally(() => showLoadingIcon(false));         
-    }, [customer.id]);
+    }
     
-    const handleSubmit = useCallback((customer: ICustomer, { setSubmitting }: FormikHelpers<ICustomer>) => {                     
+    const handleSubmit = (customer: ICustomer, { setSubmitting }: FormikHelpers<ICustomer>) => {                     
         showLoadingIcon(true);
 
-        console.log('submit', customer.id);
-        console.log('handleSubmit:', JSON.stringify(customer, null, 2)); 
+        //console.log('submit', customer.id);
+        //console.log('handleSubmit:', JSON.stringify(customer, null, 2)); 
                         
         api(`${config.API_URL}/customers`, {
             method: !customer.id ? 'POST' : 'PUT',            
@@ -150,7 +150,7 @@ export const Customer = () => {
             setSubmitting(false);  
             showLoadingIcon(false);            
         });
-    }, [customer.id]);
+    }
 
     const setUrl = (id: number) => {
         const url = `/customers/${id}`;
@@ -254,7 +254,7 @@ export const Customer = () => {
                                         item 
                                         xs={12} 
                                         sm={12} 
-                                        md={9}                                         
+                                        md={10}                                         
                                     >                                                                                                                                                                                                   
                                         <Grid                                         
                                             container 
@@ -385,7 +385,7 @@ export const Customer = () => {
                                         item 
                                         xs={12} 
                                         sm={12} 
-                                        md={3}
+                                        md={2}
                                         sx={{                                
                                             alignSelf: 'flex-start',
                                             [theme.breakpoints.down('md')]: {
@@ -459,7 +459,7 @@ export const Customer = () => {
                                                 },                                   
                                             }}
                                         >
-                                            Pokaż zlecenia serwisowe
+                                            Pokaż zlecenia
                                         </Button>
                                         <Button                                 
                                             variant="contained"
@@ -477,7 +477,7 @@ export const Customer = () => {
                                                 },                                   
                                             }}
                                         >
-                                            Pokaż konsultacje telefoniczne
+                                            Pokaż konsultacje
                                         </Button>
                                         <Button                                 
                                             variant="contained"
@@ -495,7 +495,7 @@ export const Customer = () => {
                                                 },                                   
                                             }}
                                         >
-                                            Utwórz zlecenie serwisowe
+                                            Utwórz zlecenie
                                         </Button>
                                     </Grid>                                    
                                 </Grid>

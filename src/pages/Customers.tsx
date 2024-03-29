@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTheme } from '@mui/material/styles';
 import { CustomersFilter } from "../components/CustomersFilter";
 import Box from "@mui/material/Box";
@@ -28,19 +28,12 @@ const columns: IColumn[] = [
         id: 'id',
         label: 'Id',
         numeric: true,
-        disablePadding: false,        
-        visible: false,
-        width: {
-            mobile: '0',
-            desktop: '0'
-        }
+        hidden: true,        
     },
     {
         id: 'login',
         label: 'Login',
-        numeric: false,
         disablePadding: true,        
-        visible: true,
         width: {
             mobile: '170px',
             desktop: '170px'
@@ -49,9 +42,6 @@ const columns: IColumn[] = [
     {
         id: 'name',
         label: 'Imię i nazwisko',
-        numeric: false,
-        disablePadding: false,        
-        visible: true,
         width: {
             mobile: '190px',
             desktop: '190px'
@@ -60,9 +50,6 @@ const columns: IColumn[] = [
     {
         id: 'phoneNumber',
         label: 'Numer telefonu',
-        numeric: false,
-        disablePadding: false,        
-        visible: true,
         width: {
             mobile: '170px',
             desktop: '170px'
@@ -71,9 +58,6 @@ const columns: IColumn[] = [
     {
         id: 'companyName',
         label: 'Firma',
-        numeric: false,
-        disablePadding: false,        
-        visible: true,
         width: {
             mobile: '190px',
             desktop: '190px'
@@ -82,9 +66,6 @@ const columns: IColumn[] = [
     {
         id: 'type',
         label: 'Typ',
-        numeric: false,
-        disablePadding: false,        
-        visible: true,
         width: {
             mobile: 'auto',
             desktop: 'auto'
@@ -137,102 +118,13 @@ export const Customers = () => {
           debounceFetchData.cancel();    
           window.removeEventListener('resize', handleResize);      
         }
-    }, []);
-    
-    const fetchNextData = () => {
-        //console.log('fetchNextData');
-        //console.log('search', state.search);
-        //console.log('page', state.page);
-        
-        const newState = {
-            ...state,             
-            page: state.page + 1,
-            isReset: false
-        };        
+    }, []);    
 
-        setState(newState);    
-        fetchData(newState);
-    };
-
-    const setFilter = (search: string, type: string, isDebouncedUpdate: boolean) => {
-        //console.log('setFilter');        
-        //console.log('search', value);        
-        //console.log('page', state.page);
-
-        const newState = {
-            ...state,             
-            search: search,
-            type: type,
-            page: 1, 
-            isReset: true
-        };
-        
-        setState(newState);    
-        
-        if (isDebouncedUpdate) {
-            debounceFetchData(newState);
-        } else {
-            fetchData(newState); 
-        }
-    };
-
-    const setSorting = (column: string, order: Order) => {
-        //console.log('sorting: ', column, order);
-
-        const newState = {
-            ...state,             
-            sortColumn: column,
-            sortOrder: order,
-            page: 1, 
-            isReset: true
-        };
-
-        setState(newState);
-        fetchData(newState);         
-    }
-    
     const debounceFetchData = useRef(
         debounce((stateValue: FetchState) => { 
             fetchData(stateValue); 
         }, 500)
     ).current;
-
-    const parseUrl = () => {
-        const url = queryString.parse(location.search);
-        //console.log(url);
-        
-        const newState: FetchState = {
-            ...state,
-            search: (url.search ?? '').toString(),
-            type: (url.type ?? customerType.none).toString(),
-            sortColumn: url['sort-column']?.toString() ?? null,
-            sortOrder: url['sort-order']?.toString() as Order ?? null,        
-            page: 1,            
-            isReset: true
-        };
-        
-        setState(newState);
-        fetchData(newState);   
-        
-        dataGridRef.current?.updateSorting(newState.sortColumn, newState.sortOrder);
-    }
-
-    const setUrl = (stateValue: FetchState) => {
-        let url = queryString.stringify({
-            search: stateValue.search.length > 0 ? stateValue.search : null, 
-            type: Number(stateValue.type) > 0 ? stateValue.type : null, 
-            'sort-column': stateValue.sortColumn, 
-            'sort-order': stateValue.sortOrder
-        }, {
-            skipNull: true
-        });
-        
-        if (url.length > 0) {
-            url = `/customers?${url}`;
-        }
-
-        window.history.replaceState(null, '', url);
-    }
 
     const fetchData = useCallback((stateValue: FetchState) => {                        
         //console.log('fetchData');
@@ -279,47 +171,98 @@ export const Customers = () => {
         .finally(() => {
             showLoadingIcon(false);                        
         });    
-    }, [customers, openMessageDialog, showLoadingIcon, abortController]);
+    }, [customers, openMessageDialog, showLoadingIcon, abortController, api]);
 
-    const handleDelete = (row: object) => {
-        const customer = row as ICustomerRow;
+    const setFilter = useCallback((search: string, type: string, isDebouncedUpdate: boolean) => {
+        //console.log('setFilter');        
+        //console.log('search', value);        
+        //console.log('page', state.page);
 
-        openQuestionDialog({
-            title: 'Klienci',
-            text: `Czy na pewno usunąć klienta ${customer.name}?`,            
-            action: deleteSingle,
-            actionParameters: customer.id
-        });
+        const newState = {
+            ...state,             
+            search: search,
+            type: type,
+            page: 1, 
+            isReset: true
+        };
+        
+        setState(newState);    
+        
+        if (isDebouncedUpdate) {
+            debounceFetchData(newState);
+        } else {
+            fetchData(newState); 
+        }
+    }, [state, debounceFetchData, fetchData]);
+
+    const fetchNextData = useCallback(() => {
+        //console.log('fetchNextData');
+        //console.log('search', state.search);
+        //console.log('page', state.page);
+        
+        const newState = {
+            ...state,             
+            page: state.page + 1,
+            isReset: false
+        };        
+
+        setState(newState);    
+        fetchData(newState);
+    }, [state, fetchData]);    
+
+    const setSorting = useCallback((column: string, order: Order) => {
+        //console.log('sorting: ', column, order);
+
+        const newState = {
+            ...state,             
+            sortColumn: column,
+            sortOrder: order,
+            page: 1, 
+            isReset: true
+        };
+
+        setState(newState);
+        fetchData(newState);         
+    }, [state, fetchData]);    
+
+    const parseUrl = () => {
+        const url = queryString.parse(location.search);
+        //console.log(url);
+        
+        const newState: FetchState = {
+            ...state,
+            search: (url.search ?? '').toString(),
+            type: (url.type ?? customerType.none).toString(),
+            sortColumn: url['sort-column']?.toString() ?? null,
+            sortOrder: url['sort-order']?.toString() as Order ?? null,        
+            page: 1,            
+            isReset: true
+        };
+        
+        setState(newState);
+        fetchData(newState);   
+        
+        dataGridRef.current?.updateSorting(newState.sortColumn, newState.sortOrder);
     }
 
-    const handleDeleteAll = () => {        
-        openQuestionDialog({
-            title: 'Klienci',
-            text: 'Czy na pewno usunąć wszystkich klientów?',
-            action: deleteAll,
-            //actionParameters: [1, 2, 3]
+    const setUrl = (stateValue: FetchState) => {
+        let url = queryString.stringify({
+            search: stateValue.search.length > 0 ? stateValue.search : null, 
+            type: Number(stateValue.type) > 0 ? stateValue.type : null, 
+            'sort-column': stateValue.sortColumn, 
+            'sort-order': stateValue.sortOrder
+        }, {
+            skipNull: true
         });
-    }
-
-    const deleteSingle = async (id?: number) => {
-        const result = await deleteAsync(`${config.API_URL}/customers/${id}`, 'Nieudane usunięcie klienta');        
-        if (!result) {            
-            return;
+        
+        if (url.length > 0) {
+            url = `/customers?${url}`;
         }
 
-        setCustomers(customers.filter(u => u.id !== id));     
-    }
+        window.history.replaceState(null, '', url);
+    }    
 
-    const deleteAll = async () => {
-        const result = await deleteAsync(`${config.API_URL}/customers`, 'Nieudane usunięcie wszystkich klientów');        
-        if (!result) {            
-            return;
-        }
-
-        setCustomers([]);         
-    }
-
-    const deleteAsync = async (url: string, errorMessage: string) => {
+    const deleteAsync = useCallback(async (url: string, errorMessage: string) => {
         showLoadingIcon(true);       
         
         const result = await api.delete(url, {
@@ -345,7 +288,45 @@ export const Customers = () => {
     
         //console.log('result', result);
         return result;
-    }    
+    }, [api, abortController.signal, openMessageDialog, showLoadingIcon]); 
+
+    const deleteSingle = useCallback(async (id?: number) => {
+        const result = await deleteAsync(`${config.API_URL}/customers/${id}`, 'Nieudane usunięcie klienta');        
+        if (!result) {            
+            return;
+        }
+
+        setCustomers(customers.filter(u => u.id !== id));     
+    }, [customers, deleteAsync]);
+
+    const handleDelete = useCallback((row: object) => {
+        const customer = row as ICustomerRow;
+
+        openQuestionDialog({
+            title: 'Klienci',
+            text: `Czy na pewno usunąć klienta ${customer.name}?`,            
+            action: deleteSingle,
+            actionParameters: customer.id
+        });
+    }, [deleteSingle, openQuestionDialog]);
+
+    const deleteAll = useCallback(async () => {
+        const result = await deleteAsync(`${config.API_URL}/customers`, 'Nieudane usunięcie wszystkich klientów');        
+        if (!result) {            
+            return;
+        }
+
+        setCustomers([]);         
+    }, [deleteAsync]);
+
+    const handleDeleteAll = useCallback(() => {        
+        openQuestionDialog({
+            title: 'Klienci',
+            text: 'Czy na pewno usunąć wszystkich klientów?',
+            action: deleteAll,
+            //actionParameters: [1, 2, 3]
+        });
+    }, [deleteAll, openQuestionDialog]);               
 
     const handleResize = () => {
         const appBarHeight = document.getElementById("appBar")?.clientHeight ?? 0;

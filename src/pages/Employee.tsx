@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { memo, useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTheme } from '@mui/material/styles';
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
@@ -62,7 +62,7 @@ export const Employee = () => {
         }
     }, []);
     
-    const fetchData = useCallback(() => {
+    const fetchData = () => {
         if (!employee.id) return;
                
         showLoadingIcon(true);
@@ -89,9 +89,9 @@ export const Employee = () => {
             navigate('/employees');
         })
         .finally(() => showLoadingIcon(false));         
-    }, [employee.id]);
+    }
     
-    const handleSubmit = useCallback((employee: IEmployee, { setSubmitting }: FormikHelpers<IEmployee>) => {                     
+    const handleSubmit = (employee: IEmployee, { setSubmitting }: FormikHelpers<IEmployee>) => {                     
         showLoadingIcon(true);        
 
         //console.log('submit', employee.id);
@@ -138,7 +138,7 @@ export const Employee = () => {
             setSubmitting(false);  
             showLoadingIcon(false);            
         });
-    }, [employee.id]);
+    }
     
     const setUrl = (id: number) => {
         const url = `/employees/${id}`;

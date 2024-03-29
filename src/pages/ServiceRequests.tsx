@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTheme } from '@mui/material/styles';
 import { EmployeesFilter } from "../components/EmployeesFilter";
 import Box from "@mui/material/Box";
@@ -152,65 +152,7 @@ export const ServiceRequests = () => {
           debounceFetchData.cancel();   
           window.removeEventListener('resize', handleResize);       
         }
-    }, []);
-    
-    const fetchNextData = () => {
-        //console.log('fetchNextData');
-        //console.log('search', state.search);
-        //console.log('page', state.page);
-        
-        const newState = {
-            ...state,             
-            page: state.page + 1,
-            isReset: false
-        };        
-
-        setState(newState);    
-        fetchData(newState);
-    };
-
-    const setFilter = (search: string, type: string, isDebouncedUpdate: boolean) => {
-        //console.log('setFilter');        
-        //console.log('search', value);        
-        //console.log('page', state.page);
-
-        const newState = {
-            ...state,             
-            search: search,
-            type: type,
-            page: 1, 
-            isReset: true
-        };
-        
-        setState(newState);    
-        
-        if (isDebouncedUpdate) {
-            debounceFetchData(newState);
-        } else {
-            fetchData(newState); 
-        }
-    };
-
-    const setSorting = (column: string, order: Order) => {
-        //console.log('sorting: ', column, order);
-
-        const newState = {
-            ...state,             
-            sortColumn: column,
-            sortOrder: order,
-            page: 1, 
-            isReset: true
-        };
-
-        setState(newState);
-        fetchData(newState);         
-    }
-    
-    const debounceFetchData = useRef(
-        debounce((stateValue: FetchState) => { 
-            fetchData(stateValue); 
-        }, 500)
-    ).current;
+    }, []);                
 
     const parseUrl = () => {
         const url = queryString.parse(location.search);
@@ -248,6 +190,12 @@ export const ServiceRequests = () => {
 
         window.history.replaceState(null, '', url);
     }
+
+    const debounceFetchData = useRef(
+        debounce((stateValue: FetchState) => { 
+            fetchData(stateValue); 
+        }, 500)
+    ).current;
 
     const fetchData = useCallback((stateValue: FetchState) => {                        
         //console.log('fetchData');
@@ -294,47 +242,61 @@ export const ServiceRequests = () => {
         .finally(() => {
             showLoadingIcon(false);                        
         });    
-    }, [requests, openMessageDialog, showLoadingIcon, abortController]);
+    }, [api, requests, openMessageDialog, showLoadingIcon, abortController]);
 
-    const handleDelete = (row: object) => {
-        const employee = row as IServiceRequestRow;
+    const fetchNextData = useCallback(() => {
+        //console.log('fetchNextData');
+        //console.log('search', state.search);
+        //console.log('page', state.page);
+        
+        const newState = {
+            ...state,             
+            page: state.page + 1,
+            isReset: false
+        };        
 
-        openQuestionDialog({
-            title: 'Pracownicy',
-            text: `Czy na pewno usunąć pracownika ${employee.name}?`,            
-            action: deleteSingle,
-            actionParameters: employee.id
-        });
-    }
+        setState(newState);    
+        fetchData(newState);
+    }, [state, fetchData]);
 
-    const handleDeleteAll = () => {        
-        openQuestionDialog({
-            title: 'Pracownicy',
-            text: 'Czy na pewno usunąć wszystkich pracowników?',
-            action: deleteAll,
-            //actionParameters: [1, 2, 3]
-        });
-    }
+    const setFilter = useCallback((search: string, type: string, isDebouncedUpdate: boolean) => {
+        //console.log('setFilter');        
+        //console.log('search', value);        
+        //console.log('page', state.page);
 
-    const deleteSingle = async (id: number) => {
-        const result = await deleteAsync(`${config.API_URL}/employees/${id}`, 'Nieudane usunięcie pracownika');        
-        if (!result) {            
-            return;
+        const newState = {
+            ...state,             
+            search: search,
+            type: type,
+            page: 1, 
+            isReset: true
+        };
+        
+        setState(newState);    
+        
+        if (isDebouncedUpdate) {
+            debounceFetchData(newState);
+        } else {
+            fetchData(newState); 
         }
+    }, [state, fetchData, debounceFetchData]);
 
-        setRequests(requests.filter(u => u.id !== id));     
-    }
+    const setSorting = useCallback((column: string, order: Order) => {
+        //console.log('sorting: ', column, order);
 
-    const deleteAll = async () => {
-        const result = await deleteAsync(`${config.API_URL}/employees`, 'Nieudane usunięcie wszystkich pracowników');        
-        if (!result) {            
-            return;
-        }
+        const newState = {
+            ...state,             
+            sortColumn: column,
+            sortOrder: order,
+            page: 1, 
+            isReset: true
+        };
 
-        setRequests([]);         
-    }
+        setState(newState);
+        fetchData(newState);         
+    }, [state, fetchData]);
 
-    const deleteAsync = async (url: string, errorMessage: string) => {
+    const deleteAsync = useCallback(async (url: string, errorMessage: string) => {
         showLoadingIcon(true);       
         
         const result = await api.delete(url, {
@@ -360,7 +322,45 @@ export const ServiceRequests = () => {
         
         //console.log('result', result);
         return result;
-    }    
+    }, [api, abortController.signal, openMessageDialog, showLoadingIcon]);  
+
+    const deleteSingle = useCallback(async (id: number) => {
+        const result = await deleteAsync(`${config.API_URL}/employees/${id}`, 'Nieudane usunięcie pracownika');        
+        if (!result) {            
+            return;
+        }
+
+        setRequests(requests.filter(u => u.id !== id));     
+    }, [requests, deleteAsync]);
+
+    const handleDelete = useCallback((row: object) => {
+        const employee = row as IServiceRequestRow;
+
+        openQuestionDialog({
+            title: 'Pracownicy',
+            text: `Czy na pewno usunąć pracownika ${employee.name}?`,            
+            action: deleteSingle,
+            actionParameters: employee.id
+        });
+    }, [deleteSingle, openQuestionDialog]);
+
+    const deleteAll = useCallback(async () => {
+        const result = await deleteAsync(`${config.API_URL}/employees`, 'Nieudane usunięcie wszystkich pracowników');        
+        if (!result) {            
+            return;
+        }
+
+        setRequests([]);         
+    }, [deleteAsync]);
+
+    const handleDeleteAll = useCallback(() => {        
+        openQuestionDialog({
+            title: 'Pracownicy',
+            text: 'Czy na pewno usunąć wszystkich pracowników?',
+            action: deleteAll,
+            //actionParameters: [1, 2, 3]
+        });
+    }, [deleteAll, openQuestionDialog]);       
 
     const handleResize = () => {
         const appBarHeight = document.getElementById("appBar")?.clientHeight ?? 0;
