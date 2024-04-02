@@ -29,7 +29,7 @@ import { CircularProgress } from '@mui/material';
 import { Customer } from './pages/Customer';
 import { Company } from './pages/Company';
 
-const todo = '';
+const todo = 'Pamietaj skad bylo wywolanie karty pracownika, moze byc z karty firmy. Po usunieciu nie wracaj na sztywno do listy pracownikow';
 
 interface AppBarProps extends MuiAppBarProps {
     open?: boolean;

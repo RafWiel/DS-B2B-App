@@ -236,7 +236,7 @@ export const ServiceRequests = () => {
             
             openMessageDialog({
                 title: 'Błąd aplikacji',
-                text: `${error.response.status} - Nieprawidłowa odpowiedź serwera`
+                text: error.response ? `${error.response.status} - ` : '' + 'Nieudane pobranie listy zleceń'
             });
         })
         .finally(() => {
@@ -311,7 +311,7 @@ export const ServiceRequests = () => {
             
             openMessageDialog({
                 title: 'Błąd aplikacji',
-                text: `${error.response.status} - ${errorMessage}`
+                text: error.response ? `${error.response.status} - ` : '' + `${errorMessage}`
             });
 
             return false;

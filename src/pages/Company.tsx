@@ -9,6 +9,7 @@ import { ICompany } from '../interfaces/ICompany.ts';
 import { useLocation, useRoute } from "wouter";
 import { config } from "../config/config.ts";
 import { Formik, FormikProps, FormikHelpers } from 'formik';
+import AddIcon from '@mui/icons-material/Add';
 import * as yup from 'yup';
 import CheckIcon from '@mui/icons-material/Check';
 import ClearIcon from '@mui/icons-material/Clear';
@@ -142,7 +143,7 @@ export const Company = () => {
             
             openMessageDialog({
                 title: 'Błąd aplikacji',
-                text: `${error.response.status} - Nieprawidłowa odpowiedź serwera`
+                text: error.response ? `${error.response.status} - ` : '' + 'Nieudane pobranie danych firmy'
             });
 
             navigate('/companies');
@@ -182,19 +183,19 @@ export const Company = () => {
             if (error.name === 'AbortError' || 
                 error.name === 'CanceledError') return;
 
-            let errorMessage = 'Nieprawidłowa odpowiedź serwera';
+            let errorMessage = 'Nieudany zapis danych firmy';
             
-            if (error.response.status === 404) {
+            if (error.response?.status === 404) {
                 errorMessage = 'Nie znaleziono firmy w bazie danych';
             }
 
-            if (error.response.status === 409) {
+            if (error.response?.status === 409) {
                 errorMessage = 'Firma o takich danych już istnieje';
             }
 
             openMessageDialog({
                 title: 'Błąd aplikacji',
-                text: `${error.response.status} - ${errorMessage}`
+                text: error.response ? `${error.response.status} - ` : '' + `${errorMessage}`
             });
         })        
         .finally(() => {           
@@ -242,7 +243,7 @@ export const Company = () => {
             
             openMessageDialog({
                 title: 'Błąd aplikacji',
-                text: `${error.response.status} - ${errorMessage}`                
+                text: error.response ? `${error.response.status} - ` : '' + `${errorMessage}`                
             });
 
             return false;
@@ -622,7 +623,7 @@ export const Company = () => {
                                 disableElevation 
                                 disabled={!company.id}
                                 onClick={() => navigate(`/companies/${company.id}/customers/0`)} 
-                                //startIcon={<AddIcon />}
+                                startIcon={<AddIcon />}
                                 sx={{
                                     display: 'inline-flex',                                                                        
                                     width: '100%', 

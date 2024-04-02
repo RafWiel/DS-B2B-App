@@ -95,7 +95,7 @@ export const Customer = () => {
             
             openMessageDialog({
                 title: 'Błąd aplikacji',
-                text: `${error.response.status} - Nieprawidłowa odpowiedź serwera`
+                text: error.response ? `${error.response.status} - ` : '' + 'Nieudane pobranie danych klienta'
             });
 
             navigate('/customers');
@@ -131,19 +131,19 @@ export const Customer = () => {
             if (error.name === 'AbortError' || 
                 error.name === 'CanceledError') return;
 
-            let errorMessage = 'Nieprawidłowa odpowiedź serwera';
+            let errorMessage = 'Nieudany zapis danych klienta';
             
-            if (error.response.status === 404) {
+            if (error.response?.status === 404) {
                 errorMessage = 'Nie znaleziono użytkownika w bazie danych';
             }
 
-            if (error.response.status === 409) {
+            if (error.response?.status === 409) {
                 errorMessage = 'Użytkownik o takich danych już istnieje';
             }
 
             openMessageDialog({
                 title: 'Błąd aplikacji',
-                text: `${error.response.status} - ${errorMessage}`
+                text: error.response ? `${error.response.status} - ` : '' + `${errorMessage}`
             });
         })        
         .finally(() => {           
@@ -182,7 +182,7 @@ export const Customer = () => {
             
             openMessageDialog({
                 title: 'Błąd aplikacji',
-                text: `${error.response.status} - Nieudane usunięcie pracownika`
+                text: error.response ? `${error.response.status} - ` : '' + 'Nieudane usunięcie klienta'
             });
 
             return false;

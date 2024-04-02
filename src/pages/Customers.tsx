@@ -165,7 +165,7 @@ export const Customers = () => {
             
             openMessageDialog({
                 title: 'Błąd aplikacji',
-                text: `${error.response.status} - Nieprawidłowa odpowiedź serwera`
+                text: error.response ? `${error.response.status} - ` : '' + 'Nieudane pobranie listy klientów' 
             });
         })
         .finally(() => {
@@ -277,7 +277,7 @@ export const Customers = () => {
             
             openMessageDialog({
                 title: 'Błąd aplikacji',
-                text: `${error.response.status} - ${errorMessage}`
+                text: error.response ? `${error.response.status} - ` : '' + `${errorMessage}`
             });
 
             return false;

@@ -83,7 +83,7 @@ export const Employee = () => {
             
             openMessageDialog({
                 title: 'Błąd aplikacji',
-                text: `${error.response.status} - Nieprawidłowa odpowiedź serwera`
+                text: error.response ? `${error.response.status} - ` : '' + 'Nieudane pobranie danych pracownika'
             });
 
             navigate('/employees');
@@ -119,19 +119,19 @@ export const Employee = () => {
             if (error.name === 'AbortError' || 
                 error.name === 'CanceledError') return;
 
-            let errorMessage = 'Nieprawidłowa odpowiedź serwera';
+            let errorMessage = 'Nieudany zapis danych pracownika';
             
-            if (error.response.status === 404) {
+            if (error.response?.status === 404) {
                 errorMessage = 'Nie znaleziono użytkownika w bazie danych';
             }
 
-            if (error.response.status === 409) {
+            if (error.response?.status === 409) {
                 errorMessage = 'Użytkownik o takich danych już istnieje';
             }
 
             openMessageDialog({
                 title: 'Błąd aplikacji',
-                text: `${error.response.status} - ${errorMessage}`
+                text: error.response ? `${error.response.status} - ` : '' + `${errorMessage}`
             });
         })        
         .finally(() => {           
@@ -170,7 +170,7 @@ export const Employee = () => {
             
             openMessageDialog({
                 title: 'Błąd aplikacji',
-                text: `${error.response.status} - Nieudane usunięcie pracownika`
+                text: error.response ? `${error.response.status} - ` : '' + 'Nieudane usunięcie pracownika'
             });
 
             return false;
