@@ -23,7 +23,7 @@ import ClearIcon from '@mui/icons-material/Clear';
 import { useTheme } from '@mui/material/styles';
 import { Typography, styled, useMediaQuery } from '@mui/material';
 import { InView } from 'react-intersection-observer';
-import moment from "moment";
+import dayjs from "dayjs";
 
 export interface IBaseRow {
     id: number;    
@@ -562,7 +562,7 @@ export const DataGrid = React.memo(React.forwardRef((props: IDataGridProps, ref)
                                                 <Typography className="text-ellipsis">
                                                 {
                                                     column.id == 'date' ? 
-                                                        moment(row['date']).format('DD/MM/YYYY') : 
+                                                        dayjs(row['date']).format('DD/MM/YYYY') : 
                                                         row[column.id]
                                                 }
                                                 </Typography>                                                                                                                                

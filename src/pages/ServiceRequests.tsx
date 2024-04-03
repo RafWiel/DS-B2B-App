@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTheme } from '@mui/material/styles';
-import { EmployeesFilter } from "../components/EmployeesFilter";
+import { ServiceRequestsFilter } from "../components/ServiceRequestsFilter";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
@@ -15,6 +15,7 @@ import queryString from 'query-string';
 import { useLocation } from 'wouter';
 import useApi from '../hooks/useApi.ts';
 import requestType from "../enums/requestType.ts";
+import dayjs, { Dayjs } from "dayjs";
 
 interface IServiceRequestRow extends IBaseRow {
     login: string;
@@ -110,6 +111,8 @@ const columns: IColumn[] = [
 
 type FetchState = {
     search: string,
+    start: Dayjs | null,
+    stop: Dayjs | null,
     type: string,
     page: number,
     sortColumn: string | null,
@@ -132,6 +135,8 @@ export const ServiceRequests = () => {
 
     const [state, setState] = useState<FetchState>({
         search: '',
+        start: null, //dayjs('2022-04-17'),
+        stop: null,
         type: requestType.none.toString(),
         page: 1,
         sortColumn: null,
@@ -259,14 +264,23 @@ export const ServiceRequests = () => {
         fetchData(newState);
     }, [state, fetchData]);
 
-    const setFilter = useCallback((search: string, type: string, isDebouncedUpdate: boolean) => {
-        //console.log('setFilter');        
-        //console.log('search', value);        
+    const setFilter = useCallback((
+        search: string, 
+        start: Dayjs | null, 
+        stop: Dayjs | null, 
+        type: string, 
+        isDebouncedUpdate: boolean
+    ) => {
+        console.log('setFilter');        
+        //console.log('search', search);
+        console.log('start', start);        
         //console.log('page', state.page);
 
         const newState = {
             ...state,             
             search: search,
+            start: start,
+            stop: stop,
             type: type,
             page: 1, 
             isReset: true
@@ -391,8 +405,10 @@ export const ServiceRequests = () => {
             }}
         >
             <div id="filter-container">
-                <EmployeesFilter 
+                <ServiceRequestsFilter 
                     search={state.search}
+                    start={state.start}
+                    stop={state.stop}
                     type={state.type}
                     setFilter={setFilter}
                 />

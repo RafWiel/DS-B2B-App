@@ -28,6 +28,11 @@ import { useEffect } from 'react';
 import { CircularProgress } from '@mui/material';
 import { Customer } from './pages/Customer';
 import { Company } from './pages/Company';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { plPL } from '@mui/x-date-pickers/locales';
+import 'dayjs/locale/pl';
+import { plPL as corePlPL } from '@mui/material/locale';
 
 const todo = 'Pamietaj skad bylo wywolanie karty pracownika, moze byc z karty firmy. Po usunieciu nie wracaj na sztywno do listy pracownikow';
 
@@ -158,9 +163,12 @@ export default function App() {
                         fontSize: fontSize,
                     },
                 },
-            }, 
-        }
-    });
+            },             
+        },        
+    }, 
+    plPL,  
+    corePlPL      
+    );
     
     useEffect(() => {          
         if (routes.isText(location[0])) {
@@ -195,139 +203,147 @@ export default function App() {
     // }
 
     return (
-        <ThemeProvider theme={theme}>            
-            <Box 
-                sx={{ 
-                    display: 'flex',
-                    //minHeight: `calc(100vh - ${appBarHeight}px)`, 
-                    minHeight: '100vh', 
-                    //height: '100%',
-                    [theme.breakpoints.up('sm')]: {
-                        backgroundColor: '#e8e8e8'                   
-                    },
-                    [theme.breakpoints.down('sm')]: {
-                        backgroundColor: 'white'                   
-                    },
-                }}
+        <ThemeProvider theme={theme}>     
+            <LocalizationProvider 
+                dateAdapter={AdapterDayjs} 
+                adapterLocale="pl"
+                localeText={
+                    plPL.components.MuiLocalizationProvider.defaultProps.localeText
+                  }
             >
-                <CssBaseline />
-                <AppBar 
-                    id="appBar" 
-                    position="fixed" 
-                    open={isDesktopSideBarOpen} 
-                    theme={theme} 
-                    elevation={0}>
-                    <Toolbar >                        
-                        <IconButton
-                            color="inherit"
-                            aria-label="open drawer"
-                            onClick={openMobileSideBar}
-                            edge="start"
-                            sx={{
-                                marginRight: 2,
-                                display: { xs: 'block', sm: 'none' },
-                            }}
-                        >
-                            <MenuIcon />
-                        </IconButton>
-                        <IconButton
-                            color="inherit"
-                            aria-label="open drawer"
-                            onClick={openDesktopSideBar}
-                            edge="start"
-                            sx={{
-                                marginRight: 5,
-                                display: { xs: 'none', sm: 'block' },
-                                ...(isDesktopSideBarOpen && { display: 'none' }),                            
-                            }}
-                        >
-                            <MenuIcon />
-                        </IconButton>
-                        <Typography 
-                            variant="h6" 
-                            noWrap 
-                            component="div"
-                            sx={{ 
-                                width: '50%',                                                              
-                            }}
-                        >
-                            {appBarTitle}
-                        </Typography>    
-                        <Typography 
-                            variant="h6" 
-                            noWrap 
-                            component="div" 
-                            sx={{ 
-                                width: '50%',
-                                textAlign: 'right', 
-                                color: 'yellow'                               
-                            }}
-                        >
-                            {todo}
-                        </Typography>                    
-                    </Toolbar>                    
-                </AppBar>                
-                <SideBar />
                 <Box 
-                    component="main"                    
-                    sx={{                        
+                    sx={{ 
                         display: 'flex',
-                        flexDirection: 'column',
-                        minHeight: '100vh',
-                        flexGrow: 1, 
-                        p: 0,                        
+                        //minHeight: `calc(100vh - ${appBarHeight}px)`, 
+                        minHeight: '100vh', 
+                        //height: '100%',
+                        [theme.breakpoints.up('sm')]: {
+                            backgroundColor: '#e8e8e8'                   
+                        },
+                        [theme.breakpoints.down('sm')]: {
+                            backgroundColor: 'white'                   
+                        },
                     }}
                 >
-                    <Toolbar />                                                     
-                    <Switch >   
-                        <Route path={routes.home}>
-                            <Redirect to={routes.serviceRequests} />
-                        </Route>                                                                
-                        <Route path={routes.companies}>
-                            <Companies />
-                        </Route>
-                        <Route path={routes.company}>
-                            <Company />
-                        </Route>
-                        <Route path={routes.customers}>
-                            <Customers />
-                        </Route>
-                        <Route path={routes.customer}>
-                            <Customer />
-                        </Route>
-                        <Route path={routes.companyCustomer}>
-                            <Customer />
-                        </Route>
-                        <Route path={routes.employees}>
-                            <Employees />
-                        </Route>
-                        <Route path={routes.employee}>
-                            <Employee />
-                        </Route>
-                        <Route path={routes.phoneConsultations}>
-                            <PhoneConsultations />
-                        </Route>          
-                        <Route path={routes.registrationRequests}>
-                            <RegistrationRequests />
-                        </Route>
-                        <Route path={routes.serviceRequests}>
-                            <ServiceRequests />
-                        </Route>
-                        <Route>
-                            <NotFound />
-                        </Route>                                        
-                    </Switch>                     
+                    <CssBaseline />
+                    <AppBar 
+                        id="appBar" 
+                        position="fixed" 
+                        open={isDesktopSideBarOpen} 
+                        theme={theme} 
+                        elevation={0}>
+                        <Toolbar >                        
+                            <IconButton
+                                color="inherit"
+                                aria-label="open drawer"
+                                onClick={openMobileSideBar}
+                                edge="start"
+                                sx={{
+                                    marginRight: 2,
+                                    display: { xs: 'block', sm: 'none' },
+                                }}
+                            >
+                                <MenuIcon />
+                            </IconButton>
+                            <IconButton
+                                color="inherit"
+                                aria-label="open drawer"
+                                onClick={openDesktopSideBar}
+                                edge="start"
+                                sx={{
+                                    marginRight: 5,
+                                    display: { xs: 'none', sm: 'block' },
+                                    ...(isDesktopSideBarOpen && { display: 'none' }),                            
+                                }}
+                            >
+                                <MenuIcon />
+                            </IconButton>
+                            <Typography 
+                                variant="h6" 
+                                noWrap 
+                                component="div"
+                                sx={{ 
+                                    width: '50%',                                                              
+                                }}
+                            >
+                                {appBarTitle}
+                            </Typography>    
+                            <Typography 
+                                variant="h6" 
+                                noWrap 
+                                component="div" 
+                                sx={{ 
+                                    width: '50%',
+                                    textAlign: 'right', 
+                                    color: 'yellow'                               
+                                }}
+                            >
+                                {todo}
+                            </Typography>                    
+                        </Toolbar>                    
+                    </AppBar>                
+                    <SideBar />
+                    <Box 
+                        component="main"                    
+                        sx={{                        
+                            display: 'flex',
+                            flexDirection: 'column',
+                            minHeight: '100vh',
+                            flexGrow: 1, 
+                            p: 0,                        
+                        }}
+                    >
+                        <Toolbar />                                                     
+                        <Switch >   
+                            <Route path={routes.home}>
+                                <Redirect to={routes.serviceRequests} />
+                            </Route>                                                                
+                            <Route path={routes.companies}>
+                                <Companies />
+                            </Route>
+                            <Route path={routes.company}>
+                                <Company />
+                            </Route>
+                            <Route path={routes.customers}>
+                                <Customers />
+                            </Route>
+                            <Route path={routes.customer}>
+                                <Customer />
+                            </Route>
+                            <Route path={routes.companyCustomer}>
+                                <Customer />
+                            </Route>
+                            <Route path={routes.employees}>
+                                <Employees />
+                            </Route>
+                            <Route path={routes.employee}>
+                                <Employee />
+                            </Route>
+                            <Route path={routes.phoneConsultations}>
+                                <PhoneConsultations />
+                            </Route>          
+                            <Route path={routes.registrationRequests}>
+                                <RegistrationRequests />
+                            </Route>
+                            <Route path={routes.serviceRequests}>
+                                <ServiceRequests />
+                            </Route>
+                            <Route>
+                                <NotFound />
+                            </Route>                                        
+                        </Switch>                     
+                    </Box>
+                    <AutoMessageDialog />
+                    <MessageDialog />
+                    <QuestionDialog />
+                    {
+                        isLoadingIcon && 
+                        <div className="center-screen">
+                            <CircularProgress size={60} />
+                        </div>
+                    }                                        
                 </Box>
-                <AutoMessageDialog />
-                <MessageDialog />
-                <QuestionDialog />
-                {
-                    isLoadingIcon && 
-                    <div className="center-screen">
-                        <CircularProgress size={60} />
-                    </div>
-                }                                        
-            </Box>
+            </LocalizationProvider>       
         </ThemeProvider>
     );
 }

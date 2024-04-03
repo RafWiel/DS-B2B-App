@@ -29,7 +29,7 @@ const useFetch = <T,>(url: string, errorMessage: string): T | null => {
             
             openMessageDialog({
                 title: 'Błąd aplikacji',
-                text: `${error.response.status} - ${errorMessage}`
+                text: error.response ? `${error.response.status} - ` : '' + `${errorMessage}`
             });
         })
         .finally(() => {
