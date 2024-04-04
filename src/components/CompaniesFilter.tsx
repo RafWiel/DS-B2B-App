@@ -11,11 +11,7 @@ type ComponentProps = {
 
 export const CompaniesFilter = memo(({search, setFilter}: ComponentProps) => {
     const theme = useTheme();
-    
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {           
-        setFilter(e.target.value, true);
-    };  
-        
+            
     return (
         <Card 
             variant="outlined"
@@ -27,11 +23,10 @@ export const CompaniesFilter = memo(({search, setFilter}: ComponentProps) => {
             <CardContent>
                 <Grid container spacing={2}>
                     <Grid item xs={12}>
-                        <TextField 
-                            id="employee-search"                                 
+                        <TextField                                                         
                             label="Szukaj" 
                             value={search} 
-                            onChange={handleChange}                          
+                            onChange={(e) => setFilter(e.target.value, true)}                                  
                             fullWidth                                 
                             variant="standard" 
                             InputProps={{

@@ -1,7 +1,7 @@
 const no = 0;
 const yes = 1;
 
-const boolEnum = {
+export const boolEnum = {
     no,
     yes,
     
@@ -20,6 +20,5 @@ const boolEnum = {
     },    
 };
 
-export default boolEnum;
 
 

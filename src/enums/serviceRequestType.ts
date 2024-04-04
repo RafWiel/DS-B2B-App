@@ -1,26 +1,26 @@
 const none = 0;
-const administrator = 1;
-const supervisor = 2;
-const employee = 3;
+const software = 1;
+const hardware = 2;
+const other = 3;
 
-const requestType = {
+export const serviceRequestType = {
     none,
-    administrator,
-    supervisor,
-    employee,
+    software,
+    hardware,
+    other,
 
     items: [{
         id: none, 
         text: ''
     }, {
-        id: administrator,
-        text: 'Administrator'
+        id: software,
+        text: 'Programowe'
     }, {
-        id: supervisor,
-        text: 'Kierownik'
+        id: hardware,
+        text: 'Sprzętowe'
     }, {
-        id: employee,
-        text: 'Pracownik' 
+        id: other,
+        text: 'Inne' 
     }],
 
     getText(id: number): string {
@@ -31,13 +31,12 @@ const requestType = {
 
     getFilterText(id: number): string {
         if (id === none) {
-            return 'Wszyscy';
+            return 'Wszystkie';
         }
 
         return this.getText(id);
     },
 };
 
-export default requestType;
 
 

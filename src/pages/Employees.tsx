@@ -9,7 +9,7 @@ import { useAppStore } from "../store";
 import { Button, Grid, useMediaQuery } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import { config } from "../config/config";
-import employeeType from "../enums/employeeType";
+import { employeeType } from "../enums/employeeType";
 import debounce from 'lodash/debounce';
 import queryString from 'query-string';
 import { useLocation } from 'wouter';
@@ -166,7 +166,7 @@ export const Employees = () => {
     
         api.get(`${config.API_URL}/employees?${String(new URLSearchParams({ 
                 search: stateValue.search,
-                type: stateValue.type,
+                type: Number(stateValue.type) > employeeType.none ? stateValue.type : '',
                 'sort-column': stateValue.sortColumn ?? 'login',
                 'sort-order': stateValue.sortOrder ?? 'asc',
                 page: stateValue.page.toString()

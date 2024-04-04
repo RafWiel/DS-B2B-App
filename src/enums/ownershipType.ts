@@ -1,21 +1,16 @@
 const none = 0;
-const supervisor = 2;
-const employee = 3;
+const employee = 1;
 
-export const customerType = {
+export const ownershipType = {
     none,
-    supervisor,
     employee,
-
+    
     items: [{
         id: none, 
         text: ''
     }, {
-        id: supervisor,
-        text: 'Kierownik'
-    }, {
         id: employee,
-        text: 'Pracownik' 
+        text: 'Moje'
     }],
 
     getText(id: number): string {
@@ -26,11 +21,12 @@ export const customerType = {
 
     getFilterText(id: number): string {
         if (id === none) {
-            return 'Wszyscy';
+            return 'Wszystkie';
         }
 
         return this.getText(id);
     },
 };
+
 
 

@@ -9,7 +9,7 @@ import { useAppStore } from "../store";
 import { Button, Grid, useMediaQuery } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import { config } from "../config/config";
-import customerType from "../enums/customerType";
+import { customerType } from "../enums/customerType";
 import debounce from 'lodash/debounce';
 import queryString from 'query-string';
 import { useLocation } from 'wouter';
@@ -138,7 +138,7 @@ export const Customers = () => {
     
         api.get(`${config.API_URL}/customers?${String(new URLSearchParams({ 
                 search: stateValue.search,
-                type: stateValue.type,
+                type: Number(stateValue.type) > customerType.none ? stateValue.type : '',
                 'sort-column': stateValue.sortColumn ?? 'login',
                 'sort-order': stateValue.sortOrder ?? 'asc',
                 page: stateValue.page.toString()
@@ -248,7 +248,7 @@ export const Customers = () => {
     const setUrl = (stateValue: FetchState) => {
         let url = queryString.stringify({
             search: stateValue.search.length > 0 ? stateValue.search : null, 
-            type: Number(stateValue.type) > 0 ? stateValue.type : null, 
+            type: Number(stateValue.type) > customerType.none ? stateValue.type : null, 
             'sort-column': stateValue.sortColumn, 
             'sort-order': stateValue.sortOrder
         }, {

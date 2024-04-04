@@ -9,13 +9,13 @@ import { useAppStore } from "../store";
 import { Button, Grid, useMediaQuery } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import { config } from "../config/config";
-import employeeType from "../enums/employeeType";
 import debounce from 'lodash/debounce';
 import queryString from 'query-string';
 import { useLocation } from 'wouter';
 import useApi from '../hooks/useApi.ts';
-import requestType from "../enums/requestType.ts";
+import { serviceRequestType } from "../enums/serviceRequestType.ts";
 import dayjs, { Dayjs } from "dayjs";
+import { ownershipType } from "../enums/ownershipType.ts";
 
 interface IServiceRequestRow extends IBaseRow {
     login: string;
@@ -112,7 +112,8 @@ const columns: IColumn[] = [
 type FetchState = {
     search: string,
     start: Dayjs | null,
-    stop: Dayjs | null,
+    end: Dayjs | null,
+    ownership: string,
     type: string,
     page: number,
     sortColumn: string | null,
@@ -135,9 +136,10 @@ export const ServiceRequests = () => {
 
     const [state, setState] = useState<FetchState>({
         search: '',
-        start: null, //dayjs('2022-04-17'),
-        stop: null,
-        type: requestType.none.toString(),
+        start: null, 
+        end: null,
+        ownership: ownershipType.none.toString(),
+        type: serviceRequestType.none.toString(),
         page: 1,
         sortColumn: null,
         sortOrder: null,        
@@ -161,12 +163,15 @@ export const ServiceRequests = () => {
 
     const parseUrl = () => {
         const url = queryString.parse(location.search);
-        //console.log(url);
-        
+        const dateRegExp = /^(19|20)\d{2}(-)(0[1-9]|1[1,2])(-)(0[1-9]|[12][0-9]|3[01])$/;
+                
         const newState: FetchState = {
             ...state,
             search: (url.search ?? '').toString(),
-            type: (url.type ?? employeeType.none).toString(),
+            start: url.start?.toString().match(dateRegExp) ? dayjs(url.start?.toString()) : null,
+            end: url.end?.toString().match(dateRegExp) ? dayjs(url.end?.toString()) : null,
+            ownership: (url.employee != null ? ownershipType.employee : ownershipType.none).toString(),
+            type: (url.type ?? serviceRequestType.none).toString(),
             sortColumn: url['sort-column']?.toString() ?? null,
             sortOrder: url['sort-order']?.toString() as Order ?? null,        
             page: 1,            
@@ -182,7 +187,10 @@ export const ServiceRequests = () => {
     const setUrl = (stateValue: FetchState) => {
         let url = queryString.stringify({
             search: stateValue.search.length > 0 ? stateValue.search : null, 
-            type: Number(stateValue.type) > 0 ? stateValue.type : null, 
+            start: stateValue.start !== null ? stateValue.start.format('YYYY-MM-DD') : null,
+            end: stateValue.end !== null ? stateValue.end.format('YYYY-MM-DD') : null,
+            employee: Number(stateValue.ownership) > ownershipType.none ? 666 : null, //TODO: zalogowany user
+            type: Number(stateValue.type) > serviceRequestType.none ? stateValue.type : null, 
             'sort-column': stateValue.sortColumn, 
             'sort-order': stateValue.sortOrder
         }, {
@@ -214,7 +222,10 @@ export const ServiceRequests = () => {
     
         api.get(`${config.API_URL}/service-requests?${String(new URLSearchParams({ 
                 search: stateValue.search,
-                type: stateValue.type,
+                start: stateValue.start !== null ? stateValue.start.format('YYYY-MM-DD') : '',
+                end: stateValue.end !== null ? stateValue.end.format('YYYY-MM-DD') : '',
+                employee: Number(stateValue.ownership) > ownershipType.none ? '666' : '', //TODO: zalogowany user
+                type: Number(stateValue.type) > serviceRequestType.none ? stateValue.type : '',
                 'sort-column': stateValue.sortColumn ?? 'date',
                 'sort-order': stateValue.sortOrder ?? 'asc',
                 page: stateValue.page.toString()
@@ -267,20 +278,22 @@ export const ServiceRequests = () => {
     const setFilter = useCallback((
         search: string, 
         start: Dayjs | null, 
-        stop: Dayjs | null, 
+        end: Dayjs | null, 
+        ownership: string,
         type: string, 
         isDebouncedUpdate: boolean
     ) => {
         console.log('setFilter');        
         //console.log('search', search);
-        console.log('start', start);        
+        //console.log('start', start);        
         //console.log('page', state.page);
 
         const newState = {
             ...state,             
             search: search,
             start: start,
-            stop: stop,
+            end: end,
+            ownership: ownership,
             type: type,
             page: 1, 
             isReset: true
@@ -408,7 +421,8 @@ export const ServiceRequests = () => {
                 <ServiceRequestsFilter 
                     search={state.search}
                     start={state.start}
-                    stop={state.stop}
+                    end={state.end}
+                    ownership={state.ownership}
                     type={state.type}
                     setFilter={setFilter}
                 />

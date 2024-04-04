@@ -2,7 +2,7 @@ import { Card, CardContent, FormControl, Grid, InputAdornment, InputLabel, MenuI
 import { memo } from "react";
 import { useTheme } from '@mui/material/styles';
 import SearchIcon from '@mui/icons-material/Search';
-import employeeType from '../enums/employeeType.ts';
+import { employeeType } from '../enums/employeeType.ts';
 
 type ComponentProps = { 
     search: string,  
@@ -13,13 +13,13 @@ type ComponentProps = {
 export const EmployeesFilter = memo(({search, type, setFilter}: ComponentProps) => {
     const theme = useTheme();
     
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {           
-        setFilter(e.target.value, type, true);
-    };  
+    // const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {           
+    //     setFilter(e.target.value, type, true);
+    // };  
     
-    const handleChangeSelect = (e: SelectChangeEvent<string>) => {           
-        setFilter(search, e.target.value, false);     
-    };  
+    // const handleChangeSelect = (e: SelectChangeEvent<string>) => {           
+    //     setFilter(search, e.target.value, false);     
+    // };  
 
     return (
         <Card 
@@ -33,10 +33,9 @@ export const EmployeesFilter = memo(({search, type, setFilter}: ComponentProps) 
                 <Grid container spacing={2}>
                     <Grid item xs={8} sm={10}>
                         <TextField 
-                            id="employee-search"                                 
                             label="Szukaj" 
                             value={search} 
-                            onChange={handleChange}                          
+                            onChange={(e) => setFilter(e.target.value, type, true)}                      
                             fullWidth                                 
                             variant="standard" 
                             InputProps={{
@@ -52,10 +51,9 @@ export const EmployeesFilter = memo(({search, type, setFilter}: ComponentProps) 
                         <FormControl variant="standard" fullWidth>
                             <InputLabel id="employee-type-label">Typ</InputLabel>
                             <Select
-                                labelId="employee-type-label"
-                                id="employee-type"
+                                labelId="employee-type-label"                                
                                 value={type}
-                                onChange={handleChangeSelect}
+                                onChange={(e) => setFilter(search, e.target.value, false)}
                             >
                                 {
                                     employeeType && employeeType.items                                        

@@ -2,7 +2,7 @@ import { Card, CardContent, FormControl, Grid, InputAdornment, InputLabel, MenuI
 import { memo } from "react";
 import { useTheme } from '@mui/material/styles';
 import SearchIcon from '@mui/icons-material/Search';
-import customerType from '../enums/customerType.ts';
+import { customerType } from '../enums/customerType.ts';
 
 type ComponentProps = { 
     search: string,  
@@ -13,13 +13,13 @@ type ComponentProps = {
 export const CustomersFilter = memo(({search, type, setFilter}: ComponentProps) => {
     const theme = useTheme();
     
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {           
-        setFilter(e.target.value, type, true);
-    };  
+    // const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {           
+    //     setFilter(e.target.value, type, true);
+    // };  
     
-    const handleChangeSelect = (e: SelectChangeEvent<string>) => {           
-        setFilter(search, e.target.value, false);     
-    };  
+    // const handleChangeSelect = (e: SelectChangeEvent<string>) => {           
+    //     setFilter(search, e.target.value, false);     
+    // };  
 
     return (
         <Card 
@@ -32,11 +32,10 @@ export const CustomersFilter = memo(({search, type, setFilter}: ComponentProps) 
             <CardContent>
                 <Grid container spacing={2}>
                     <Grid item xs={8} sm={10}>
-                        <TextField 
-                            id="customer-search"                                 
+                        <TextField                                                          
                             label="Szukaj" 
                             value={search} 
-                            onChange={handleChange}                          
+                            onChange={(e) => setFilter(e.target.value, type, true)}
                             fullWidth                                 
                             variant="standard" 
                             InputProps={{
@@ -52,10 +51,9 @@ export const CustomersFilter = memo(({search, type, setFilter}: ComponentProps) 
                         <FormControl variant="standard" fullWidth>
                             <InputLabel id="customer-type-label">Typ</InputLabel>
                             <Select
-                                labelId="customer-type-label"
-                                id="customer-type"
+                                labelId="customer-type-label"                                
                                 value={type}
-                                onChange={handleChangeSelect}
+                                onChange={(e) => setFilter(search, e.target.value, false)}
                             >
                                 {
                                     customerType && customerType.items                                        

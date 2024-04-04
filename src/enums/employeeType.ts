@@ -3,7 +3,7 @@ const administrator = 1;
 const supervisor = 2;
 const employee = 3;
 
-const employeeType = {
+export const employeeType = {
     none,
     administrator,
     supervisor,
@@ -37,7 +37,5 @@ const employeeType = {
         return this.getText(id);
     },
 };
-
-export default employeeType;
 
 
