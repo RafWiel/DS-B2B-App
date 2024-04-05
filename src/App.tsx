@@ -35,6 +35,7 @@ import 'dayjs/locale/pl';
 import { plPL as corePlPL } from '@mui/material/locale';
 
 const todo = 'Pamietaj skad bylo wywolanie karty pracownika, moze byc z karty firmy. Po usunieciu nie wracaj na sztywno do listy pracownikow';
+const todo1 = 'Pobaw sie zoomem, popraw szerokosc kolumn. Chyba trzeba zrobic wiecej przedzialow';
 
 interface AppBarProps extends MuiAppBarProps {
     open?: boolean;

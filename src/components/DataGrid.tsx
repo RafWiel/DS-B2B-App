@@ -36,6 +36,7 @@ export interface IColumn {
     disablePadding?: boolean;
     hidden?: boolean;
     mobileHidden?: boolean;
+    mediumHidden?: boolean;
     width?: {
         mobile?: string;
         desktop: string;
@@ -122,6 +123,7 @@ function stableSort<T>(array: T[], comparator: (a: T, b: T) => number) {
 function EnhancedTableHead(props: IHeadProps) {
     const theme = useTheme();
     const isMobileView = useMediaQuery(theme.breakpoints.down("md"));           
+    const isMediumView = useMediaQuery(theme.breakpoints.down("xl"));           
 
     const { 
         onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort, 
@@ -178,7 +180,9 @@ function EnhancedTableHead(props: IHeadProps) {
                 }
                 {
                     columns && columns.map((column) => (
-                        !column.hidden && ((isMobileView && !column.mobileHidden) || !isMobileView) && 
+                        !column.hidden && 
+                        ((isMobileView && !column.mobileHidden) || !isMobileView) && 
+                        ((isMediumView && !column.mediumHidden) || !isMediumView) && 
                         <TableCell
                             key={column.id}                            
                             align={column.numeric ? 'right' : 'left'}
@@ -338,7 +342,8 @@ export const DataGrid = React.memo(React.forwardRef((props: IDataGridProps, ref)
     } = props;
 
     const theme = useTheme();
-    const isMobileView = useMediaQuery(theme.breakpoints.down("md"));           
+    const isMobileView = useMediaQuery(theme.breakpoints.down("md"));
+    const isMediumView = useMediaQuery(theme.breakpoints.down("xl"));
     const [order, setOrder] = React.useState<Order>('asc');    
     const [orderBy, setOrderBy] = React.useState<string>('');
     const [selected, setSelected] = React.useState<readonly number[]>([]);
@@ -541,7 +546,9 @@ export const DataGrid = React.memo(React.forwardRef((props: IDataGridProps, ref)
                                     }                                    
                                     {
                                         columns && columns.map((column, columnIndex) => (
-                                            !column.hidden && ((isMobileView && !column.mobileHidden) || !isMobileView) && 
+                                            !column.hidden && 
+                                            ((isMobileView && !column.mobileHidden) || !isMobileView) && 
+                                            ((isMediumView && !column.mediumHidden) || !isMediumView) && 
                                             <TableCell                                                
                                                 id={columnIndex === 1 ? labelId : undefined}
                                                 scope="row"                                                 

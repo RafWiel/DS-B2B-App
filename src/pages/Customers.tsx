@@ -66,8 +66,8 @@ const columns: IColumn[] = [
     {
         id: 'type',
         label: 'Typ',
-        width: {
-            mobile: 'auto',
+        mobileHidden: true,
+        width: {            
             desktop: 'auto'
         }
     },

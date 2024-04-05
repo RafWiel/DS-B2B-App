@@ -16,6 +16,8 @@ import useApi from '../hooks/useApi.ts';
 import { serviceRequestType } from "../enums/serviceRequestType.ts";
 import dayjs, { Dayjs } from "dayjs";
 import { ownershipType } from "../enums/ownershipType.ts";
+import { serviceRequestSubmitType } from "../enums/serviceRequestSubmitType.ts";
+import { serviceRequestStatus } from "../enums/serviceRequestStatus.ts";
 
 interface IServiceRequestRow extends IBaseRow {
     login: string;
@@ -79,6 +81,7 @@ const columns: IColumn[] = [
         id: 'employee',
         label: 'Odpowiedzialny',
         mobileHidden: true,
+        mediumHidden: true,
         width: {
             desktop: '150px'
         }
@@ -87,6 +90,7 @@ const columns: IColumn[] = [
         id: 'type',
         label: 'Typ',
         mobileHidden: true,
+        mediumHidden: true,
         width: {
             desktop: '100px'
         }
@@ -95,6 +99,7 @@ const columns: IColumn[] = [
         id: 'submitType',
         label: 'Źródło',
         mobileHidden: true,
+        mediumHidden: true,
         width: {
             desktop: 'auto'
         }
@@ -103,6 +108,7 @@ const columns: IColumn[] = [
         id: 'status',
         label: 'Status',
         mobileHidden: true,
+        mediumHidden: true,
         width: {
             desktop: 'auto'
         }
@@ -115,6 +121,8 @@ type FetchState = {
     end: Dayjs | null,
     ownership: string,
     type: string,
+    submitType: string,
+    status: string,
     page: number,
     sortColumn: string | null,
     sortOrder: Order | null,
@@ -140,6 +148,8 @@ export const ServiceRequests = () => {
         end: null,
         ownership: ownershipType.none.toString(),
         type: serviceRequestType.none.toString(),
+        submitType: serviceRequestSubmitType.none.toString(),
+        status: serviceRequestStatus.none.toString(),
         page: 1,
         sortColumn: null,
         sortOrder: null,        
@@ -172,6 +182,8 @@ export const ServiceRequests = () => {
             end: url.end?.toString().match(dateRegExp) ? dayjs(url.end?.toString()) : null,
             ownership: (url.employee != null ? ownershipType.employee : ownershipType.none).toString(),
             type: (url.type ?? serviceRequestType.none).toString(),
+            submitType: (url['submit-type']?.toString() ?? serviceRequestSubmitType.none).toString(),
+            status: (url.status ?? serviceRequestStatus.none).toString(),
             sortColumn: url['sort-column']?.toString() ?? null,
             sortOrder: url['sort-order']?.toString() as Order ?? null,        
             page: 1,            
@@ -191,6 +203,8 @@ export const ServiceRequests = () => {
             end: stateValue.end !== null ? stateValue.end.format('YYYY-MM-DD') : null,
             employee: Number(stateValue.ownership) > ownershipType.none ? 666 : null, //TODO: zalogowany user
             type: Number(stateValue.type) > serviceRequestType.none ? stateValue.type : null, 
+            'submit-type': Number(stateValue.submitType) > serviceRequestSubmitType.none ? stateValue.submitType : null, 
+            status: Number(stateValue.status) > serviceRequestStatus.none ? stateValue.status : null, 
             'sort-column': stateValue.sortColumn, 
             'sort-order': stateValue.sortOrder
         }, {
@@ -226,6 +240,8 @@ export const ServiceRequests = () => {
                 end: stateValue.end !== null ? stateValue.end.format('YYYY-MM-DD') : '',
                 employee: Number(stateValue.ownership) > ownershipType.none ? '666' : '', //TODO: zalogowany user
                 type: Number(stateValue.type) > serviceRequestType.none ? stateValue.type : '',
+                'submit-type': Number(stateValue.submitType) > serviceRequestSubmitType.none ? stateValue.submitType : '',
+                status: Number(stateValue.status) > serviceRequestStatus.none ? stateValue.status : '',
                 'sort-column': stateValue.sortColumn ?? 'date',
                 'sort-order': stateValue.sortOrder ?? 'asc',
                 page: stateValue.page.toString()
@@ -281,11 +297,13 @@ export const ServiceRequests = () => {
         end: Dayjs | null, 
         ownership: string,
         type: string, 
+        submitType: string,
+        status: string,
         isDebouncedUpdate: boolean
     ) => {
-        console.log('setFilter');        
-        //console.log('search', search);
-        //console.log('start', start);        
+        //console.log('setFilter');        
+        //console.log('submitType', submitType);
+        //console.log('status', status);        
         //console.log('page', state.page);
 
         const newState = {
@@ -295,6 +313,8 @@ export const ServiceRequests = () => {
             end: end,
             ownership: ownership,
             type: type,
+            submitType: submitType,
+            status: status,
             page: 1, 
             isReset: true
         };
@@ -424,6 +444,8 @@ export const ServiceRequests = () => {
                     end={state.end}
                     ownership={state.ownership}
                     type={state.type}
+                    submitType={state.submitType}
+                    status={state.status}
                     setFilter={setFilter}
                 />
             </div>
