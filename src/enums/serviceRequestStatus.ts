@@ -1,12 +1,12 @@
 const none = 0;
 const submited = 1;
 const accepted = 2;
-const ongoing = 3;
-const rejected = 4;
-const closed = 5;
-const closedInvoicing = 6;
-const closedInvoice = 7;
-const archived = 8;
+const ongoing = 4;
+const rejected = 8;
+const closed = 16;
+const closedInvoicing = 32;
+const closedInvoice = 64;
+const archived = 128;
 
 export const serviceRequestStatus = {
     none,

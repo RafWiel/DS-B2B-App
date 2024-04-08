@@ -18,6 +18,7 @@ import dayjs, { Dayjs } from "dayjs";
 import { ownershipType } from "../enums/ownershipType.ts";
 import { serviceRequestSubmitType } from "../enums/serviceRequestSubmitType.ts";
 import { serviceRequestStatus } from "../enums/serviceRequestStatus.ts";
+import { serviceRequestSimpleStatus } from "../enums/serviceRequestSimpleStatus.ts";
 
 interface IServiceRequestRow extends IBaseRow {
     login: string;
@@ -157,6 +158,9 @@ export const ServiceRequests = () => {
     });
     
     //console.log('render', state.page);
+    console.log('x', state.status);
+    console.log('y', Number(state.status) & 0xFF);
+    
 
     useEffect(() => {                    
         parseUrl();        
@@ -231,8 +235,9 @@ export const ServiceRequests = () => {
         //console.log('page: ', stateValue.page, ' | ', state.page);           
     
         setUrl(stateValue);        
-
-        showLoadingIcon(true);       
+        showLoadingIcon(true);     
+        
+        const status = (Number(stateValue.status) & 0xFF).toString(); //maska 0xFF
     
         api.get(`${config.API_URL}/service-requests?${String(new URLSearchParams({ 
                 search: stateValue.search,
@@ -241,7 +246,7 @@ export const ServiceRequests = () => {
                 employee: Number(stateValue.ownership) > ownershipType.none ? '666' : '', //TODO: zalogowany user
                 type: Number(stateValue.type) > serviceRequestType.none ? stateValue.type : '',
                 'submit-type': Number(stateValue.submitType) > serviceRequestSubmitType.none ? stateValue.submitType : '',
-                status: Number(stateValue.status) > serviceRequestStatus.none ? stateValue.status : '',
+                status: Number(stateValue.status) > serviceRequestStatus.none ? status : '',
                 'sort-column': stateValue.sortColumn ?? 'date',
                 'sort-order': stateValue.sortOrder ?? 'asc',
                 page: stateValue.page.toString()

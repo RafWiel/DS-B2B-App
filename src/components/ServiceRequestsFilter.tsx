@@ -1,4 +1,4 @@
-import { Accordion, AccordionDetails, AccordionSummary, Card, CardContent, FormControl, Grid, InputAdornment, InputLabel, MenuItem, Select, SelectChangeEvent, TextField } from "@mui/material";
+import { Accordion, AccordionDetails, AccordionSummary, Card, CardContent, Divider, FormControl, Grid, InputAdornment, InputLabel, MenuItem, Select, SelectChangeEvent, TextField } from "@mui/material";
 import { memo } from "react";
 import { useTheme } from '@mui/material/styles';
 import SearchIcon from '@mui/icons-material/Search';
@@ -9,6 +9,7 @@ import { serviceRequestType } from "../enums/serviceRequestType.ts";
 import { serviceRequestSubmitType } from "../enums/serviceRequestSubmitType.ts";
 import { serviceRequestStatus } from "../enums/serviceRequestStatus.ts";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { serviceRequestSimpleStatus } from "../enums/serviceRequestSimpleStatus.ts";
 
 type ComponentProps = { 
     search: string,  
@@ -157,10 +158,6 @@ export const ServiceRequestsFilter = memo(({search, start, end, ownership, type,
                             />                            
                         </FormControl>                        
                     </Grid> 
-
-
-
-
                     <Grid item xs={4} md={3} lg={1}>
                         <FormControl variant="standard" fullWidth>
                             <InputLabel id="service-request-ownership-label">Zlecenia</InputLabel>
@@ -168,13 +165,13 @@ export const ServiceRequestsFilter = memo(({search, start, end, ownership, type,
                                 labelId="service-request-ownership-label"
                                 value={ownership}
                                 onChange={(e) => setFilter(search, start, end, e.target.value, type, submitType, status, false)}                                 
-                            >
+                            >                                                                          
                                 {
                                     ownershipType && ownershipType.items                                        
                                         .map((item) => (
                                             <MenuItem key={item.id} value={item.id}>{ownershipType.getFilterText(item.id)}</MenuItem>                                    
                                         ))
-                                }                                
+                                }           
                             </Select>
                         </FormControl>                        
                     </Grid>  
@@ -220,8 +217,19 @@ export const ServiceRequestsFilter = memo(({search, start, end, ownership, type,
                                 value={status}
                                 onChange={(e) => setFilter(search, start, end, ownership, type, submitType, e.target.value, false)}
                             >
-                                {
-                                    serviceRequestStatus && serviceRequestStatus.items                                        
+                                <MenuItem key={0} value={0}>Wszystkie</MenuItem>
+                                <Divider /> 
+                                {                                     
+                                    serviceRequestSimpleStatus && serviceRequestSimpleStatus.items
+                                        .filter(u => u.id > serviceRequestSimpleStatus.none)
+                                        .map((item) => (
+                                            <MenuItem key={item.id} value={item.id}>{serviceRequestSimpleStatus.getFilterText(item.id)}</MenuItem>
+                                        ))
+                                }  
+                                <Divider /> 
+                                {                                     
+                                    serviceRequestStatus && serviceRequestStatus.items   
+                                        .filter(u => u.id > serviceRequestStatus.none)                                     
                                         .map((item) => (
                                             <MenuItem key={item.id} value={item.id}>{serviceRequestStatus.getFilterText(item.id)}</MenuItem>                                    
                                         ))
@@ -351,12 +359,23 @@ export const ServiceRequestsFilter = memo(({search, start, end, ownership, type,
                                 value={status}
                                 onChange={(e) => setFilter(search, start, end, ownership, type, submitType, e.target.value, false)}
                             >
-                                {
-                                    serviceRequestStatus && serviceRequestStatus.items                                        
+                                <MenuItem key={0} value={0}>Wszystkie</MenuItem>
+                                <Divider /> 
+                                {                                     
+                                    serviceRequestSimpleStatus && serviceRequestSimpleStatus.items
+                                        .filter(u => u.id > serviceRequestSimpleStatus.none)
+                                        .map((item) => (
+                                            <MenuItem key={item.id} value={item.id}>{serviceRequestSimpleStatus.getFilterText(item.id)}</MenuItem>
+                                        ))
+                                }  
+                                <Divider /> 
+                                {                                     
+                                    serviceRequestStatus && serviceRequestStatus.items   
+                                        .filter(u => u.id > serviceRequestStatus.none)                                     
                                         .map((item) => (
                                             <MenuItem key={item.id} value={item.id}>{serviceRequestStatus.getFilterText(item.id)}</MenuItem>                                    
                                         ))
-                                }                                
+                                }                                 
                             </Select>
                         </FormControl>                        
                     </Grid>                      
