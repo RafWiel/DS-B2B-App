@@ -1,5 +1,5 @@
 import { Accordion, AccordionDetails, AccordionSummary, Card, CardContent, Divider, FormControl, Grid, InputAdornment, InputLabel, MenuItem, Select, SelectChangeEvent, TextField } from "@mui/material";
-import { memo } from "react";
+import { memo, useState } from "react";
 import { useTheme } from '@mui/material/styles';
 import SearchIcon from '@mui/icons-material/Search';
 import { ownershipType } from '../enums/ownershipType.ts';
@@ -10,6 +10,8 @@ import { serviceRequestSubmitType } from "../enums/serviceRequestSubmitType.ts";
 import { serviceRequestStatus } from "../enums/serviceRequestStatus.ts";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { serviceRequestSimpleStatus } from "../enums/serviceRequestSimpleStatus.ts";
+// import MuiAccordionSummary from "@material-ui/core/AccordionSummary";
+// import { withStyles } from "@material-ui/core/styles";
 
 type ComponentProps = { 
     search: string,  
@@ -30,18 +32,51 @@ type ComponentProps = {
         isDebouncedUpdate: boolean): void;           
 };  
 
+// const AccordionSummary = withStyles({
+//     root: {
+//       "&.Mui-focused": {
+//         backgroundColor: "inherit"
+//       }
+//     }
+//   })(MuiAccordionSummary);
+
 export const ServiceRequestsFilter = memo(({search, start, end, ownership, type, submitType, status, setFilter}: ComponentProps) => {
     const theme = useTheme();
-        
+    const [expand, setExpand] = useState(false);
+
+    const toggleAccordion = () => {
+        setExpand((prev) => !prev);
+    };
+
     return (
         <>
-        <Accordion elevation={0} variant="outlined">
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Grid container spacing={2}>
-                    <Grid item xs={12} md={6} lg={4} >
+        <Accordion 
+            elevation={0} 
+            variant="outlined"
+            expanded={expand}
+            sx={{
+                [theme.breakpoints.up('xl')]: {
+                    display: 'none' 
+                },                                                     
+            }}
+        >
+            <AccordionSummary             
+                expandIcon={
+                    <ExpandMoreIcon onClick={toggleAccordion}/>
+                }                
+            >
+                <Grid 
+                    container 
+                    spacing={2} 
+                    marginRight={2}
+                >
+                    {/* Search */}
+                    <Grid item xs={12} md={8}>
                         <TextField                                                        
                             label="Szukaj" 
-                            value={search} 
+                            //value={search} 
+                            value="MARGINES DOLNY!"
+                            //onClick={(e) => e.stopPropagation()}
                             onChange={(e) => setFilter(e.target.value, start, end, ownership, type, submitType, status, true)}                          
                             fullWidth                                 
                             variant="standard" 
@@ -54,9 +89,10 @@ export const ServiceRequestsFilter = memo(({search, start, end, ownership, type,
                             }}
                         />                        
                     </Grid>
+                    {/* Start */}
                     <Grid 
                         item 
-                        md={3}
+                        md={2}
                         sx={{
                             [theme.breakpoints.down('md')]: {
                                 display: 'none'
@@ -66,7 +102,7 @@ export const ServiceRequestsFilter = memo(({search, start, end, ownership, type,
                         <FormControl variant="standard" fullWidth>
                             <InputLabel>Od</InputLabel>
                             <DatePicker 
-                                value={start}
+                                value={start}                                
                                 onChange={(newValue: Dayjs | null) => setFilter(search, newValue, end, ownership, type, submitType, status, false)}
                                 format="DD/MM/YYYY"
                                 sx={{
@@ -79,9 +115,10 @@ export const ServiceRequestsFilter = memo(({search, start, end, ownership, type,
                             />                          
                         </FormControl>                        
                     </Grid>  
+                    {/* End */}
                     <Grid 
                         item 
-                        md={3}
+                        md={2}
                         sx={{
                             [theme.breakpoints.down('md')]: {
                                 display: 'none'
@@ -106,8 +143,15 @@ export const ServiceRequestsFilter = memo(({search, start, end, ownership, type,
                     </Grid>  
                 </Grid>
             </AccordionSummary>
-            <AccordionDetails>
-                <Grid container spacing={2}>
+            <AccordionDetails >
+                <Grid 
+                    container 
+                    spacing={2}
+                    sx={{
+                        paddingRight: '38px'
+                    }}                    
+                >
+                    {/* Start */}
                     <Grid 
                         item 
                         xs={4}
@@ -133,6 +177,7 @@ export const ServiceRequestsFilter = memo(({search, start, end, ownership, type,
                             />                          
                         </FormControl>                        
                     </Grid>  
+                    {/* End */}
                     <Grid 
                         item 
                         xs={4}
@@ -158,7 +203,8 @@ export const ServiceRequestsFilter = memo(({search, start, end, ownership, type,
                             />                            
                         </FormControl>                        
                     </Grid> 
-                    <Grid item xs={4} md={3} lg={1}>
+                    {/* Ownership */}
+                    <Grid item xs={4} md={3}>
                         <FormControl variant="standard" fullWidth>
                             <InputLabel id="service-request-ownership-label">Zlecenia</InputLabel>
                             <Select
@@ -175,7 +221,8 @@ export const ServiceRequestsFilter = memo(({search, start, end, ownership, type,
                             </Select>
                         </FormControl>                        
                     </Grid>  
-                    <Grid item xs={4} md={3} lg={1}>
+                    {/* Type */}
+                    <Grid item xs={4} md={3}>
                         <FormControl variant="standard" fullWidth>
                             <InputLabel id="service-request-type-label">Typ</InputLabel>
                             <Select
@@ -192,7 +239,8 @@ export const ServiceRequestsFilter = memo(({search, start, end, ownership, type,
                             </Select>
                         </FormControl>                        
                     </Grid>  
-                    <Grid item xs={4} md={3} lg={1}>
+                    {/* Submit type */}
+                    <Grid item xs={4} md={3}>
                         <FormControl variant="standard" fullWidth>
                             <InputLabel id="service-request-submit-type-label">Źródło</InputLabel>
                             <Select
@@ -209,7 +257,8 @@ export const ServiceRequestsFilter = memo(({search, start, end, ownership, type,
                             </Select>
                         </FormControl>                        
                     </Grid>  
-                    <Grid item xs={4} md={3} lg={1}>
+                    {/* Status */}
+                    <Grid item xs={4} md={3}>
                         <FormControl variant="standard" fullWidth>
                             <InputLabel id="service-request-status-label">Status</InputLabel>
                             <Select
@@ -243,143 +292,187 @@ export const ServiceRequestsFilter = memo(({search, start, end, ownership, type,
 
         <Card 
             variant="outlined"
-            sx={{                 
-                [theme.breakpoints.down('sm')]: {
-                    border: 'none' 
-                },                    
+            sx={{
+                [theme.breakpoints.down('xl')]: {
+                    display: 'none' 
+                },                                                     
             }}>
             <CardContent>
-                <Grid container spacing={2}>
-                    <Grid item xs={12} md={6} lg={4} >
-                        <TextField                                                        
-                            label="Szukaj" 
-                            value={search} 
-                            onChange={(e) => setFilter(e.target.value, start, end, ownership, type, submitType, status, true)}                          
-                            fullWidth                                 
-                            variant="standard" 
-                            InputProps={{
-                                startAdornment: (
-                                <InputAdornment position="start">
-                                    <SearchIcon />
-                                </InputAdornment>
-                                ),
+                <div                     
+                    style={{
+                        display: 'flex',                        
+                    }}
+                >
+                    {/* Search */}
+                    <TextField                                                        
+                        label="Szukaj" 
+                        value={search} 
+                        onChange={(e) => setFilter(e.target.value, start, end, ownership, type, submitType, status, true)}                          
+                        fullWidth                                 
+                        variant="standard" 
+                        InputProps={{
+                            startAdornment: (
+                            <InputAdornment position="start">
+                                <SearchIcon />
+                            </InputAdornment>
+                            ),
+                        }}
+                        sx={{
+                            width: '300%'
+                        }}                            
+                    />                        
+                
+                    {/* Start */}
+                    <FormControl 
+                        variant="standard" 
+                        fullWidth 
+                        sx={{
+                            marginLeft: '16px'
+                        }}
+                    >
+                        <InputLabel>Od</InputLabel>
+                        <DatePicker 
+                            value={start}
+                            onChange={(newValue: Dayjs | null) => setFilter(search, newValue, end, ownership, type, submitType, status, false)}
+                            format="DD/MM/YYYY"
+                            sx={{
+                                mt: 2
+                            }}                                
+                            slotProps={{ 
+                                textField: { variant: 'standard', },
+                                field: { clearable: true }
                             }}
-                        />                        
-                    </Grid>
-                    <Grid item xs={4} md={3} lg={2}>
-                        <FormControl variant="standard" fullWidth>
-                            <InputLabel>Od</InputLabel>
-                            <DatePicker 
-                                value={start}
-                                onChange={(newValue: Dayjs | null) => setFilter(search, newValue, end, ownership, type, submitType, status, false)}
-                                format="DD/MM/YYYY"
-                                sx={{
-                                    mt: 2
-                                }}                                
-                                slotProps={{ 
-                                    textField: { variant: 'standard', },
-                                    field: { clearable: true }
-                                }}
-                            />                          
-                        </FormControl>                        
-                    </Grid>  
-                    <Grid item xs={4} md={3} lg={2}>
-                        <FormControl variant="standard" fullWidth>
-                            <InputLabel>Do</InputLabel>
-                            <DatePicker 
-                                value={end}
-                                onChange={(newValue: Dayjs | null) => setFilter(search, start, newValue, ownership, type, submitType, status, false)}
-                                format="DD/MM/YYYY"
-                                sx={{
-                                    mt: 2
-                                }}                                
-                                slotProps={{ 
-                                    textField: { variant: 'standard', },
-                                    field: { clearable: true }
-                                }}
-                            />                            
-                        </FormControl>                        
-                    </Grid>  
-                    <Grid item xs={4} md={3} lg={1}>
-                        <FormControl variant="standard" fullWidth>
-                            <InputLabel id="service-request-ownership-label">Zlecenia</InputLabel>
-                            <Select
-                                labelId="service-request-ownership-label"
-                                value={ownership}
-                                onChange={(e) => setFilter(search, start, end, e.target.value, type, submitType, status, false)}                                 
-                            >
-                                {
-                                    ownershipType && ownershipType.items                                        
-                                        .map((item) => (
-                                            <MenuItem key={item.id} value={item.id}>{ownershipType.getFilterText(item.id)}</MenuItem>                                    
-                                        ))
-                                }                                
-                            </Select>
-                        </FormControl>                        
-                    </Grid>  
-                    <Grid item xs={4} md={3} lg={1}>
-                        <FormControl variant="standard" fullWidth>
-                            <InputLabel id="service-request-type-label">Typ</InputLabel>
-                            <Select
-                                labelId="service-request-type-label"
-                                value={type}
-                                onChange={(e) => setFilter(search, start, end, ownership, e.target.value, submitType, status, false)}
-                            >
-                                {
-                                    serviceRequestType && serviceRequestType.items                                        
-                                        .map((item) => (
-                                            <MenuItem key={item.id} value={item.id}>{serviceRequestType.getFilterText(item.id)}</MenuItem>                                    
-                                        ))
-                                }                                
-                            </Select>
-                        </FormControl>                        
-                    </Grid>  
-                    <Grid item xs={4} md={3} lg={1}>
-                        <FormControl variant="standard" fullWidth>
-                            <InputLabel id="service-request-submit-type-label">Źródło</InputLabel>
-                            <Select
-                                labelId="service-request-submit-type-label"
-                                value={submitType}
-                                onChange={(e) => setFilter(search, start, end, ownership, type, e.target.value, status, false)}
-                            >
-                                {
-                                    serviceRequestSubmitType && serviceRequestSubmitType.items                                        
-                                        .map((item) => (
-                                            <MenuItem key={item.id} value={item.id}>{serviceRequestSubmitType.getFilterText(item.id)}</MenuItem>                                    
-                                        ))
-                                }                                
-                            </Select>
-                        </FormControl>                        
-                    </Grid>  
-                    <Grid item xs={4} md={3} lg={1}>
-                        <FormControl variant="standard" fullWidth>
-                            <InputLabel id="service-request-status-label">Status</InputLabel>
-                            <Select
-                                labelId="service-request-status-label"
-                                value={status}
-                                onChange={(e) => setFilter(search, start, end, ownership, type, submitType, e.target.value, false)}
-                            >
-                                <MenuItem key={0} value={0}>Wszystkie</MenuItem>
-                                <Divider /> 
-                                {                                     
-                                    serviceRequestSimpleStatus && serviceRequestSimpleStatus.items
-                                        .filter(u => u.id > serviceRequestSimpleStatus.none)
-                                        .map((item) => (
-                                            <MenuItem key={item.id} value={item.id}>{serviceRequestSimpleStatus.getFilterText(item.id)}</MenuItem>
-                                        ))
-                                }  
-                                <Divider /> 
-                                {                                     
-                                    serviceRequestStatus && serviceRequestStatus.items   
-                                        .filter(u => u.id > serviceRequestStatus.none)                                     
-                                        .map((item) => (
-                                            <MenuItem key={item.id} value={item.id}>{serviceRequestStatus.getFilterText(item.id)}</MenuItem>                                    
-                                        ))
-                                }                                 
-                            </Select>
-                        </FormControl>                        
-                    </Grid>                      
-                </Grid>                                                            
+                        />                          
+                    </FormControl>                        
+                    
+                    {/* End */}                    
+                    <FormControl 
+                        variant="standard" 
+                        fullWidth
+                        sx={{
+                            marginLeft: '16px'
+                        }}
+                    >
+                        <InputLabel>Do</InputLabel>
+                        <DatePicker 
+                            value={end}
+                            onChange={(newValue: Dayjs | null) => setFilter(search, start, newValue, ownership, type, submitType, status, false)}
+                            format="DD/MM/YYYY"
+                            sx={{
+                                mt: 2
+                            }}                                
+                            slotProps={{ 
+                                textField: { variant: 'standard', },
+                                field: { clearable: true }
+                            }}
+                        />                            
+                    </FormControl>                        
+                    
+                    {/* Ownership */}                    
+                    <FormControl 
+                        variant="standard" 
+                        fullWidth
+                        sx={{
+                            marginLeft: '16px',
+                            width: '80%'
+                        }}
+                    >
+                        <InputLabel id="service-request-ownership-label">Zlecenia</InputLabel>
+                        <Select
+                            labelId="service-request-ownership-label"
+                            value={ownership}
+                            onChange={(e) => setFilter(search, start, end, e.target.value, type, submitType, status, false)}                                 
+                        >
+                            {
+                                ownershipType && ownershipType.items                                        
+                                    .map((item) => (
+                                        <MenuItem key={item.id} value={item.id}>{ownershipType.getFilterText(item.id)}</MenuItem>                                    
+                                    ))
+                            }                                
+                        </Select>
+                    </FormControl>                        
+                    
+                    {/* Type */}                    
+                    <FormControl 
+                        variant="standard" 
+                        fullWidth
+                        sx={{
+                            marginLeft: '16px',
+                        }}
+                    >
+                        <InputLabel id="service-request-type-label">Typ</InputLabel>
+                        <Select
+                            labelId="service-request-type-label"
+                            value={type}
+                            onChange={(e) => setFilter(search, start, end, ownership, e.target.value, submitType, status, false)}
+                        >
+                            {
+                                serviceRequestType && serviceRequestType.items                                        
+                                    .map((item) => (
+                                        <MenuItem key={item.id} value={item.id}>{serviceRequestType.getFilterText(item.id)}</MenuItem>                                    
+                                    ))
+                            }                                
+                        </Select>
+                    </FormControl>                        
+                    
+                    {/* Submit type */}                    
+                    <FormControl 
+                        variant="standard" 
+                        fullWidth
+                        sx={{
+                            marginLeft: '16px',
+                        }}
+                    >
+                        <InputLabel id="service-request-submit-type-label">Źródło</InputLabel>
+                        <Select
+                            labelId="service-request-submit-type-label"
+                            value={submitType}
+                            onChange={(e) => setFilter(search, start, end, ownership, type, e.target.value, status, false)}
+                        >
+                            {
+                                serviceRequestSubmitType && serviceRequestSubmitType.items                                        
+                                    .map((item) => (
+                                        <MenuItem key={item.id} value={item.id}>{serviceRequestSubmitType.getFilterText(item.id)}</MenuItem>                                    
+                                    ))
+                            }                                
+                        </Select>
+                    </FormControl>                        
+
+                    {/* Status */}                    
+                    <FormControl 
+                        variant="standard" 
+                        fullWidth
+                        sx={{
+                            marginLeft: '16px',
+                            width: '150%'
+                        }}
+                    >
+                        <InputLabel id="service-request-status-label">Status</InputLabel>
+                        <Select
+                            labelId="service-request-status-label"
+                            value={status}
+                            onChange={(e) => setFilter(search, start, end, ownership, type, submitType, e.target.value, false)}
+                        >
+                            <MenuItem key={0} value={0}>Wszystkie</MenuItem>
+                            <Divider /> 
+                            {                                     
+                                serviceRequestSimpleStatus && serviceRequestSimpleStatus.items
+                                    .filter(u => u.id > serviceRequestSimpleStatus.none)
+                                    .map((item) => (
+                                        <MenuItem key={item.id} value={item.id}>{serviceRequestSimpleStatus.getFilterText(item.id)}</MenuItem>
+                                    ))
+                            }  
+                            <Divider /> 
+                            {                                     
+                                serviceRequestStatus && serviceRequestStatus.items   
+                                    .filter(u => u.id > serviceRequestStatus.none)                                     
+                                    .map((item) => (
+                                        <MenuItem key={item.id} value={item.id}>{serviceRequestStatus.getFilterText(item.id)}</MenuItem>                                    
+                                    ))
+                            }                                 
+                        </Select>
+                    </FormControl>                                            
+                </div>
             </CardContent>      
         </Card>
         </>

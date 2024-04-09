@@ -157,10 +157,7 @@ export const ServiceRequests = () => {
         isReset: true
     });
     
-    //console.log('render', state.page);
-    console.log('x', state.status);
-    console.log('y', Number(state.status) & 0xFF);
-    
+    //console.log('render', state.page);    
 
     useEffect(() => {                    
         parseUrl();        

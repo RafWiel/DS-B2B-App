@@ -164,7 +164,14 @@ export default function App() {
                         fontSize: fontSize,
                     },
                 },
-            },             
+            }, 
+            MuiAccordionSummary: {
+                styleOverrides: {
+                    root: {
+                        backgroundColor: 'inherit !important',                        
+                    },
+                },
+            }            
         },        
     }, 
     plPL,  
