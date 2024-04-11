@@ -93,7 +93,7 @@ export const Customers = () => {
     const [, navigate] = useLocation();
     const abortController = useRef(new AbortController()).current;  
     const [dataGridHeight, setDataGridHeight] = useState(0);
-    const api = useApi();
+    const api = useApi();    
     
     const [state, setState] = useState<FetchState>({
         search: '',

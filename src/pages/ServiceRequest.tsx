@@ -31,7 +31,8 @@ export const ServiceRequest = () => {
     const [, navigate] = useLocation();    
     const abortController = useRef(new AbortController()).current;      
     const api = useApi();
-
+    const previousLocation = useAppStore((state) => state.previousLocation); 
+    
     const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
 
     const schema = yup.object().shape({                                        
@@ -54,7 +55,7 @@ export const ServiceRequest = () => {
     }); 
 
     useEffect(() => {                        
-        setAppBarTitle('Pracownik');   
+        setAppBarTitle('Zlecenie serwisowe');   
         fetchData();                
         
         return () => {            
@@ -86,7 +87,7 @@ export const ServiceRequest = () => {
                 text: (error.response ? `${error.response.status} - ` : '') + 'Nieudane pobranie danych pracownika'
             });
 
-            navigate('/employees');
+            navigate(previousLocation);
         })
         .finally(() => showLoadingIcon(false));         
     }
@@ -162,7 +163,7 @@ export const ServiceRequest = () => {
             signal: abortController.signal 
         })              
         .then(() => {                       
-            navigate('/employees');
+            navigate(previousLocation);
         })        
         .catch((error) => {
             if (error.name === 'AbortError' || 

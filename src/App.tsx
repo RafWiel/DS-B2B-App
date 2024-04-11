@@ -35,8 +35,7 @@ import 'dayjs/locale/pl';
 import { plPL as corePlPL } from '@mui/material/locale';
 import { ServiceRequest } from './pages/ServiceRequest';
 
-const todo = 'Pamietaj skad bylo wywolanie karty pracownika, moze byc z karty firmy. Po usunieciu nie wracaj na sztywno do listy pracownikow';
-const todo1 = 'Pobaw sie zoomem, popraw szerokosc kolumn. Chyba trzeba zrobic wiecej przedzialow';
+const todo = 'Pobaw sie zoomem, popraw szerokosc kolumn. Chyba trzeba zrobic wiecej przedzialow';
 
 interface AppBarProps extends MuiAppBarProps {
     open?: boolean;
@@ -65,13 +64,14 @@ const AppBar = styled(MuiAppBar, {
 }));
 
 export default function App() {  
-    const location = useLocation();  
+    const [location, ] = useLocation();  
     const isDesktopSideBarOpen = useAppStore((state) => state.isOpenDesktop);
     const openDesktopSideBar = useAppStore((state) => state.openDesktop);
     const openMobileSideBar = useAppStore((state) => state.openMobile);         
     const appBarTitle = useAppStore((state) => state.appBarTitle);         
     const setAppBarTitle = useAppStore((state) => state.setAppBarTitle);     
     const isLoadingIcon = useAppStore((state) => state.isLoadingIcon);      
+    const setPreviousLocation = useAppStore((state) => state.setPreviousLocation); 
 
     const fontSize = '0.8rem';
 
@@ -180,8 +180,13 @@ export default function App() {
     );
     
     useEffect(() => {          
-        if (routes.isText(location[0])) {
-            setAppBarTitle(routes.getText(location[0]));
+        if (routes.isText(location)) {
+            setAppBarTitle(routes.getText(location));
+        }
+
+        return () => {
+            console.log('previous', location);
+            setPreviousLocation(location);
         }
     }, [location, setAppBarTitle]);
     

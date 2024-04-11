@@ -18,7 +18,6 @@ import dayjs, { Dayjs } from "dayjs";
 import { ownershipType } from "../enums/ownershipType.ts";
 import { serviceRequestSubmitType } from "../enums/serviceRequestSubmitType.ts";
 import { serviceRequestStatus } from "../enums/serviceRequestStatus.ts";
-import { serviceRequestSimpleStatus } from "../enums/serviceRequestSimpleStatus.ts";
 
 interface IServiceRequestRow extends IBaseRow {
     login: string;
@@ -508,7 +507,7 @@ export const ServiceRequests = () => {
                                 deleteAllRows={handleDeleteAll} 
                                 fetchNextData={fetchNextData}        
                                 setSorting={setSorting}
-                                onRowClick={(id: number) => navigate(`/employees/${id}`)}
+                                onRowClick={(id: number) => navigate(`/service-requests/${id}`)}
                             />
                         </Grid>
                         <Grid 
@@ -527,7 +526,7 @@ export const ServiceRequests = () => {
                             <Button                                 
                                 variant="contained"
                                 disableElevation 
-                                onClick={() => navigate('/employees/0')} 
+                                onClick={() => navigate('/service-requests/0')} 
                                 startIcon={<AddIcon />}
                                 sx={{
                                     display: 'inline-flex',                                                                        

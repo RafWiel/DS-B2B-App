@@ -39,6 +39,7 @@ export const Customer = () => {
     const companies = useFetch<Array<IList>>(`${config.API_URL}/companies/list`, 'Nieudane pobranie listy firm'); 
     const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
     const api = useApi();
+    const previousLocation = useAppStore((state) => state.previousLocation); 
 
     //console.log('company id', companyParams?.companyId);
     //console.log('customer id', companyParams?.id);
@@ -67,8 +68,8 @@ export const Customer = () => {
 
     useEffect(() => {                        
         setAppBarTitle('Klient');   
-        fetchData();                
-        
+        fetchData();                        
+
         return () => {            
             abortController.abort();            
         }
@@ -85,7 +86,7 @@ export const Customer = () => {
         .then((res) => {             
             setCustomer(res.data);                        
 
-            console.log('load:', JSON.stringify(res, null, 2));
+            //console.log('load:', JSON.stringify(res, null, 2));
             
             setAppBarTitle(`Klient ${res.data.name}`);        
         })
@@ -98,7 +99,7 @@ export const Customer = () => {
                 text: (error.response ? `${error.response.status} - ` : '') + 'Nieudane pobranie danych klienta'
             });
 
-            navigate('/customers');
+            navigate(previousLocation);
         })
         .finally(() => showLoadingIcon(false));         
     }
@@ -174,7 +175,7 @@ export const Customer = () => {
             signal: abortController.signal  
         })              
         .then(() => {                       
-            navigate('/customers');
+            navigate(previousLocation);
         })        
         .catch((error) => {
             if (error.name === 'AbortError' || 

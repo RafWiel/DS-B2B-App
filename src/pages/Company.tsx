@@ -86,6 +86,7 @@ export const Company = () => {
     const isXsMobileView = useMediaQuery(theme.breakpoints.only("xs"));           
     const postalRegExp = /^[0-9]{2}-[0-9]{3}$/    
     const api = useApi();
+    const previousLocation = useAppStore((state) => state.previousLocation); 
 
     const schema = yup.object().shape({                                                    
         name: yup.string().required('Podaj nazwę'),
@@ -146,7 +147,7 @@ export const Company = () => {
                 text: (error.response ? `${error.response.status} - ` : '') + 'Nieudane pobranie danych firmy'
             });
 
-            navigate('/companies');
+            navigate(previousLocation);
         })
         .finally(() => showLoadingIcon(false));         
     }
@@ -225,7 +226,7 @@ export const Company = () => {
             return;
         }
 
-        navigate('/companies');
+        navigate(previousLocation);
     }   
 
     const deleteAsync = useCallback(async (url: string, errorMessage: string) => {

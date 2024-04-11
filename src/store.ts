@@ -5,6 +5,7 @@ import { AutoMessageDialogSlice, createAutoMessageDialogSlice } from './store/au
 import { MessageDialogSlice, createMessageDialogSlice } from './store/messageDialogSlice.ts';
 import { QuestionDialogSlice, createQuestionDialogSlice } from './store/questionDialogSlice.ts';
 import { LoadingIconSlice, createLoadingIconSlice } from './store/loadingIconSlice.ts';
+import { PreviousLocationSlice, createPreviousLocationSlice } from './store/previouseLocationSlice.ts';
 
 export const useAppStore = create<
     SideBarSlice & 
@@ -12,12 +13,14 @@ export const useAppStore = create<
     AutoMessageDialogSlice &
     MessageDialogSlice &
     QuestionDialogSlice &
-    LoadingIconSlice
+    LoadingIconSlice &
+    PreviousLocationSlice
 >((...a) => ({
     ...createSideBarSlice(...a),    
     ...createAppBarTitleSlice(...a),
     ...createAutoMessageDialogSlice(...a),
     ...createMessageDialogSlice(...a),
     ...createQuestionDialogSlice(...a),
-    ...createLoadingIconSlice(...a)
+    ...createLoadingIconSlice(...a),
+    ...createPreviousLocationSlice(...a)
 }));
