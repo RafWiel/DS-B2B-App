@@ -193,7 +193,7 @@ export const Employees = () => {
             
             openMessageDialog({
                 title: 'Błąd aplikacji',
-                text: error.response ? `${error.response.status} - ` : '' + 'Nieudane pobranie listy pracowników' 
+                text: (error.response ? `${error.response.status} - ` : '') + 'Nieudane pobranie listy pracowników' 
             });
         })
         .finally(() => {
@@ -268,7 +268,7 @@ export const Employees = () => {
             
             openMessageDialog({
                 title: 'Błąd aplikacji',
-                text: error.response ? `${error.response.status} - ` : '' + `${errorMessage}`
+                text: (error.response ? `${error.response.status} - ` : '') + errorMessage
             });
 
             return false;

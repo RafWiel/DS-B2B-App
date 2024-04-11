@@ -83,7 +83,7 @@ export const Employee = () => {
             
             openMessageDialog({
                 title: 'Błąd aplikacji',
-                text: error.response ? `${error.response.status} - ` : '' + 'Nieudane pobranie danych pracownika'
+                text: (error.response ? `${error.response.status} - ` : '') + 'Nieudane pobranie danych pracownika'
             });
 
             navigate('/employees');
@@ -131,7 +131,7 @@ export const Employee = () => {
 
             openMessageDialog({
                 title: 'Błąd aplikacji',
-                text: error.response ? `${error.response.status} - ` : '' + `${errorMessage}`
+                text: (error.response ? `${error.response.status} - ` : '') + errorMessage
             });
         })        
         .finally(() => {           
@@ -170,7 +170,7 @@ export const Employee = () => {
             
             openMessageDialog({
                 title: 'Błąd aplikacji',
-                text: error.response ? `${error.response.status} - ` : '' + 'Nieudane usunięcie pracownika'
+                text: (error.response ? `${error.response.status} - ` : '') + 'Nieudane usunięcie pracownika'
             });
 
             return false;

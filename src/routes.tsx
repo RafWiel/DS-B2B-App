@@ -9,32 +9,33 @@ const home = '/';
 const companies = '/companies';
 const company = '/companies/:id';
 const companyCustomer = '/companies/:companyId/customers/:id';
-const customers = '/customers';
 const customer = '/customers/:id';
-const employees = '/employees';
+const customers = '/customers';
 const employee = '/employees/:id';
+const employees = '/employees';
 const phoneConsultations = '/phone-consultations';
 const registrationRequests = '/registration-requests';
+const serviceRequest = '/service-requests/:id';
 const serviceRequests = '/service-requests';
-
 
 const routes = {
     home,
-    companies,
-    company,    
+    companies,       
+    company,     
     companyCustomer,
-    customers,
     customer,
-    employees,
-    employee,    
+    customers,    
+    employee, 
+    employees,       
     phoneConsultations,
     registrationRequests,
+    serviceRequest,    
     serviceRequests,    
 
     items: [{
         id: home, 
         text: 'Home',
-        isSidebarItem: false,
+        isSidebarItem: false,        
     }, {
         id: companies,
         text: 'Firmy',
@@ -42,39 +43,39 @@ const routes = {
         sidebarIndex: 3,
         renderIcon: () => {
             return <FactoryIcon />;
-        }
+        }   
     }, {
         id: company,
         text: 'Firma',
-        isSidebarItem: false,        
+        isSidebarItem: false,     
     }, {
         id: companyCustomer,
         text: 'Klient',
         isSidebarItem: false        
     }, {
+        id: customer,
+        text: 'Klient',
+        isSidebarItem: false  
+    }, {        
         id: customers,
         text: 'Klienci',
         isSidebarItem: true,
         sidebarIndex: 4,
         renderIcon: () => {
-            return <PeopleAltIcon />;
+            return <PeopleAltIcon />;        
         }
     }, {
-        id: customer,
-        text: 'Klient',
-        isSidebarItem: false        
-    }, {
+        id: employee,
+        text: 'Pracownik',
+        isSidebarItem: false               
+    }, {        
         id: employees,
         text: 'Pracownicy',
         isSidebarItem: true,
         sidebarIndex: 5,
         renderIcon: () => {
             return <BadgeIcon />;
-        }
-    }, {
-        id: employee,
-        text: 'Pracownik',
-        isSidebarItem: false        
+        }       
     }, {
         id: phoneConsultations,
         text: 'Konsultacje telefoniczne',
@@ -91,6 +92,10 @@ const routes = {
         renderIcon: () => {
             return <PersonAddIcon />;
         }
+    }, {
+        id: serviceRequest,
+        text: 'Pracownik',
+        isSidebarItem: false     
     }, {
         id: serviceRequests,
         text: 'Zlecenia serwisowe',

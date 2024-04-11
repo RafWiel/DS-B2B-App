@@ -52,12 +52,17 @@ export const ServiceRequestsFilter = memo(({search, start, end, ownership, type,
         <>
         <Accordion 
             elevation={0} 
-            variant="outlined"
+            square={false}
             expanded={expand}
+            disableGutters
             sx={{
+                [theme.breakpoints.up('sm')]: {
+                    border: '1px solid #dddddd', 
+                    borderRadius: '4px'
+                }, 
                 [theme.breakpoints.up('xl')]: {
                     display: 'none' 
-                },                                                     
+                },                            
             }}
         >
             <AccordionSummary             
@@ -74,8 +79,7 @@ export const ServiceRequestsFilter = memo(({search, start, end, ownership, type,
                     <Grid item xs={12} md={8}>
                         <TextField                                                        
                             label="Szukaj" 
-                            //value={search} 
-                            value="MARGINES DOLNY!"
+                            value={search}                             
                             //onClick={(e) => e.stopPropagation()}
                             onChange={(e) => setFilter(e.target.value, start, end, ownership, type, submitType, status, true)}                          
                             fullWidth                                 
@@ -204,7 +208,7 @@ export const ServiceRequestsFilter = memo(({search, start, end, ownership, type,
                         </FormControl>                        
                     </Grid> 
                     {/* Ownership */}
-                    <Grid item xs={4} md={3}>
+                    <Grid item xs={4} md={2}>
                         <FormControl variant="standard" fullWidth>
                             <InputLabel id="service-request-ownership-label">Zlecenia</InputLabel>
                             <Select
@@ -258,7 +262,7 @@ export const ServiceRequestsFilter = memo(({search, start, end, ownership, type,
                         </FormControl>                        
                     </Grid>  
                     {/* Status */}
-                    <Grid item xs={4} md={3}>
+                    <Grid item xs={4} md={4}>
                         <FormControl variant="standard" fullWidth>
                             <InputLabel id="service-request-status-label">Status</InputLabel>
                             <Select

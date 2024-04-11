@@ -4,60 +4,48 @@ import { useTheme } from '@mui/material/styles';
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import { Button, FormControl, FormHelperText, Grid, InputLabel, MenuItem, Select, TextField, Typography } from "@mui/material";
+import { Button, FormControl, FormHelperText, Grid, InputLabel, MenuItem, Select, TextField } from "@mui/material";
 import { useAppStore } from "../store.ts";
-import { ICustomer } from '../interfaces/ICustomer.ts';
+import { IEmployee } from '../interfaces/IEmployee.ts';
 import { useLocation, useRoute } from "wouter";
-import { config } from '../config/config.ts';
-import { customerType } from '../enums/customerType.ts';
+import { config } from "../config/config.ts";
+import { employeeType } from "../enums/employeeType.ts";
 import { Formik, FormikProps, FormikHelpers } from 'formik';
 import * as yup from 'yup';
 import { boolEnum } from "../enums/boolEnum.ts";
 import CheckIcon from '@mui/icons-material/Check';
 import ClearIcon from '@mui/icons-material/Clear';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
-import ArticleIcon from '@mui/icons-material/Article';
-import PhoneIcon from '@mui/icons-material/Phone';
-import AddIcon from '@mui/icons-material/Add';
 import { IIdResponse } from "../interfaces/IIdResponse.ts";
 import '../assets/card.css';
-import { IList } from "../interfaces/IList.ts";
-import useFetch from "../hooks/useFetch.ts";
 import useApi from '../hooks/useApi.ts';
 
-export const Customer = () => {
+export const ServiceRequest = () => {
     const theme = useTheme();  
     const setAppBarTitle = useAppStore((state) => state.setAppBarTitle);       
     const showLoadingIcon = useAppStore((state) => state.showLoadingIcon);
     const openAutoMessageDialog = useAppStore((state) => state.openAutoMessageDialog); 
     const openMessageDialog = useAppStore((state) => state.openMessageDialog); 
     const openQuestionDialog = useAppStore((state) => state.openQuestionDialog); 
-    const [, params] = useRoute("/customers/:id");    
-    const [, companyParams] = useRoute("/companies/:companyId/customers/:id");    
+    const [, params] = useRoute("/employees/:id");
     const [, navigate] = useLocation();    
-    const abortController = useRef(new AbortController()).current;     
-    const companies = useFetch<Array<IList>>(`${config.API_URL}/companies/list`, 'Nieudane pobranie listy firm'); 
-    const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
+    const abortController = useRef(new AbortController()).current;      
     const api = useApi();
 
-    //console.log('company id', companyParams?.companyId);
-    //console.log('customer id', companyParams?.id);
-    //console.log('id', params?.id);
+    const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
 
     const schema = yup.object().shape({                                        
-        type: yup.number().required().min(customerType.supervisor, 'Podaj typ').max(customerType.employee, 'Podaj typ'),
+        type: yup.number().required().min(employeeType.administrator, 'Podaj typ').max(employeeType.employee, 'Podaj typ'),
         login: yup.string().required('Podaj login'),
         name: yup.string().required('Podaj imię i nazwisko'),
         phoneNumber: yup.string().required('Podaj numer telefonu').matches(phoneRegExp, 'Nieprawidłowy numer telefonu'),
         email: yup.string().required('Podaj e-mail').email('Nieprawidłowy e-mail'),
-        isMailing: yup.boolean().required(),
-        companyId: yup.number().required('Wybierz firmę').min(1, 'Wybierz firmę'),
+        isMailing: yup.boolean().required(),                        
     });
 
-    const [customer, setCustomer] = useState<ICustomer>({
-        id: Number(params?.id ?? companyParams?.id),     
-        companyId: Number(companyParams?.companyId ?? 0),   
-        type: customerType.none,
+    const [employee, setEmployee] = useState<IEmployee>({         
+        id: Number(params?.id),        
+        type: employeeType.none,
         login: '',
         name: '',
         phoneNumber: '',
@@ -66,7 +54,7 @@ export const Customer = () => {
     }); 
 
     useEffect(() => {                        
-        setAppBarTitle('Klient');   
+        setAppBarTitle('Pracownik');   
         fetchData();                
         
         return () => {            
@@ -75,19 +63,19 @@ export const Customer = () => {
     }, []);
     
     const fetchData = () => {
-        if (!customer.id) return;
+        if (!employee.id) return;
                
         showLoadingIcon(true);
         
-        api.get(`${config.API_URL}/customers/${customer.id}`, { 
+        api.get(`${config.API_URL}/employees/${employee.id}`, { 
             signal: abortController.signal 
-        })      
-        .then((res) => {             
-            setCustomer(res.data);                        
+        })              
+        .then((res) => {                                                                 
+            setEmployee(res.data);                        
 
-            console.log('load:', JSON.stringify(res, null, 2));
+            //console.log('load:', JSON.stringify(res, null, 2));
             
-            setAppBarTitle(`Klient ${res.data.name}`);        
+            setAppBarTitle(`Pracownik ${res.data.name}`);        
         })
         .catch((error) => {
             if (error.name === 'AbortError' || 
@@ -95,43 +83,43 @@ export const Customer = () => {
             
             openMessageDialog({
                 title: 'Błąd aplikacji',
-                text: (error.response ? `${error.response.status} - ` : '') + 'Nieudane pobranie danych klienta'
+                text: (error.response ? `${error.response.status} - ` : '') + 'Nieudane pobranie danych pracownika'
             });
 
-            navigate('/customers');
+            navigate('/employees');
         })
         .finally(() => showLoadingIcon(false));         
     }
     
-    const handleSubmit = (customer: ICustomer, { setSubmitting }: FormikHelpers<ICustomer>) => {                     
-        showLoadingIcon(true);
+    const handleSubmit = (employee: IEmployee, { setSubmitting }: FormikHelpers<IEmployee>) => {                     
+        showLoadingIcon(true);        
 
-        //console.log('submit', customer.id);
-        //console.log('handleSubmit:', JSON.stringify(customer, null, 2)); 
+        //console.log('submit', employee.id);
+        //console.log('handleSubmit:', JSON.stringify(employee, null, 2)); 
                         
-        api(`${config.API_URL}/customers`, {
-            method: !customer.id ? 'POST' : 'PUT',            
+        api(`${config.API_URL}/employees`, {
+            method: !employee.id ? 'POST' : 'PUT',            
             headers: { "Content-Type": "application/json" },
-            data: customer,
+            data: employee,
             signal: abortController.signal 
         })       
         .then((res) => {                            
             const response = res.data as IIdResponse;
 
-            setCustomer({...customer, id: response.id});
+            setEmployee({...employee, id: response.id});
             setUrl(response.id);
 
             openAutoMessageDialog({
-                title: 'Klient',
+                title: 'Pracownik',
                 text: 'Zapisano',
                 delay: 1000
-            });             
+            });
         })              
         .catch((error) => {
             if (error.name === 'AbortError' || 
                 error.name === 'CanceledError') return;
 
-            let errorMessage = 'Nieudany zapis danych klienta';
+            let errorMessage = 'Nieudany zapis danych pracownika';
             
             if (error.response?.status === 404) {
                 errorMessage = 'Nie znaleziono użytkownika w bazie danych';
@@ -151,30 +139,30 @@ export const Customer = () => {
             showLoadingIcon(false);            
         });
     }
-
+    
     const setUrl = (id: number) => {
-        const url = `/customers/${id}`;
+        const url = `/employees/${id}`;
         
         window.history.replaceState(null, '', url);
     }
     
     const handleDelete = () => {        
         openQuestionDialog({
-            title: 'Klient',
-            text: `Czy na pewno usunąć klienta ${customer.name}?`,            
+            title: 'Pracownik',
+            text: `Czy na pewno usunąć pracownika ${employee.name}?`,            
             action: deleteSingle,
-            actionParameters: customer.id
+            actionParameters: employee.id
         });
     }
 
     const deleteSingle = (id: number) => {
         showLoadingIcon(true);       
         
-        api.delete(`${config.API_URL}/customers/${id}`, { 
-            signal: abortController.signal  
+        api.delete(`${config.API_URL}/employees/${id}`, { 
+            signal: abortController.signal 
         })              
         .then(() => {                       
-            navigate('/customers');
+            navigate('/employees');
         })        
         .catch((error) => {
             if (error.name === 'AbortError' || 
@@ -182,7 +170,7 @@ export const Customer = () => {
             
             openMessageDialog({
                 title: 'Błąd aplikacji',
-                text: (error.response ? `${error.response.status} - ` : '') + 'Nieudane usunięcie klienta'
+                text: (error.response ? `${error.response.status} - ` : '') + 'Nieudane usunięcie pracownika'
             });
 
             return false;
@@ -190,7 +178,7 @@ export const Customer = () => {
         .finally(() => {
             showLoadingIcon(false);                        
         });               
-    }        
+    }       
 
     return (
         <Box         
@@ -229,12 +217,12 @@ export const Customer = () => {
                 }}>     
                     <Formik
                         enableReinitialize={true}
-                        initialValues={customer}
+                        initialValues={employee}
                         validationSchema={schema} 
                         validateOnChange={true}
                         validateOnBlur={true}           
                         onSubmit={handleSubmit}>                    
-                        {(props: FormikProps<ICustomer>) => {
+                        {(props: FormikProps<IEmployee>) => {
                             const { handleSubmit, handleChange, values, errors, touched, isSubmitting } = props;                            
 
                             //console.log('render Formik');
@@ -254,13 +242,27 @@ export const Customer = () => {
                                         item 
                                         xs={12} 
                                         sm={12} 
-                                        md={10}                                         
-                                    >                                                                                                                                                                                                   
+                                        md={10} 
+                                        // sx={{                                
+                                        //     backgroundColor: 'aqua',                                
+                                        // }}
+                                    >       
+                                        {/* <Typography className="card-title" component="div">
+                                            Pracownik
+                                        </Typography>                                                                                                                                                        */}
                                         <Grid                                         
                                             container 
-                                            spacing={2}                                            
+                                            spacing={2}
+                                            // sx={{                                                
+                                            //     backgroundColor: 'gainsboro',                                                                                                                                           
+                                            // }}
                                         >
-                                            <Grid item md={3} sm={4} xs={6}>
+                                            <Grid 
+                                                item 
+                                                sm={4} 
+                                                xs={6} 
+                                                // sx={{ mt: 1 }}
+                                            >
                                                 <TextField 
                                                     error={touched?.login && !!errors?.login}
                                                     helperText={touched?.login && errors?.login}
@@ -273,7 +275,7 @@ export const Customer = () => {
                                                     // inputProps={{ style: { fontSize: '14px' } }}
                                                 />  
                                             </Grid>
-                                            <Grid item md={3} sm={4} xs={6}>
+                                            <Grid item sm={4} xs={6}>
                                                 <TextField 
                                                     error={touched?.name && !!errors?.name}
                                                     helperText={touched?.name && errors?.name}
@@ -285,7 +287,7 @@ export const Customer = () => {
                                                     variant="standard"                                 
                                                 />  
                                             </Grid>
-                                            <Grid item md={6} sm={4} xs={6}>
+                                            <Grid item sm={4} xs={6}>
                                                 <TextField 
                                                     error={touched?.email && !!errors?.email}
                                                     helperText={touched?.email && errors?.email}           
@@ -297,7 +299,7 @@ export const Customer = () => {
                                                     variant="standard"                                 
                                                 />  
                                             </Grid>                                            
-                                            <Grid item md={3} sm={4} xs={6}>
+                                            <Grid item sm={4} xs={6}>
                                                 <TextField 
                                                     error={touched?.phoneNumber && !!errors?.phoneNumber}
                                                     helperText={touched?.phoneNumber && errors?.phoneNumber}                        
@@ -309,32 +311,7 @@ export const Customer = () => {
                                                     variant="standard"                                 
                                                 />  
                                             </Grid>
-                                            <Grid item md={3} sm={4} xs={6}>
-                                                <FormControl 
-                                                    error={touched?.companyId && !!errors?.companyId}
-                                                    variant="standard" 
-                                                    fullWidth 
-                                                >
-                                                    <InputLabel id="companyId">Firma</InputLabel>
-                                                    <Select
-                                                        displayEmpty                                                        
-                                                        labelId="companyId"
-                                                        name="companyId"
-                                                        value={values.companyId}
-                                                        onChange={handleChange}
-                                                    >
-                                                        {
-                                                            companies && companies.map((item) => (
-                                                                    <MenuItem key={item.id} value={item.id}>{item.name}&nbsp;</MenuItem>                                    
-                                                                ))
-                                                        }                                
-                                                    </Select>
-                                                    <FormHelperText>
-                                                        {touched?.companyId && errors?.companyId}
-                                                    </FormHelperText>
-                                                </FormControl>   
-                                            </Grid>
-                                            <Grid item md={3} sm={4} xs={6}>
+                                            <Grid item sm={4} xs={6}>
                                                 <FormControl 
                                                     error={touched?.type && !!errors?.type}
                                                     variant="standard" 
@@ -349,7 +326,7 @@ export const Customer = () => {
                                                         onChange={handleChange}
                                                     >
                                                         {
-                                                            customerType && customerType.items                                                                   
+                                                            employeeType && employeeType.items                                                                   
                                                                 .map((item) => (
                                                                     <MenuItem key={item.id} value={item.id}>{item.text}&nbsp;</MenuItem>                                    
                                                                 ))
@@ -360,7 +337,7 @@ export const Customer = () => {
                                                     </FormHelperText>
                                                 </FormControl>   
                                             </Grid>
-                                            <Grid item md={3} sm={4} xs={6}>
+                                            <Grid item sm={4} xs={6}>
                                                 <FormControl variant="standard" fullWidth>
                                                     <InputLabel id="isMailing">Powiadomienia e-mail</InputLabel>
                                                     <Select                                                        
@@ -395,8 +372,8 @@ export const Customer = () => {
                                     >
                                         <Button                                 
                                             variant="contained"
-                                            disabled={isSubmitting}
                                             disableElevation 
+                                            disabled={isSubmitting}
                                             onClick={() => handleSubmit()}                                
                                             startIcon={<CheckIcon />}
                                             sx={{
@@ -410,7 +387,7 @@ export const Customer = () => {
                                         <Button                                 
                                             variant="contained"
                                             disableElevation 
-                                            disabled={!customer.id || isSubmitting}
+                                            disabled={!employee.id || isSubmitting}
                                             onClick={() => handleDelete()}                                
                                             startIcon={<ClearIcon />}
                                             sx={{
@@ -428,7 +405,7 @@ export const Customer = () => {
                                         <Button                                 
                                             variant="contained"
                                             disableElevation 
-                                            disabled={!customer.id || isSubmitting}
+                                            disabled={!employee.id || isSubmitting}
                                             // onClick={() => fetchNextData()}                                
                                             startIcon={<VpnKeyIcon />}
                                             sx={{
@@ -443,63 +420,9 @@ export const Customer = () => {
                                         >
                                             Zresetuj hasło
                                         </Button>
-                                        <Button                                 
-                                            variant="contained"
-                                            disableElevation 
-                                            disabled={!customer.id || isSubmitting}
-                                            // onClick={() => fetchNextData()}                                
-                                            startIcon={<ArticleIcon />}
-                                            sx={{
-                                                display: 'inline-flex',                                                                        
-                                                width: '100%', 
-                                                height: 40,
-                                                marginTop: '4px',
-                                                [theme.breakpoints.down('sm')]: {
-                                                    marginTop: '1px',
-                                                },                                   
-                                            }}
-                                        >
-                                            Pokaż zlecenia
-                                        </Button>
-                                        <Button                                 
-                                            variant="contained"
-                                            disableElevation 
-                                            disabled={!customer.id || isSubmitting}
-                                            // onClick={() => fetchNextData()}                                
-                                            startIcon={<PhoneIcon />}
-                                            sx={{
-                                                display: 'inline-flex',                                                                        
-                                                width: '100%', 
-                                                height: 40,
-                                                marginTop: '4px',
-                                                [theme.breakpoints.down('sm')]: {
-                                                    marginTop: '1px',
-                                                },                                   
-                                            }}
-                                        >
-                                            Pokaż konsultacje
-                                        </Button>
-                                        <Button                                 
-                                            variant="contained"
-                                            disableElevation 
-                                            disabled={!customer.id || isSubmitting}
-                                            // onClick={() => fetchNextData()}                                
-                                            startIcon={<AddIcon />}
-                                            sx={{
-                                                display: 'inline-flex',                                                                        
-                                                width: '100%', 
-                                                height: 40,
-                                                marginTop: '4px',
-                                                [theme.breakpoints.down('sm')]: {
-                                                    marginTop: '1px',
-                                                },                                   
-                                            }}
-                                        >
-                                            Utwórz zlecenie
-                                        </Button>
                                     </Grid>                                    
                                 </Grid>
-                            );
+                            )
                         }}
                     </Formik>  
                 </CardContent>

@@ -270,7 +270,7 @@ export const ServiceRequests = () => {
             
             openMessageDialog({
                 title: 'Błąd aplikacji',
-                text: error.response ? `${error.response.status} - ` : '' + 'Nieudane pobranie listy zleceń'
+                text: (error.response ? `${error.response.status} - ` : '') + 'Nieudane pobranie listy zleceń'
             });
         })
         .finally(() => {
@@ -352,15 +352,15 @@ export const ServiceRequests = () => {
             signal: abortController.signal 
         })              
         .then(() => {                       
-            return true;
+            return true;            
         })        
         .catch((error) => {            
             if (error.name === 'AbortError' || 
-                error.name === 'CanceledError') return;
-            
+                error.name === 'CanceledError') return;                    
+
             openMessageDialog({
                 title: 'Błąd aplikacji',
-                text: error.response ? `${error.response.status} - ` : '' + `${errorMessage}`
+                text: (error.response ? `${error.response.status} - ` : '') + errorMessage
             });
 
             return false;
@@ -374,7 +374,7 @@ export const ServiceRequests = () => {
     }, [api, abortController.signal, openMessageDialog, showLoadingIcon]);  
 
     const deleteSingle = useCallback(async (id: number) => {
-        const result = await deleteAsync(`${config.API_URL}/employees/${id}`, 'Nieudane usunięcie pracownika');        
+        const result = await deleteAsync(`${config.API_URL}/service-requests/${id}`, 'Nieudane usunięcie zlecenia serwisowego');        
         if (!result) {            
             return;
         }
@@ -383,18 +383,18 @@ export const ServiceRequests = () => {
     }, [requests, deleteAsync]);
 
     const handleDelete = useCallback((row: object) => {
-        const employee = row as IServiceRequestRow;
+        const request = row as IServiceRequestRow;
 
         openQuestionDialog({
             title: 'Pracownicy',
-            text: `Czy na pewno usunąć pracownika ${employee.name}?`,            
+            text: `Czy na pewno usunąć zlecenie serwisowe ${request.name}?`,            
             action: deleteSingle,
-            actionParameters: employee.id
+            actionParameters: request.id
         });
     }, [deleteSingle, openQuestionDialog]);
 
     const deleteAll = useCallback(async () => {
-        const result = await deleteAsync(`${config.API_URL}/employees`, 'Nieudane usunięcie wszystkich pracowników');        
+        const result = await deleteAsync(`${config.API_URL}/service-requests`, 'Nieudane usunięcie wszystkich zleceń serwisowych');        
         if (!result) {            
             return;
         }
@@ -405,7 +405,7 @@ export const ServiceRequests = () => {
     const handleDeleteAll = useCallback(() => {        
         openQuestionDialog({
             title: 'Pracownicy',
-            text: 'Czy na pewno usunąć wszystkich pracowników?',
+            text: 'Czy na pewno usunąć wszystkie zlecenia serwisowe?',
             action: deleteAll,
             //actionParameters: [1, 2, 3]
         });

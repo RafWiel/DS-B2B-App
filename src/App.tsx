@@ -33,6 +33,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { plPL } from '@mui/x-date-pickers/locales';
 import 'dayjs/locale/pl';
 import { plPL as corePlPL } from '@mui/material/locale';
+import { ServiceRequest } from './pages/ServiceRequest';
 
 const todo = 'Pamietaj skad bylo wywolanie karty pracownika, moze byc z karty firmy. Po usunieciu nie wracaj na sztywno do listy pracownikow';
 const todo1 = 'Pobaw sie zoomem, popraw szerokosc kolumn. Chyba trzeba zrobic wiecej przedzialow';
@@ -312,26 +313,29 @@ export default function App() {
                             <Route path={routes.company}>
                                 <Company />
                             </Route>
-                            <Route path={routes.customers}>
-                                <Customers />
+                            <Route path={routes.companyCustomer}>
+                                <Customer />
                             </Route>
                             <Route path={routes.customer}>
                                 <Customer />
                             </Route>
-                            <Route path={routes.companyCustomer}>
-                                <Customer />
+                            <Route path={routes.customers}>
+                                <Customers />
+                            </Route>                                                                                    
+                            <Route path={routes.employee}>
+                                <Employee />
                             </Route>
                             <Route path={routes.employees}>
                                 <Employees />
-                            </Route>
-                            <Route path={routes.employee}>
-                                <Employee />
                             </Route>
                             <Route path={routes.phoneConsultations}>
                                 <PhoneConsultations />
                             </Route>          
                             <Route path={routes.registrationRequests}>
                                 <RegistrationRequests />
+                            </Route>                            
+                            <Route path={routes.serviceRequest}>
+                                <ServiceRequest />
                             </Route>
                             <Route path={routes.serviceRequests}>
                                 <ServiceRequests />

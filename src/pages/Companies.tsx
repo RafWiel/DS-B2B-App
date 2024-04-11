@@ -153,7 +153,7 @@ export const Companies = () => {
             
             openMessageDialog({
                 title: 'Błąd aplikacji',
-                text: error.response ? `${error.response.status} - ` : '' + 'Nieudane pobranie listy firm'                
+                text: (error.response ? `${error.response.status} - ` : '') + 'Nieudane pobranie listy firm'                
             });
         })
         .finally(() => {
@@ -262,7 +262,7 @@ export const Companies = () => {
             
             openMessageDialog({
                 title: 'Błąd aplikacji',
-                text: error.response ? `${error.response.status} - ` : '' + `${errorMessage}`
+                text: (error.response ? `${error.response.status} - ` : '') + errorMessage
             });
 
             return false;

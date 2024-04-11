@@ -143,7 +143,7 @@ export const Company = () => {
             
             openMessageDialog({
                 title: 'Błąd aplikacji',
-                text: error.response ? `${error.response.status} - ` : '' + 'Nieudane pobranie danych firmy'
+                text: (error.response ? `${error.response.status} - ` : '') + 'Nieudane pobranie danych firmy'
             });
 
             navigate('/companies');
@@ -195,7 +195,7 @@ export const Company = () => {
 
             openMessageDialog({
                 title: 'Błąd aplikacji',
-                text: error.response ? `${error.response.status} - ` : '' + `${errorMessage}`
+                text: (error.response ? `${error.response.status} - ` : '') + errorMessage
             });
         })        
         .finally(() => {           
@@ -243,7 +243,7 @@ export const Company = () => {
             
             openMessageDialog({
                 title: 'Błąd aplikacji',
-                text: error.response ? `${error.response.status} - ` : '' + `${errorMessage}`                
+                text: (error.response ? `${error.response.status} - ` : '') + errorMessage
             });
 
             return false;
