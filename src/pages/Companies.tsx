@@ -12,7 +12,7 @@ import { config } from "../config/config";
 import debounce from 'lodash/debounce';
 import queryString from 'query-string';
 import { useLocation } from 'wouter';
-import useApi from '../hooks/useApi.ts';
+import { useApi } from '../hooks/useApi.ts';
 
 interface ICompanyRow extends IBaseRow {
     name: string;

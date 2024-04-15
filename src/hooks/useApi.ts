@@ -5,7 +5,7 @@ import { config } from '../config/config.ts';
 //import { ILoginResponse } from '../interfaces/ILoginResponse.ts';
 //import { useAuth } from './useAuth.ts';
 
-const useApi = () => {
+export const useApi = () => {
     //const auth = useAuth();
 
     const api = axios.create({
@@ -95,4 +95,3 @@ const useApi = () => {
     return api;
 }
 
-export default useApi;

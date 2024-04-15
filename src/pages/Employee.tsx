@@ -18,7 +18,7 @@ import ClearIcon from '@mui/icons-material/Clear';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import { IIdResponse } from "../interfaces/IIdResponse.ts";
 import '../assets/card.css';
-import useApi from '../hooks/useApi.ts';
+import { useApi } from '../hooks/useApi.ts';
 
 export const Employee = () => {
     const theme = useTheme();  

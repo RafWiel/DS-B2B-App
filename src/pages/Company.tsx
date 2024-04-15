@@ -18,7 +18,7 @@ import { IIdResponse } from "../interfaces/IIdResponse.ts";
 import '../assets/card.css';
 import { DataGrid, IBaseRow, IColumn, IDataGridRef } from "../components/DataGrid.tsx";
 import { ICustomer } from "../interfaces/ICustomer.ts";
-import useApi from '../hooks/useApi.ts';
+import { useApi } from '../hooks/useApi.ts';
 
 interface ICustomerRow extends IBaseRow {
     login: string,

@@ -12,7 +12,7 @@ import { config } from "../config/config";
 import debounce from 'lodash/debounce';
 import queryString from 'query-string';
 import { useLocation } from 'wouter';
-import useApi from '../hooks/useApi.ts';
+import { useApi } from '../hooks/useApi.ts';
 import { serviceRequestType } from "../enums/serviceRequestType.ts";
 import dayjs, { Dayjs } from "dayjs";
 import { ownershipType } from "../enums/ownershipType.ts";

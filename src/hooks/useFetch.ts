@@ -2,9 +2,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from 'react';
 import { useAppStore } from '../store';
-import useApi from './useApi';
+import { useApi } from './useApi';
 
-const useFetch = <T,>(url: string, errorMessage: string): T | null => {
+export const useFetch = <T,>(url: string, errorMessage: string): T | null => {
     const [data, setData] = useState(null);
     const showLoadingIcon = useAppStore((state) => state.showLoadingIcon);
     const openMessageDialog = useAppStore((state) => state.openMessageDialog);   
@@ -47,5 +47,3 @@ const useFetch = <T,>(url: string, errorMessage: string): T | null => {
 
     return data;
 }
-
-export default useFetch;

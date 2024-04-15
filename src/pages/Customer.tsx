@@ -22,8 +22,8 @@ import AddIcon from '@mui/icons-material/Add';
 import { IIdResponse } from "../interfaces/IIdResponse.ts";
 import '../assets/card.css';
 import { IList } from "../interfaces/IList.ts";
-import useFetch from "../hooks/useFetch.ts";
-import useApi from '../hooks/useApi.ts';
+import { useFetch } from "../hooks/useFetch.ts";
+import { useApi } from '../hooks/useApi.ts';
 
 export const Customer = () => {
     const theme = useTheme();  

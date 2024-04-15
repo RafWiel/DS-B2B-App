@@ -13,7 +13,7 @@ import { employeeType } from "../enums/employeeType";
 import debounce from 'lodash/debounce';
 import queryString from 'query-string';
 import { useLocation } from 'wouter';
-import useApi from '../hooks/useApi.ts';
+import { useApi } from '../hooks/useApi.ts';
 
 interface IEmployeeRow extends IBaseRow {
     login: string;
