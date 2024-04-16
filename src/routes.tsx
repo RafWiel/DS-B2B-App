@@ -11,6 +11,7 @@ const company = '/companies/:id';
 const companyCustomer = '/companies/:companyId/customers/:id';
 const customer = '/customers/:id';
 const customers = '/customers';
+const customerServiceRequest = '/customers/:id/service-request';
 const employee = '/employees/:id';
 const employees = '/employees';
 const phoneConsultations = '/phone-consultations';
@@ -24,7 +25,8 @@ const routes = {
     company,     
     companyCustomer,
     customer,
-    customers,    
+    customers, 
+    customerServiceRequest,   
     employee, 
     employees,       
     phoneConsultations,
@@ -55,6 +57,10 @@ const routes = {
     }, {
         id: customer,
         text: 'Klient',
+        isSidebarItem: false  
+    }, {
+        id: customerServiceRequest,
+        text: 'Nowe zlecenie serwisowe',
         isSidebarItem: false  
     }, {        
         id: customers,

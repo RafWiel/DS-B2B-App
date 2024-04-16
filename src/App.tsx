@@ -34,8 +34,9 @@ import { plPL } from '@mui/x-date-pickers/locales';
 import 'dayjs/locale/pl';
 import { plPL as corePlPL } from '@mui/material/locale';
 import { ServiceRequest } from './pages/ServiceRequest';
+import { NewServiceRequest } from './pages/NewServiceRequest';
 
-const todo = 'Pobaw sie zoomem, popraw szerokosc kolumn. Chyba trzeba zrobic wiecej przedzialow';
+const todo = 'Nowe zlecenie';//'Pobaw sie zoomem, popraw szerokosc kolumn. Chyba trzeba zrobic wiecej przedzialow';
 
 interface AppBarProps extends MuiAppBarProps {
     open?: boolean;
@@ -326,7 +327,10 @@ export default function App() {
                             </Route>
                             <Route path={routes.customers}>
                                 <Customers />
-                            </Route>                                                                                    
+                            </Route>
+                            <Route path={routes.customerServiceRequest}>
+                                <NewServiceRequest />
+                            </Route>
                             <Route path={routes.employee}>
                                 <Employee />
                             </Route>

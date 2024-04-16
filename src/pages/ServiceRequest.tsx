@@ -20,6 +20,7 @@ import { ICustomer } from "../interfaces/ICustomer.ts";
 import { useApi } from '../hooks/useApi.ts';
 import { IServiceRequest } from "../interfaces/IServiceRequest.ts";
 import BadgeIcon from '@mui/icons-material/Badge';
+import dayjs from "dayjs";
 
 interface ICustomerRow extends IBaseRow {
     login: string,
@@ -337,108 +338,149 @@ export const ServiceRequest = () => {
                                         sm={12} 
                                         md={10} 
                                         // sx={{                                
-                                        //     backgroundColor: 'aqua',                                
+                                        //     backgroundColor: 'yellow',                                
                                         // }}
                                     >      
                                         <Typography className="card-title" component="div">
                                             Zlecenie
                                         </Typography>                                
+                                        {/* 2 columns */}
                                         <Grid                                         
                                             container 
                                             spacing={2}
-                                            
-                                        >                                            
+                                            // sx={{                                
+                                            //     backgroundColor: 'blue',                                
+                                            // }}
+                                        >
+                                            {/* Column 1 */}
                                             <Grid 
                                                 item 
-                                                sm={4} 
-                                                xs={6} 
-                                                sx={{ mt: 1 }}
+                                                xs={6}                                                 
+                                                // sx={{                                
+                                                //     backgroundColor: 'aqua',
+                                                // }}
                                             >
-                                                <TextField 
-                                                    error={touched?.topic && !!errors?.topic}
-                                                    helperText={touched?.topic && errors?.topic}
-                                                    name="topic"
-                                                    value={values.topic} 
-                                                    label="Tytuł" 
-                                                    onChange={handleChange}                                                                              
-                                                    fullWidth                                 
-                                                    variant="standard"                                                                                    
-                                                    // inputProps={{ style: { fontSize: '14px' } }}
-                                                />  
-                                            </Grid>
+                                                <Grid                                         
+                                                    container 
+                                                    spacing={2}                                                    
+                                                >   
+                                                    <Grid 
+                                                        item                                                         
+                                                        xs={12} 
+                                                        sx={{ mt: 1 }}
+                                                    >
+                                                        <TextField 
+                                                            error={touched?.topic && !!errors?.topic}
+                                                            helperText={touched?.topic && errors?.topic}
+                                                            name="topic"
+                                                            value={values.topic} 
+                                                            label="Tytuł" 
+                                                            onChange={handleChange}                                                                              
+                                                            fullWidth                                 
+                                                            variant="standard"                                                                                    
+                                                            // inputProps={{ style: { fontSize: '14px' } }}
+                                                        />  
+                                                    </Grid>
+                                                    <Grid 
+                                                        item                                                          
+                                                        xs={12}
+                                                        sx={{ mt: 1 }}
+                                                    >
+                                                        <TextField 
+                                                            error={touched?.description && !!errors?.description}
+                                                            helperText={touched?.description && errors?.description}
+                                                            name="description"                                                    
+                                                            value={values.description} 
+                                                            label="Opis" 
+                                                            onChange={handleChange}                                                     
+                                                            fullWidth                                 
+                                                            variant="standard" 
+                                                            multiline  
+                                                            rows={4}                              
+                                                        />  
+                                                    </Grid>
+                                                </Grid>
+                                            </Grid> 
+                                            {/* Column 2 */}
                                             <Grid 
                                                 item 
-                                                sm={4} 
-                                                xs={6}
-                                                sx={{ mt: 1 }}
+                                                xs={6}                                              
+                                                // sx={{                                
+                                                //     backgroundColor: 'aqua',
+                                                // }}
                                             >
-                                                <TextField 
-                                                    error={touched?.description && !!errors?.description}
-                                                    helperText={touched?.description && errors?.description}
-                                                    name="description"                                                    
-                                                    value={values.description} 
-                                                    label="Opis" 
-                                                    onChange={handleChange}                                                     
-                                                    fullWidth                                 
-                                                    variant="standard" 
-                                                    multiline  
-                                                    rows={4}                              
-                                                />  
+                                                <Grid                                         
+                                                    container 
+                                                    spacing={2}
+                                                    
+                                                >                                            
+                                                    <Grid 
+                                                        item                                                         
+                                                        xs={3} 
+                                                        sx={{ mt: 1 }}
+                                                    >
+                                                        <TextField 
+                                                            name="status"
+                                                            value={values.status} 
+                                                            label="Status" 
+                                                            fullWidth                                 
+                                                            variant="standard"                                                                                    
+                                                            inputProps={
+                                                                { readOnly: true, }
+                                                            }
+                                                        />  
+                                                    </Grid>
+                                                    <Grid 
+                                                        item                                                         
+                                                        xs={3}
+                                                        sx={{ mt: 1 }}
+                                                    >
+                                                        <TextField 
+                                                            name="status"
+                                                            value={dayjs(values.creationDate).format('DD/MM/YYYY')} 
+                                                            label="Data utworzenia" 
+                                                            fullWidth                                 
+                                                            variant="standard"                                                                                    
+                                                            inputProps={
+                                                                { readOnly: true, }
+                                                            }
+                                                        />   
+                                                    </Grid>
+                                                    <Grid 
+                                                        item                                                         
+                                                        xs={3}
+                                                        sx={{ mt: 1 }}
+                                                    >
+                                                        <TextField 
+                                                            name="type"
+                                                            value={values.requestType} 
+                                                            label="Typ" 
+                                                            fullWidth                                 
+                                                            variant="standard"                                                                                    
+                                                            inputProps={
+                                                                { readOnly: true, }
+                                                            }
+                                                        />  
+                                                    </Grid>                                            
+                                                    <Grid 
+                                                        item 
+                                                        xs={3}
+                                                        sx={{ mt: 1 }}
+                                                    >
+                                                        <TextField 
+                                                            name="type"
+                                                            value={values.submitType} 
+                                                            label="Źródło" 
+                                                            fullWidth                                 
+                                                            variant="standard"                                                                                    
+                                                            inputProps={
+                                                                { readOnly: true, }
+                                                            }
+                                                        />  
+                                                    </Grid>                                                    
+                                                </Grid>  
                                             </Grid>
-                                            <Grid 
-                                                item 
-                                                sm={4} 
-                                                xs={6}
-                                                sx={{ mt: 1 }}
-                                            >
-                                                <TextField 
-                                                    error={touched?.taxNumber && !!errors?.taxNumber}
-                                                    helperText={touched?.taxNumber && errors?.taxNumber}           
-                                                    name="taxNumber"                                                    
-                                                    value={values.taxNumber} 
-                                                    label="NIP" 
-                                                    onChange={handleChange}                                                               
-                                                    fullWidth                                 
-                                                    variant="standard"                                 
-                                                />  
-                                            </Grid>                                            
-                                            <Grid item sm={4} xs={6}>
-                                                <TextField 
-                                                    error={touched?.address && !!errors?.address}
-                                                    helperText={touched?.address && errors?.address}                        
-                                                    name="address"                                                    
-                                                    value={values.address} 
-                                                    label="Adres" 
-                                                    onChange={handleChange}                                                     
-                                                    fullWidth                                 
-                                                    variant="standard"                                 
-                                                />  
-                                            </Grid>
-                                            <Grid item sm={4} xs={6}>
-                                                <TextField 
-                                                    error={touched?.postal && !!errors?.postal}
-                                                    helperText={touched?.postal && errors?.postal}                        
-                                                    name="postal"                                                    
-                                                    value={values.postal} 
-                                                    label="Kod pocztowy" 
-                                                    onChange={handleChange}                                                     
-                                                    fullWidth                                 
-                                                    variant="standard"                                 
-                                                />  
-                                            </Grid>
-                                            <Grid item sm={4} xs={6}>
-                                                <TextField 
-                                                    error={touched?.city && !!errors?.city}
-                                                    helperText={touched?.city && errors?.city}                        
-                                                    name="city"                                                    
-                                                    value={values.city} 
-                                                    label="Miasto" 
-                                                    onChange={handleChange}                                                     
-                                                    fullWidth                                 
-                                                    variant="standard"                                 
-                                                />  
-                                            </Grid>
-                                        </Grid>                                    
+                                        </Grid>                                  
                                     </Grid>
                                     {/* Buttons grid */}
                                     <Grid                             

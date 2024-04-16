@@ -25,7 +25,7 @@ import { IList } from "../interfaces/IList.ts";
 import { useFetch } from "../hooks/useFetch.ts";
 import { useApi } from '../hooks/useApi.ts';
 
-export const Customer = () => {
+export const NewServiceRequest = () => {
     const theme = useTheme();  
     const setAppBarTitle = useAppStore((state) => state.setAppBarTitle);       
     const showLoadingIcon = useAppStore((state) => state.showLoadingIcon);
@@ -34,7 +34,7 @@ export const Customer = () => {
     const openQuestionDialog = useAppStore((state) => state.openQuestionDialog); 
     const [, params] = useRoute("/customers/:id");    
     const [, companyParams] = useRoute("/companies/:companyId/customers/:id");    
-    const [location, navigate] = useLocation();    
+    const [, navigate] = useLocation();    
     const abortController = useRef(new AbortController()).current;     
     const companies = useFetch<Array<IList>>(`${config.API_URL}/companies/list`, 'Nieudane pobranie listy firm'); 
     const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
@@ -67,7 +67,7 @@ export const Customer = () => {
     }); 
 
     useEffect(() => {                        
-        setAppBarTitle('Klient');   
+        setAppBarTitle('Nowe zlecenie serwisowe');   
         fetchData();                        
 
         return () => {            
@@ -484,7 +484,7 @@ export const Customer = () => {
                                             variant="contained"
                                             disableElevation 
                                             disabled={!customer.id || isSubmitting}
-                                            onClick={() => navigate(`${location}/service-request`)}                                
+                                            // onClick={() => fetchNextData()}                                
                                             startIcon={<AddIcon />}
                                             sx={{
                                                 display: 'inline-flex',                                                                        
