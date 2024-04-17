@@ -1,13 +1,17 @@
+const min = 0;
 const none = 0;
 const software = 1;
 const hardware = 2;
 const other = 3;
+const max = 3;
 
 export const serviceRequestType = {
+    min,
     none,
     software,
     hardware,
     other,
+    max,
 
     items: [{
         id: none, 
