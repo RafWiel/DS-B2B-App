@@ -94,6 +94,8 @@ export const Customers = () => {
     const abortController = useRef(new AbortController()).current;  
     const [dataGridHeight, setDataGridHeight] = useState(0);
     const api = useApi();    
+    const setPreviousLocation = useAppStore((state) => state.setPreviousLocation); 
+    const [location, ] = useLocation();  
     
     const [state, setState] = useState<FetchState>({
         search: '',
@@ -341,6 +343,11 @@ export const Customers = () => {
         //console.log('calculatedContainerHeight', window.innerHeight - appBarHeight);    
     }    
 
+    const handleDataGridRowClick = (id: number) => {
+        setPreviousLocation(location);
+        navigate(`/customers/${id}`);
+    }
+
     return (
         <Box 
             id="main-container"                   
@@ -420,7 +427,7 @@ export const Customers = () => {
                                 deleteAllRows={handleDeleteAll} 
                                 fetchNextData={fetchNextData}        
                                 setSorting={setSorting}
-                                onRowClick={(id: number) => navigate(`/customers/${id}`)}
+                                onRowClick={(id: number) => handleDataGridRowClick(id)}
                             />
                         </Grid>
                         <Grid 

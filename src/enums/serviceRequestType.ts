@@ -1,9 +1,10 @@
-const min = 0;
 const none = 0;
 const software = 1;
 const hardware = 2;
 const other = 3;
-const max = 3;
+
+const min = software;
+const max = other;
 
 export const serviceRequestType = {
     min,

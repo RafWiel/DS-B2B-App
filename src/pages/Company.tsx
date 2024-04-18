@@ -86,8 +86,9 @@ export const Company = () => {
     const isXsMobileView = useMediaQuery(theme.breakpoints.only("xs"));           
     const postalRegExp = /^[0-9]{2}-[0-9]{3}$/    
     const api = useApi();
-    const previousLocation = useAppStore((state) => state.previousLocation); 
-
+    const setPreviousLocation = useAppStore((state) => state.setPreviousLocation); 
+    const [location, ] = useLocation();  
+    
     const schema = yup.object().shape({                                                    
         name: yup.string().required('Podaj nazwę'),
         erpId: yup.number().typeError('Nieprawidłowy ERP Id').required('Podaj ERP Id'),
@@ -147,7 +148,7 @@ export const Company = () => {
                 text: (error.response ? `${error.response.status} - ` : '') + 'Nieudane pobranie danych firmy'
             });
 
-            navigate(previousLocation);
+            navigate('/companies');
         })
         .finally(() => showLoadingIcon(false));         
     }
@@ -226,7 +227,7 @@ export const Company = () => {
             return;
         }
 
-        navigate(previousLocation);
+        navigate('/companies');
     }   
 
     const deleteAsync = useCallback(async (url: string, errorMessage: string) => {
@@ -303,7 +304,12 @@ export const Company = () => {
         
         setMainCardHeight(mainCardHeight);    
         setDataGridHeight(window.innerHeight - appBarHeight - mainCardHeight - titleHeight - mainMargin * 3 - datagridMargin);                    
-    }  
+    } 
+    
+    const handleDataGridRowClick = (id: number) => {
+        setPreviousLocation(location);
+        navigate(`/customers/${id}`);
+    }
 
     return (
         <Box         
@@ -604,7 +610,7 @@ export const Company = () => {
                                 deleteAllRows={handleDeleteAllCustomers} 
                                 fetchNextData={() => void 0}        
                                 setSorting={() => void 0}
-                                onRowClick={(id: number) => navigate(`/customers/${id}`)}
+                                onRowClick={(id: number) => handleDataGridRowClick(id)} 
                             />
                         </Grid>
                         <Grid 

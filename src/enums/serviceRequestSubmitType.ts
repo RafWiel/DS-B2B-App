@@ -1,10 +1,11 @@
-const min = 0;
 const none = 0;
 const www = 1;
 const email = 2;
 const phone = 3;
 const internal = 4;
-const max = 4;
+
+const min = www;
+const max = internal;
 
 export const serviceRequestSubmitType = {
     min,

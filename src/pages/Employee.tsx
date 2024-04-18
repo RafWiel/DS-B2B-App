@@ -30,8 +30,7 @@ export const Employee = () => {
     const [, params] = useRoute("/employees/:id");
     const [, navigate] = useLocation();    
     const abortController = useRef(new AbortController()).current;      
-    const api = useApi();
-    const previousLocation = useAppStore((state) => state.previousLocation); 
+    const api = useApi();    
     
     const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
 
@@ -87,7 +86,7 @@ export const Employee = () => {
                 text: (error.response ? `${error.response.status} - ` : '') + 'Nieudane pobranie danych pracownika'
             });
 
-            navigate(previousLocation);
+            navigate('/employees');
         })
         .finally(() => showLoadingIcon(false));         
     }
@@ -163,7 +162,7 @@ export const Employee = () => {
             signal: abortController.signal 
         })              
         .then(() => {                       
-            navigate(previousLocation);
+            navigate('/employees');
         })        
         .catch((error) => {
             if (error.name === 'AbortError' || 

@@ -71,8 +71,7 @@ export default function App() {
     const openMobileSideBar = useAppStore((state) => state.openMobile);         
     const appBarTitle = useAppStore((state) => state.appBarTitle);         
     const setAppBarTitle = useAppStore((state) => state.setAppBarTitle);     
-    const isLoadingIcon = useAppStore((state) => state.isLoadingIcon);      
-    const setPreviousLocation = useAppStore((state) => state.setPreviousLocation); 
+    const isLoadingIcon = useAppStore((state) => state.isLoadingIcon);          
 
     const fontSize = '0.8rem';
 
@@ -186,8 +185,8 @@ export default function App() {
         }
 
         return () => {
-            console.log('previous', location);
-            setPreviousLocation(location);
+            //console.log('previous', location);
+            //setPreviousLocation(location);
         }
     }, [location, setAppBarTitle]);
     

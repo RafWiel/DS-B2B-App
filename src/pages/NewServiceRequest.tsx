@@ -33,8 +33,7 @@ export const NewServiceRequest = () => {
     const [, navigate] = useLocation();    
     const abortController = useRef(new AbortController()).current;     
     const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
-    const api = useApi();
-    const previousLocation = useAppStore((state) => state.previousLocation); 
+    const api = useApi();    
     const customer = useFetch<ICustomer>(`${config.API_URL}/customers/${Number(params?.id)}`, 'Nieudane pobranie danych klienta'); 
 
     //console.log('company id', companyParams?.companyId);
@@ -88,7 +87,11 @@ export const NewServiceRequest = () => {
                 title: 'Nowe zlecenie serwisowe',
                 text: 'Zapisano',
                 delay: 1000
-            });             
+            });     
+            
+            setTimeout(() => {
+                navigate(`/customers/${Number(params?.id)}`);
+            }, 1000);
         })              
         .catch((error) => {
             if (error.name === 'AbortError' || 
