@@ -81,15 +81,13 @@ interface IHeadProps {
 export type Order = 'asc' | 'desc';
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
-    if (b[orderBy] < a[orderBy]) {
-        return -1;
-    }
-  
-    if (b[orderBy] > a[orderBy]) {
-        return 1;
-    }
-    
+    //server side sorting
     return 0;
+    
+    if (!a[orderBy] || !b[orderBy])
+        return 0;
+    
+    return (b[orderBy] as string).localeCompare(a[orderBy] as string);        
 }
 
 function getComparator<Key extends keyof any>(

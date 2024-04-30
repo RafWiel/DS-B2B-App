@@ -163,6 +163,17 @@ export const ServiceRequests = () => {
         handleResize();              
         window.addEventListener('resize', handleResize);
 
+        // const a = 'e';
+        // const b = 'Klient 21';
+
+        // if (b < a)
+        //     console.log(-1);
+
+        // if (b > a)
+        //     console.log(1);
+
+        // console.log('locale', a.localeCompare(b));
+
         return () => {
           showLoadingIcon(false);
           abortController.abort();
@@ -256,6 +267,8 @@ export const ServiceRequests = () => {
                 return;
             }            
             
+            console.log('newRequests', newRequests);
+
             if (stateValue.isReset) {
                 setRequests(newRequests);
             }
