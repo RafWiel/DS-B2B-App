@@ -21,6 +21,8 @@ import { INewServiceRequest } from "../interfaces/INewServiceRequest.ts";
 import { serviceRequestType } from "../enums/serviceRequestType.ts";
 import { serviceRequestSubmitType } from "../enums/serviceRequestSubmitType.ts";
 import { ICustomer } from "../interfaces/ICustomer.ts";
+import { softwareProductType } from "../enums/softwareProductType.ts";
+import { softwareModuleType } from "../enums/softwareModuleType.ts";
 
 export const NewServiceRequest = () => {
     const theme = useTheme();  
@@ -32,7 +34,6 @@ export const NewServiceRequest = () => {
     const [, params] = useRoute("/customers/:id/service-request");    
     const [, navigate] = useLocation();    
     const abortController = useRef(new AbortController()).current;     
-    const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
     const api = useApi();    
     const customer = useFetch<ICustomer>(`${config.API_URL}/customers/${Number(params?.id)}`, 'Nieudane pobranie danych klienta'); 
 
@@ -45,6 +46,7 @@ export const NewServiceRequest = () => {
         description: yup.string(),
         requestType: yup.number().required('Wybierz typ').min(serviceRequestType.min, 'Wybierz typ').max(serviceRequestType.max, 'Wybierz typ'),
         submitType: yup.number().required('Wybierz źródło').min(serviceRequestSubmitType.min, 'Wybierz źródło').max(serviceRequestSubmitType.max, 'Wybierz źródło'),
+        softwareProduct: yup.number().required('Wybierz produkt').min(softwareProductType.min, 'Wybierz produkt').max(softwareProductType.max, 'Wybierz produkt'),
     });
 
     const [request, setRequest] = useState<INewServiceRequest>({         
@@ -53,7 +55,11 @@ export const NewServiceRequest = () => {
         topic: '',        
         description: '',        
         requestType: 0,
-        submitType: 0,        
+        submitType: 0,  
+        softwareProduct: 0,
+        softwareModule: 0,
+        softwareVersion: '',
+        softwareOS: 0,  
     }); 
 
     useEffect(() => {                        
@@ -271,7 +277,7 @@ export const NewServiceRequest = () => {
                                                                 }                                
                                                             </Select>
                                                             <FormHelperText>
-                                                                {touched?.requestType && errors?.requestType}
+                                                                {errors?.requestType}
                                                             </FormHelperText>
                                                         </FormControl>   
                                                     </Grid>                                          
@@ -301,7 +307,7 @@ export const NewServiceRequest = () => {
                                                                 }                                
                                                             </Select>
                                                             <FormHelperText>
-                                                                {touched?.submitType && errors?.submitType}
+                                                                {errors?.submitType}
                                                             </FormHelperText>
                                                         </FormControl>   
                                                     </Grid>  
@@ -320,7 +326,73 @@ export const NewServiceRequest = () => {
                                                                 { readOnly: true, }
                                                             }
                                                         />  
-                                                    </Grid>                                                    
+                                                    </Grid>
+
+
+
+                                                    <Grid 
+                                                        item 
+                                                        xs={4}
+                                                        sx={{ mt: 1 }}
+                                                    >
+                                                        <FormControl 
+                                                            error={touched?.softwareProduct && !!errors?.softwareProduct}
+                                                            variant="standard" 
+                                                            fullWidth 
+                                                        >
+                                                            <InputLabel id="softwareProduct">Product</InputLabel>
+                                                            <Select
+                                                                displayEmpty                                                        
+                                                                labelId="softwareProduct"
+                                                                name="softwareProduct"
+                                                                value={values.softwareProduct}
+                                                                onChange={handleChange}
+                                                            >
+                                                                {
+                                                                    softwareProductType && softwareProductType.items
+                                                                    .sort((a, b) => a.text.localeCompare(b.text))                                                                     
+                                                                        .map((item) => (
+                                                                            <MenuItem key={item.id} value={item.id}>{item.text}&nbsp;</MenuItem>                                    
+                                                                        ))
+                                                                }                                
+                                                            </Select>
+                                                            <FormHelperText>
+                                                                {errors?.softwareProduct}
+                                                            </FormHelperText>
+                                                        </FormControl>   
+                                                    </Grid> 
+                                                    <Grid 
+                                                        item 
+                                                        xs={4}
+                                                        sx={{ mt: 1 }}
+                                                    >
+                                                        <FormControl 
+                                                            error={touched?.softwareModule && !!errors?.softwareModule}
+                                                            variant="standard" 
+                                                            fullWidth 
+                                                        >
+                                                            <InputLabel id="softwareModule">Moduł</InputLabel>
+                                                            <Select
+                                                                displayEmpty                                                        
+                                                                labelId="softwareModule"
+                                                                name="softwareModule"
+                                                                value={values.softwareModule}
+                                                                onChange={handleChange}
+                                                            >
+                                                                {
+                                                                    softwareModuleType && softwareModuleType.items
+                                                                        .filter(u => u.productId.includes(values.softwareProduct))  
+                                                                        .sort((a, b) => a.text.localeCompare(b.text))       
+                                                                        .map((item) => (
+                                                                            <MenuItem key={item.id} value={item.id}>{item.text}&nbsp;</MenuItem>                                    
+                                                                        ))
+                                                                }                                
+                                                            </Select>
+                                                            <FormHelperText>
+                                                                {errors?.softwareModule}
+                                                            </FormHelperText>
+                                                        </FormControl>   
+                                                    </Grid>                                                     
                                                 </Grid>  
                                             </Grid>
                                         </Grid>                                   

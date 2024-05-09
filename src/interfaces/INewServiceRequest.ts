@@ -5,4 +5,8 @@ export interface INewServiceRequest {
     description: string;    
     requestType: number;
     submitType: number;    
+    softwareProduct: number;
+    softwareModule: number;
+    softwareVersion: string;
+    softwareOS: number;
 }
