@@ -159,7 +159,7 @@ export const ServiceRequests = () => {
     //console.log('render', state.page);    
 
     useEffect(() => {                    
-        parseUrl();        
+        parseUrl();
         handleResize();              
         window.addEventListener('resize', handleResize);
 
@@ -177,7 +177,7 @@ export const ServiceRequests = () => {
         return () => {
           showLoadingIcon(false);
           abortController.abort();
-          debounceFetchData.cancel();   
+          debounceFetchData.cancel();
           window.removeEventListener('resize', handleResize);       
         }
     }, []);                
@@ -222,10 +222,7 @@ export const ServiceRequests = () => {
             skipNull: true
         });
         
-        if (url.length > 0) {
-            url = `/service-requests?${url}`;
-        }
-
+        url = '/service-requests' + (url.length > 0 ? `?${url}` : '');                
         window.history.replaceState(null, '', url);
     }
 
